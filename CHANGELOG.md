@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.0-alpha.4 — 2026-04-24
+
+- `xmesh-agent dry-run --config <path>` — validates config, adapter creds,
+  SVAF weights completeness, budget sanity, attach mode; no mesh join, no
+  model call. Exits 0 on PASS, 1 on any FAIL.
+
 ## 0.1.0-alpha.3 — 2026-04-24
 
 - Claude Code attach advisory (`src/attach/claude-code.js`) — pre-flight

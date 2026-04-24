@@ -13,10 +13,11 @@ function printHelp() {
       '  xmesh-agent <command> [options]',
       '',
       'Commands:',
-      '  run --config <path>   Start a peer (headless attach) from agent.toml',
-      '  stop <peer-name>      Graceful shutdown of a running peer',
-      '  status <peer-name>    Report peer state, uptime, budget usage',
-      '  cost <peer-name>      Report token + cost counters',
+      '  run --config <path>       Start a peer (headless attach) from agent.toml',
+      '  dry-run --config <path>   Validate config + adapters without joining mesh',
+      '  stop <peer-name>          Graceful shutdown of a running peer',
+      '  status <peer-name>        Report peer state, uptime, budget usage',
+      '  cost <peer-name>          Report token + cost counters',
       '  trace <peer-name> <cmb-id>   Print ancestor lineage for a CMB',
       '',
       '  --help, -h            This message',
@@ -48,6 +49,22 @@ async function dispatchRun(args) {
     return 0;
   } catch (err) {
     process.stderr.write(`xmesh-agent run: ${err.message}\n`);
+    return 1;
+  }
+}
+
+async function dispatchDryRun(args) {
+  const configPath = parseFlag(args, '--config');
+  if (!configPath) {
+    process.stderr.write('xmesh-agent dry-run: missing --config <path>\n');
+    return 2;
+  }
+  try {
+    const { dryRun } = require('./dry-run.js');
+    const result = await dryRun(configPath);
+    return result.ok ? 0 : 1;
+  } catch (err) {
+    process.stderr.write(`xmesh-agent dry-run: ${err.message}\n`);
     return 1;
   }
 }
@@ -135,6 +152,8 @@ async function main(argv) {
   switch (cmd) {
     case 'run':
       return dispatchRun(args.slice(1));
+    case 'dry-run':
+      return dispatchDryRun(args.slice(1));
     case 'stop':
     case 'status':
     case 'cost':
