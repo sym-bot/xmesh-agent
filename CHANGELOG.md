@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.1.0-alpha.11 — 2026-04-24
+
+- Circuit breaker for model adapter (`src/safety/circuit-breaker.js`) —
+  opens after 5 consecutive failures, half-opens after 60s, exponential
+  backoff per consecutive failure (1s → 30s cap)
+- Transient-error detection: 429 / 502 / 503 / 504, "rate limit",
+  "overloaded", "ECONNRESET", "ETIMEDOUT" — these trigger backoff + retry
+- AgentLoop `stats.breaker` exposes state + consecutive failures + next
+  backoff for observability via `xmesh-agent status`
+- Non-transient errors (invalid API key, 4xx other) still open the
+  breaker but do not trigger the sleep-then-retry — fail fast
+
 ## 0.1.0-alpha.10 — 2026-04-24
 
 - Gitleaks secret-scan job in CI — runs on every push/PR, independent of

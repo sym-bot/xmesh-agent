@@ -212,6 +212,71 @@ test('AgentLoop: identity-collision stops running flag', async () => {
   assert.equal(loop.stats.running, false);
 });
 
+test('AgentLoop: circuit breaker opens after consecutive model failures and suppresses subsequent calls', async () => {
+  const { CircuitBreaker } = require('../src/safety/circuit-breaker.js');
+  let calls = 0;
+  const failingModel = {
+    calls: 0,
+    call: async () => {
+      calls += 1;
+      const err = new Error('rate limit exceeded');
+      err.status = 429;
+      throw err;
+    },
+  };
+  const mesh = fakeMesh();
+  const loop = new AgentLoop({
+    mesh,
+    model: failingModel,
+    role: { name: 'r' },
+    circuitBreaker: new CircuitBreaker({ failureThreshold: 3, baseBackoffMs: 1, maxBackoffMs: 1 }),
+    contextLimits: { maxContextTokens: 8000 },
+    cycleDepth: 5,
+    logger: silentLogger,
+  });
+  await loop.start();
+  for (let i = 0; i < 6; i += 1) {
+    await loop._handleAdmission(cmb({ id: 'a' + i, source: 'peer' }));
+  }
+  assert.equal(loop.stats.breaker.state, 'open');
+  assert.equal(calls, 3, 'breaker opened after 3 failures; next calls skipped');
+  assert.equal(loop.stats.cmbsEmitted, 0);
+  assert.ok(loop.stats.cmbsSuppressed >= 6);
+});
+
+test('AgentLoop: successful call resets breaker counter', async () => {
+  const { CircuitBreaker } = require('../src/safety/circuit-breaker.js');
+  let shouldFail = true;
+  const flappyModel = {
+    call: async () => {
+      if (shouldFail) {
+        const err = new Error('overloaded'); err.status = 503; throw err;
+      }
+      return {
+        text: '',
+        toolCalls: [{ id: 'x', name: 'emit_cmb', input: { focus: 'x' } }],
+        usage: { inputTokens: 1, outputTokens: 1, costUsd: 0.001 },
+        stopReason: 'tool_use',
+      };
+    },
+  };
+  const loop = new AgentLoop({
+    mesh: fakeMesh(),
+    model: flappyModel,
+    role: { name: 'r' },
+    circuitBreaker: new CircuitBreaker({ failureThreshold: 3, baseBackoffMs: 1, maxBackoffMs: 1 }),
+    contextLimits: { maxContextTokens: 8000 },
+    cycleDepth: 5,
+    logger: silentLogger,
+  });
+  await loop.start();
+  await loop._handleAdmission(cmb({ id: 'a1', source: 'p' }));
+  assert.equal(loop.stats.breaker.consecutiveFailures, 1);
+  shouldFail = false;
+  await loop._handleAdmission(cmb({ id: 'a2', source: 'p' }));
+  assert.equal(loop.stats.breaker.consecutiveFailures, 0);
+});
+
 test('AgentLoop: cmb-accepted from mesh triggers handler and emits', async () => {
   const toolCall = { id: 't1', name: 'emit_cmb', input: { issue: 'from-handler' } };
   const { loop, mesh } = makeLoop({ model: fakeModel({ toolCall }) });

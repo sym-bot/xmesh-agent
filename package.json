@@ -1,6 +1,6 @@
 {
   "name": "@sym-bot/xmesh-agent",
-  "version": "0.1.0-alpha.10",
+  "version": "0.1.0-alpha.11",
   "description": "Autonomous agent runtime for the xmesh mesh — wake-on-admission reasoning with wake-budget, cycle detection, token cap, and approval gates.",
   "main": "src/index.js",
   "bin": {

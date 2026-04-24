@@ -3,6 +3,7 @@
 const { assembleContext, CAT7_FIELDS } = require('./context.js');
 const { detectCycle } = require('../safety/cycle.js');
 const { checkGates } = require('../safety/gates.js');
+const { CircuitBreaker, isTransientError } = require('../safety/circuit-breaker.js');
 
 const EMIT_CMB_TOOL = {
   name: 'emit_cmb',
@@ -39,6 +40,7 @@ class AgentLoop {
     cycleDepth,
     gatePatterns,
     maxTokensPerCall = 1024,
+    circuitBreaker,
     logger = defaultLogger,
   }) {
     if (!mesh) throw new Error('AgentLoop: mesh required');
@@ -52,6 +54,7 @@ class AgentLoop {
     this.cycleDepth = cycleDepth;
     this.gatePatterns = gatePatterns;
     this.maxTokensPerCall = maxTokensPerCall;
+    this.breaker = circuitBreaker || new CircuitBreaker();
     this.logger = logger;
     this._costUsdTotal = 0;
     this._cmbsEmitted = 0;
@@ -67,6 +70,7 @@ class AgentLoop {
       cmbsEmitted: this._cmbsEmitted,
       cmbsSuppressed: this._cmbsSuppressed,
       inFlight: this._handlingCount,
+      breaker: this.breaker.snapshot(),
     };
   }
 
@@ -104,6 +108,15 @@ class AgentLoop {
         this.logger.warn('wake-budget-soft-warn', { window: wake.warn, counts: wake.counts });
       }
 
+      if (!this.breaker.canAttempt()) {
+        this.logger.warn('circuit-open-skip', {
+          admittedId: admittedCmb.id,
+          breaker: this.breaker.snapshot(),
+        });
+        this._cmbsSuppressed += 1;
+        return;
+      }
+
       const ctx = await assembleContext({
         admittedCmb,
         role: this.role,
@@ -111,12 +124,30 @@ class AgentLoop {
         limits: this.contextLimits,
       });
 
-      const response = await this.model.call({
-        systemPrompt: ctx.systemPrompt,
-        messages: ctx.messages,
-        maxTokens: this.maxTokensPerCall,
-        tools: [EMIT_CMB_TOOL],
-      });
+      let response;
+      try {
+        response = await this.model.call({
+          systemPrompt: ctx.systemPrompt,
+          messages: ctx.messages,
+          maxTokens: this.maxTokensPerCall,
+          tools: [EMIT_CMB_TOOL],
+        });
+        this.breaker.recordSuccess();
+      } catch (err) {
+        this.breaker.recordFailure();
+        const transient = isTransientError(err);
+        this.logger.error('model-call-failed', {
+          admittedId: admittedCmb.id,
+          transient,
+          message: err.message,
+          breaker: this.breaker.snapshot(),
+        });
+        this._cmbsSuppressed += 1;
+        if (transient && this.breaker.backoffMs() > 0) {
+          await new Promise((r) => setTimeout(r, this.breaker.backoffMs()));
+        }
+        return;
+      }
 
       this._costUsdTotal += response.usage?.costUsd || 0;
       this.logger.info('model-call', {
