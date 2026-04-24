@@ -6,6 +6,7 @@ const { AnthropicAdapter } = require('../model/anthropic.js');
 const { OpenAiAdapter } = require('../model/openai.js');
 const { OllamaAdapter } = require('../model/ollama.js');
 const { ClaudeCodeAttach } = require('../attach/claude-code.js');
+const { RotatingJsonLogger } = require('../core/logger.js');
 const { AgentLoop } = require('../core/loop.js');
 const { WakeBudget } = require('../safety/budget.js');
 const { startServer } = require('./ipc.js');
@@ -54,6 +55,14 @@ async function runFromConfig(configPath) {
     maxWakesPerDay: cfg.budget.maxWakesPerDay,
   });
 
+  const logger = new RotatingJsonLogger({
+    filePath: cfg.logging.filePath,
+    level: cfg.logging.level,
+    maxFileSize: cfg.logging.maxFileSize,
+    keep: cfg.logging.keep,
+    peer: cfg.identity.name,
+  });
+
   const loop = new AgentLoop({
     mesh,
     model,
@@ -66,6 +75,7 @@ async function runFromConfig(configPath) {
     contextLimits: cfg.context,
     cycleDepth: cfg.safety.cycleDepth,
     maxTokensPerCall: cfg.model.maxTokensPerCall,
+    logger,
   });
 
   const ccAttach = new ClaudeCodeAttach({ role: { name: cfg.identity.name } });
@@ -143,6 +153,7 @@ async function runFromConfig(configPath) {
     try {
       await loop.stop();
       await ipc.close();
+      logger.close();
       process.stderr.write(`[run] stopped cleanly — stats=${JSON.stringify(loop.stats)}\n`);
       process.exit(0);
     } catch (err) {

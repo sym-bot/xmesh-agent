@@ -217,5 +217,8 @@ rm -f ~/.xmesh-agent/*.sock
 
 - No control-plane UI — everything via CLI (Phase 2)
 - No automatic restart on peer crash — supervisor process is operator's job
-- No log rotation — stderr-based, rely on terminal history or redirect to file
 - No metrics endpoint — `status`/`cost` over IPC is the observability surface
+
+Structured JSON logging is available since 0.1.0-alpha.5: set
+`[logging] file_path = "..."` in `agent.toml` and logs go to disk as JSON
+lines with automatic size-based rotation (default 5 MB × 5 files).

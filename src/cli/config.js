@@ -62,6 +62,12 @@ function normalise(p) {
     attach: {
       mode: p.attach?.mode || 'headless',
     },
+    logging: {
+      level: p.logging?.level || 'info',
+      filePath: p.logging?.file_path || null,
+      maxFileSize: p.logging?.max_file_size ?? 5 * 1024 * 1024,
+      keep: p.logging?.keep ?? 5,
+    },
   };
 }
 

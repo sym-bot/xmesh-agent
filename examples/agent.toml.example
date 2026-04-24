@@ -49,3 +49,11 @@ approval_gates = "default"
 
 [attach]
 mode = "headless"
+
+[logging]
+# level: error | warn | info | debug
+level = "info"
+# file_path: leave commented for stderr-only. Uncomment for JSON log file with rotation.
+# file_path = "~/.xmesh-agent/logs/reviewer-01.log"
+max_file_size = 5242880   # 5 MB; rotates when exceeded
+keep = 5                   # keep up to 5 rotated files (.1 .. .5)

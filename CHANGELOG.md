@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.1.0-alpha.5 — 2026-04-24
+
+- Structured JSON logging (`src/core/logger.js`) — RotatingJsonLogger writes
+  one JSON line per event to stderr + optional log file. Size-based rotation
+  (default 5 MB × 5 files). Level filter (error / warn / info / debug).
+  Synchronous append semantics — no buffering, no flush lag.
+- `[logging]` section in agent.toml — `level`, `file_path`, `max_file_size`,
+  `keep`. All optional; stderr-only when file_path omitted.
+- AgentLoop accepts the new logger via existing `logger` constructor arg —
+  no API change.
+
 ## 0.1.0-alpha.4 — 2026-04-24
 
 - `xmesh-agent dry-run --config <path>` — validates config, adapter creds,
