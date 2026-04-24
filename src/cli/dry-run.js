@@ -5,6 +5,7 @@ const { AnthropicAdapter } = require('../model/anthropic.js');
 const { OpenAiAdapter } = require('../model/openai.js');
 const { OllamaAdapter } = require('../model/ollama.js');
 const { ClaudeCodeAttach } = require('../attach/claude-code.js');
+const { checkRoleSanity } = require('../core/role-sanity.js');
 
 async function dryRun(configPath, { out = process.stdout, err = process.stderr } = {}) {
   const checks = [];
@@ -67,6 +68,16 @@ async function dryRun(configPath, { out = process.stdout, err = process.stderr }
   if (b.maxCostUsdPerRun <= 0) record('budget sanity', false, 'maxCostUsdPerRun must be > 0');
   else if (b.maxWakesPerMinute <= 0) record('budget sanity', false, 'maxWakesPerMinute must be > 0');
   else record('budget sanity', true, `wakes=${b.maxWakesPerMinute}/min cost=$${b.maxCostUsdPerRun}/run`);
+
+  const roleCheck = checkRoleSanity({ role: cfg.identity.role, weights: cfg.roleWeights });
+  if (!roleCheck.knownRole) {
+    record('role sanity', true, `(info) role "${cfg.identity.role}" not in known-role table — skipping check`);
+  } else if (roleCheck.ok) {
+    record('role sanity', true, `role "${cfg.identity.role}" α_f emphasis matches expectations`);
+  } else {
+    const summary = roleCheck.advisories.map((a) => `${a.field}=${a.weight}`).join(', ');
+    record('role sanity', true, `(warn) role "${cfg.identity.role}" α_f mismatch: ${summary}`);
+  }
 
   if (cfg.safety.cycleDepth < 1) record('cycle depth', false, 'cycleDepth < 1 disables detection');
   else record('cycle depth', true, String(cfg.safety.cycleDepth));

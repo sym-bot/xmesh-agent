@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.1.0-alpha.9 — 2026-04-24
+
+- Role-vs-weights sanity check (`src/core/role-sanity.js`) — compares
+  peer's `identity.role` against expected CAT7 α_f emphasis. Known roles:
+  writer, reviewer, test-writer, spec, spec-drafter, auditor, generator,
+  mood. Unknown roles pass silently.
+- Wired into `xmesh-agent dry-run` — surfaces advisories for mismatches
+  (e.g. `role="reviewer"` with low `issue` weight) without blocking start.
+
 ## 0.1.0-alpha.8 — 2026-04-24
 
 - JSON Schema for agent.toml (`src/cli/schema.js`) — JSON Schema Draft
