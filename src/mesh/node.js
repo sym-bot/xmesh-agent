@@ -143,6 +143,7 @@ class MeshAdapter {
     return {
       id: entry?.key || cmb?.key || null,
       source: entry?.source || cmb?.createdBy || null,
+      createdBy: cmb?.createdBy || entry?.source || null,
       fields: cmb?.fields || {},
       ancestors: cmb?.lineage?.ancestors || [],
       parents: cmb?.lineage?.parents || [],

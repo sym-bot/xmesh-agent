@@ -7,8 +7,9 @@
     "xmesh-agent": "src/cli/index.js"
   },
   "scripts": {
-    "test": "node --test 'test/*.test.js'",
-    "test:coverage": "node --test --experimental-test-coverage 'test/*.test.js'"
+    "test": "node --test --test-timeout=10000 'test/*.test.js'",
+    "test:coverage": "node --test --experimental-test-coverage 'test/*.test.js'",
+    "smoke": "node --test --test-timeout=60000 'test/*.smoke.js'"
   },
   "files": [
     "src/",
