@@ -1,0 +1,51 @@
+# xmesh-agent configuration — runtime doc §3.3 + §5.
+# Copy to agent.toml and fill in credentials. Do not commit agent.toml.
+
+[identity]
+name = "reviewer-01"
+role = "reviewer"
+
+[mesh]
+group = "xmesh-dev-demo"
+# relay = "wss://sym-relay.onrender.com"
+# relay_token = "..."
+
+[role_weights]
+# SVAF alpha_f — runtime doc §4.2. Reviewer emphasises issue + commitment.
+focus = 1.0
+issue = 2.5
+intent = 1.2
+motivation = 0.8
+commitment = 2.0
+perspective = 0.5
+mood = 0.6
+
+[model]
+adapter = "anthropic"
+# api_key = "sk-ant-..."   # prefer ANTHROPIC_API_KEY env var
+model_name = "claude-opus-4-7"
+max_tokens_per_call = 1024
+
+[context]
+k_lineage = 3
+n_own = 5
+n_group = 10
+max_context_tokens = 8000
+
+[budget]
+# runtime doc §5.1 + §5.3
+max_wakes_per_minute = 10
+max_wakes_per_hour = 100
+max_wakes_per_day = 1000
+max_cost_usd_per_hour = 1.0
+max_cost_usd_per_day = 10.0
+max_cost_usd_per_run = 5.0
+
+[safety]
+# runtime doc §5.2
+cycle_depth = 5
+# runtime doc §5.4 — use CLI `xmesh-agent gates list` to see defaults
+approval_gates = "default"
+
+[attach]
+mode = "headless"

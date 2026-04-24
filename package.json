@@ -1,0 +1,46 @@
+{
+  "name": "@sym-bot/xmesh-agent",
+  "version": "0.1.0-alpha.0",
+  "description": "Autonomous agent runtime for the xmesh mesh — wake-on-admission reasoning with wake-budget, cycle detection, token cap, and approval gates.",
+  "main": "src/index.js",
+  "bin": {
+    "xmesh-agent": "src/cli/index.js"
+  },
+  "scripts": {
+    "test": "node --test 'test/*.test.js'",
+    "test:coverage": "node --test --experimental-test-coverage 'test/*.test.js'"
+  },
+  "files": [
+    "src/",
+    "examples/",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.32.0",
+    "@iarna/toml": "^2.2.5",
+    "@sym-bot/sym": "^0.5.1"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "keywords": [
+    "xmesh",
+    "xmesh-agent",
+    "mesh-memory-protocol",
+    "mmp",
+    "cat7",
+    "svaf",
+    "collective-intelligence",
+    "agent-to-agent",
+    "autonomous-agent"
+  ],
+  "author": "SYM.BOT",
+  "license": "Apache-2.0",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sym-bot/xmesh-agent.git"
+  }
+}
