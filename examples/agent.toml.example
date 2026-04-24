@@ -47,6 +47,15 @@ cycle_depth = 5
 # runtime doc §5.4 — use CLI `xmesh-agent gates list` to see defaults
 approval_gates = "default"
 
+[routing]
+# How responses to admitted CMBs are dispatched on the mesh.
+#   broadcast — every peer sees the response (canonical agent-to-agent
+#               mesh; default; required for autonomous multi-hop coordination)
+#   targeted  — response is sent only to the originator (useful when the
+#               originator is a long-lived peer that should gate the loop)
+#   auto      — broadcast in small mesh (≤2 peers), targeted in larger
+response_routing = "broadcast"
+
 [attach]
 mode = "headless"
 

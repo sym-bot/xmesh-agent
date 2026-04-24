@@ -80,6 +80,7 @@ async function runFromConfig(configPath) {
     contextLimits: cfg.context,
     cycleDepth: cfg.safety.cycleDepth,
     maxTokensPerCall: cfg.model.maxTokensPerCall,
+    responseRouting: cfg.routing.responseRouting,
     logger,
   });
 

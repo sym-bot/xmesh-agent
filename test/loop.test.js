@@ -104,7 +104,7 @@ test('AgentLoop: emits a CMB via observe when peer unreachable', async () => {
   assert.equal(loop.stats.cmbsEmitted, 1);
 });
 
-test('AgentLoop: emits via send when originator is a connected peer', async () => {
+test('AgentLoop: default broadcast routing emits via observe even when originator is reachable', async () => {
   const toolCall = { id: 't1', name: 'emit_cmb', input: { issue: 'x' } };
   const { loop, mesh } = makeLoop({
     model: fakeModel({ toolCall }),
@@ -112,8 +112,85 @@ test('AgentLoop: emits via send when originator is a connected peer', async () =
   });
   await loop.start();
   await loop._handleAdmission(cmb({ id: 'a1', source: 'writer-01' }));
+  assert.equal(mesh.emitted[0].kind, 'observe', 'broadcast is the default — every peer sees responses');
+});
+
+test('AgentLoop: responseRouting=targeted sends to reachable originator', async () => {
+  const toolCall = { id: 't1', name: 'emit_cmb', input: { issue: 'x' } };
+  const mesh = fakeMesh({ peers: [{ id: 'p1', name: 'writer-01' }] });
+  const loop = new AgentLoop({
+    mesh,
+    model: fakeModel({ toolCall }),
+    role: { name: 'reviewer-01' },
+    contextLimits: { maxContextTokens: 8000 },
+    cycleDepth: 5,
+    responseRouting: 'targeted',
+    logger: silentLogger,
+  });
+  await loop.start();
+  await loop._handleAdmission(cmb({ id: 'a1', source: 'writer-01' }));
   assert.equal(mesh.emitted[0].kind, 'send');
   assert.equal(mesh.emitted[0].to, 'writer-01');
+});
+
+test('AgentLoop: responseRouting=targeted falls back to broadcast when originator unreachable', async () => {
+  const toolCall = { id: 't1', name: 'emit_cmb', input: { issue: 'x' } };
+  const mesh = fakeMesh({ peers: [] });
+  const loop = new AgentLoop({
+    mesh,
+    model: fakeModel({ toolCall }),
+    role: { name: 'reviewer-01' },
+    contextLimits: { maxContextTokens: 8000 },
+    cycleDepth: 5,
+    responseRouting: 'targeted',
+    logger: silentLogger,
+  });
+  await loop.start();
+  await loop._handleAdmission(cmb({ id: 'a1', source: 'writer-01' }));
+  assert.equal(mesh.emitted[0].kind, 'observe');
+});
+
+test('AgentLoop: responseRouting=auto broadcasts in small mesh, targets in large mesh', async () => {
+  const toolCall = { id: 't1', name: 'emit_cmb', input: { issue: 'x' } };
+  const smallMesh = fakeMesh({ peers: [{ id: 'p1', name: 'writer-01' }] });
+  const smallLoop = new AgentLoop({
+    mesh: smallMesh,
+    model: fakeModel({ toolCall }),
+    role: { name: 'reviewer-01' },
+    contextLimits: { maxContextTokens: 8000 },
+    cycleDepth: 5,
+    responseRouting: 'auto',
+    logger: silentLogger,
+  });
+  await smallLoop.start();
+  await smallLoop._handleAdmission(cmb({ id: 'a1', source: 'writer-01' }));
+  assert.equal(smallMesh.emitted[0].kind, 'observe', 'small mesh (≤2 peers) prefers broadcast');
+
+  const largeMesh = fakeMesh({ peers: [
+    { id: 'p1', name: 'writer-01' }, { id: 'p2', name: 'b' }, { id: 'p3', name: 'c' }, { id: 'p4', name: 'd' },
+  ] });
+  const largeLoop = new AgentLoop({
+    mesh: largeMesh,
+    model: fakeModel({ toolCall }),
+    role: { name: 'reviewer-01' },
+    contextLimits: { maxContextTokens: 8000 },
+    cycleDepth: 5,
+    responseRouting: 'auto',
+    logger: silentLogger,
+  });
+  await largeLoop.start();
+  await largeLoop._handleAdmission(cmb({ id: 'a1', source: 'writer-01' }));
+  assert.equal(largeMesh.emitted[0].kind, 'send', 'large mesh (>2 peers) targets the originator');
+});
+
+test('AgentLoop: rejects invalid responseRouting at construction', () => {
+  assert.throws(() => new AgentLoop({
+    mesh: fakeMesh(),
+    model: fakeModel(),
+    role: { name: 'r' },
+    responseRouting: 'multicast',
+    logger: silentLogger,
+  }), /must be one of/);
 });
 
 test('AgentLoop: suppresses emission when model returns no tool_use', async () => {

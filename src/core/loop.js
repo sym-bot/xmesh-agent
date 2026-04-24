@@ -41,6 +41,7 @@ class AgentLoop {
     gatePatterns,
     maxTokensPerCall = 1024,
     circuitBreaker,
+    responseRouting = 'broadcast',
     logger = defaultLogger,
   }) {
     if (!mesh) throw new Error('AgentLoop: mesh required');
@@ -55,6 +56,10 @@ class AgentLoop {
     this.gatePatterns = gatePatterns;
     this.maxTokensPerCall = maxTokensPerCall;
     this.breaker = circuitBreaker || new CircuitBreaker();
+    if (!['broadcast', 'targeted', 'auto'].includes(responseRouting)) {
+      throw new Error(`AgentLoop: responseRouting must be one of broadcast | targeted | auto (got: ${responseRouting})`);
+    }
+    this.responseRouting = responseRouting;
     this.logger = logger;
     this._costUsdTotal = 0;
     this._cmbsEmitted = 0;
@@ -193,17 +198,34 @@ class AgentLoop {
         return;
       }
 
-      const targetPeer = admittedCmb.source;
-      if (targetPeer && this._peerReachable(targetPeer)) {
+      const targetPeer = this._chooseTarget(admittedCmb);
+      if (targetPeer) {
         await this.mesh.send({ to: targetPeer, fields, parents: [{ key: admittedCmb.id }] });
       } else {
         await this.mesh.observe({ fields, parents: [{ key: admittedCmb.id }] });
       }
       this._cmbsEmitted += 1;
-      this.logger.info('emitted', { admittedId: admittedCmb.id, to: targetPeer, fields: Object.keys(fields) });
+      this.logger.info('emitted', {
+        admittedId: admittedCmb.id,
+        kind: targetPeer ? 'send' : 'observe',
+        to: targetPeer,
+        fields: Object.keys(fields),
+      });
     } finally {
       this._handlingCount -= 1;
     }
+  }
+
+  _chooseTarget(admittedCmb) {
+    if (this.responseRouting === 'broadcast') return null;
+    const originator = admittedCmb?.createdBy || admittedCmb?.source;
+    if (!originator) return null;
+    if (this.responseRouting === 'targeted') {
+      return this._peerReachable(originator) ? originator : null;
+    }
+    const peers = (() => { try { return this.mesh.peers(); } catch { return []; } })();
+    if (peers.length <= 2) return null;
+    return this._peerReachable(originator) ? originator : null;
   }
 
   _peerReachable(name) {

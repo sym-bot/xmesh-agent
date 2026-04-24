@@ -86,6 +86,13 @@ const SCHEMA = Object.freeze({
         approval_gates: { type: 'string', enum: ['default', 'none'], default: 'default' },
       },
     },
+    routing: {
+      type: 'object',
+      additionalProperties: false,
+      properties: {
+        response_routing: { type: 'string', enum: ['broadcast', 'targeted', 'auto'], default: 'broadcast' },
+      },
+    },
     attach: {
       type: 'object',
       additionalProperties: false,

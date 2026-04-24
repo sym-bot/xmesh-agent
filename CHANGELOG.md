@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.1.2 — 2026-04-24
+
+- **Behavior fix:** AgentLoop response routing now defaults to broadcast
+  (was implicit-targeted-to-originator). Verified bug from end-to-end
+  3-peer demo: targeted-replies to a transient seed peer left the rest
+  of the mesh starved. Broadcast is the canonical agent-to-agent
+  behavior and matches the "every peer sees every response, runs SVAF"
+  mental model.
+- New `[routing] response_routing` config: `broadcast` (default),
+  `targeted` (legacy behavior), `auto` (broadcast for ≤2 peers,
+  targeted otherwise).
+- Existing scenarios continue to work — they implicitly inherit the new
+  broadcast default. Operators wanting the old behavior set
+  `response_routing = "targeted"`.
+
 ## 0.1.1 — 2026-04-24
 
 - `examples/scenarios/writer-openai.toml` + `test-writer-openai.toml` —

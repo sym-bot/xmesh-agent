@@ -59,6 +59,9 @@ function normalise(p) {
       cycleDepth: p.safety?.cycle_depth ?? 5,
       approvalGates: p.safety?.approval_gates || 'default',
     },
+    routing: {
+      responseRouting: p.routing?.response_routing || 'broadcast',
+    },
     attach: {
       mode: p.attach?.mode || 'headless',
     },
