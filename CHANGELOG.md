@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.1.0 — 2026-04-24
+
+First production-grade public release. Phase-1 of `xmesh-agent` is complete:
+autonomous runtime, three model adapters (Anthropic / OpenAI / Ollama),
+six-layer safety envelope (wake-budget / cycle / token / cost / gates /
+circuit), structured JSON logging, persistent stats, full CLI surface, IPC
+control plane, JSON Schema for config, ed25519 identity primitive, JSON
+schema validation, dry-run validation, migrate command, demo scenarios,
+cross-host runbook.
+
+Phase 2 (May–Jun 2026): wire-signed CMBs in `@sym-bot/sym` 0.6.0 +
+mesh-channel 0.4.0 + sym-swift + MMP spec v0.3.0 simultaneous release.
+
 ## 0.1.0-alpha.14 — 2026-04-24
 
 - `xmesh-agent migrate` command — automated `~/.xmesh-agent` →
