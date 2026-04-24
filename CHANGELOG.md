@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.0-alpha.7 — 2026-04-24
+
+- `test/relay.smoke.js` — automated WAN-relay smoke test, two-peer
+  discover + CMB exchange via real WebSocket relay. Skip-gated on
+  SYM_RELAY_URL + SYM_RELAY_TOKEN env vars.
+- `examples/cross-host-runbook.md` — new "Automated WAN smoke"
+  subsection linking to the smoke test for single-machine verification.
+
 ## 0.1.0-alpha.6 — 2026-04-24
 
 - Persistent per-peer state (`src/core/state-store.js`) — lifetime cost,

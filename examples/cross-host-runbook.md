@@ -161,6 +161,21 @@ relay_token = "..."   # or env SYM_RELAY_TOKEN
 The rest of the runbook is identical. Verify by checking
 `https://sym-relay.onrender.com/admin/groups` shows both peers connected.
 
+### Automated WAN smoke (single-machine)
+
+For rapid verification without physically setting up two hosts, the relay
+smoke test runs both peers on one machine pointed at the real relay:
+
+```bash
+export SYM_RELAY_URL=wss://sym-relay.onrender.com
+export SYM_RELAY_TOKEN=...
+npm run smoke   # includes test/relay.smoke.js — skips when env vars absent
+```
+
+Asserts: two peers in the same group discover through the relay within 30s,
+exchange a CAT7 CMB within 20s, shut down cleanly. Fails loudly if the
+relay is unreachable, tokens are wrong, or group isolation is broken.
+
 ## Acceptance criterion
 
 - Both peers discovered within 30s of second start
