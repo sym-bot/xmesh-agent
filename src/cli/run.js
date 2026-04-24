@@ -5,6 +5,7 @@ const { MeshAdapter } = require('../mesh/node.js');
 const { AnthropicAdapter } = require('../model/anthropic.js');
 const { OpenAiAdapter } = require('../model/openai.js');
 const { OllamaAdapter } = require('../model/ollama.js');
+const { ClaudeCodeAttach } = require('../attach/claude-code.js');
 const { AgentLoop } = require('../core/loop.js');
 const { WakeBudget } = require('../safety/budget.js');
 const { startServer } = require('./ipc.js');
@@ -66,6 +67,17 @@ async function runFromConfig(configPath) {
     cycleDepth: cfg.safety.cycleDepth,
     maxTokensPerCall: cfg.model.maxTokensPerCall,
   });
+
+  const ccAttach = new ClaudeCodeAttach({ role: { name: cfg.identity.name } });
+  const advisoryCheck = ccAttach.advisoryFor(cfg.mesh.group);
+  const advisoryResult = await advisoryCheck();
+  if (advisoryResult.ok) {
+    process.stderr.write(
+      `[run] claude-code advisory: group="${advisoryResult.group}" nodeName="${advisoryResult.nodeName}" — mesh-channel compatible\n`,
+    );
+  } else if (advisoryResult.advisory) {
+    process.stderr.write(`[run] claude-code advisory: ${advisoryResult.advisory}\n`);
+  }
 
   await loop.start();
   process.stderr.write(

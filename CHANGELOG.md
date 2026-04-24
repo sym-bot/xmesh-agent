@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.1.0-alpha.3 — 2026-04-24
+
+- Claude Code attach advisory (`src/attach/claude-code.js`) — pre-flight
+  check that a Claude Code mesh-channel plugin, if installed, shares the
+  same group and does not name-collide with this peer
+- run.js prints advisory on start (ok / warning both stderr-visible)
+
 ## 0.1.0-alpha.2 — 2026-04-24
 
 - Ollama local model adapter (`src/model/ollama.js`) — zero-cost inference
