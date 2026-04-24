@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.1.0-alpha.8 — 2026-04-24
+
+- JSON Schema for agent.toml (`src/cli/schema.js`) — JSON Schema Draft
+  2020-12 covering all sections and field types
+- `xmesh-agent schema` command — prints the schema to stdout for piping
+  into editor integrations (VS Code Even Better TOML, IntelliJ, etc.)
+- Schema kept in lockstep with config: model adapter enum matches
+  SUPPORTED_ADAPTERS, logging level matches LEVEL_ORDER, additionalProperties
+  false at top level
+
 ## 0.1.0-alpha.7 — 2026-04-24
 
 - `test/relay.smoke.js` — automated WAN-relay smoke test, two-peer

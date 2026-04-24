@@ -15,6 +15,7 @@ function printHelp() {
       'Commands:',
       '  run --config <path>       Start a peer (headless attach) from agent.toml',
       '  dry-run --config <path>   Validate config + adapters without joining mesh',
+      '  schema                    Print the JSON Schema for agent.toml',
       '  stop <peer-name>          Graceful shutdown of a running peer',
       '  status <peer-name>        Report peer state, uptime, budget usage',
       '  cost <peer-name>          Report token + cost counters',
@@ -160,6 +161,11 @@ async function main(argv) {
       return dispatchRun(args.slice(1));
     case 'dry-run':
       return dispatchDryRun(args.slice(1));
+    case 'schema': {
+      const { printSchema } = require('./schema.js');
+      printSchema();
+      return 0;
+    }
     case 'stop':
     case 'status':
     case 'cost':
