@@ -5,6 +5,7 @@ const { MeshAdapter } = require('../mesh/node.js');
 const { AnthropicAdapter } = require('../model/anthropic.js');
 const { AgentLoop } = require('../core/loop.js');
 const { WakeBudget } = require('../safety/budget.js');
+const { startServer } = require('./ipc.js');
 
 function pickModelAdapter(modelCfg) {
   if (modelCfg.adapter === 'anthropic') {
@@ -57,10 +58,65 @@ async function runFromConfig(configPath) {
     `[run] xmesh-agent started — peer=${cfg.identity.name} group=${cfg.mesh.group} model=${cfg.model.modelName}\n`,
   );
 
+  const startedAt = Date.now();
+
+  const ipc = await startServer({
+    peerName: cfg.identity.name,
+    handlers: {
+      status: () => ({
+        peer: cfg.identity.name,
+        group: cfg.mesh.group,
+        model: cfg.model.modelName,
+        uptimeMs: Date.now() - startedAt,
+        stats: loop.stats,
+        budget: {
+          maxWakesPerMinute: cfg.budget.maxWakesPerMinute,
+          maxWakesPerHour: cfg.budget.maxWakesPerHour,
+          maxWakesPerDay: cfg.budget.maxWakesPerDay,
+          currentCounts: budget.peek(),
+        },
+      }),
+      cost: () => ({
+        peer: cfg.identity.name,
+        costUsdTotal: loop.stats.costUsdTotal,
+        cmbsEmitted: loop.stats.cmbsEmitted,
+        cmbsSuppressed: loop.stats.cmbsSuppressed,
+        caps: {
+          perHour: cfg.budget.maxCostUsdPerHour,
+          perDay: cfg.budget.maxCostUsdPerDay,
+          perRun: cfg.budget.maxCostUsdPerRun,
+        },
+      }),
+      trace: async (req) => {
+        const cmbId = req.cmbId;
+        if (!cmbId) throw new Error('trace requires cmbId');
+        const chain = [];
+        const visited = new Set();
+        const queue = [{ id: cmbId, depth: 0 }];
+        while (queue.length > 0) {
+          const { id, depth } = queue.shift();
+          if (visited.has(id) || depth > 20) continue;
+          visited.add(id);
+          const cmb = await mesh.resolveCmb(id);
+          if (!cmb) { chain.push({ id, depth, missing: true }); continue; }
+          chain.push({ id, depth, source: cmb.source, fields: cmb.fields, ancestors: cmb.ancestors });
+          for (const a of cmb.ancestors || []) queue.push({ id: a, depth: depth + 1 });
+        }
+        return { root: cmbId, chain };
+      },
+      stop: () => {
+        setImmediate(() => shutdown('IPC_STOP'));
+        return { accepted: true };
+      },
+    },
+  });
+  process.stderr.write(`[run] ipc socket: ${ipc.sockPath}\n`);
+
   const shutdown = async (signal) => {
     process.stderr.write(`[run] ${signal} received — draining\n`);
     try {
       await loop.stop();
+      await ipc.close();
       process.stderr.write(`[run] stopped cleanly — stats=${JSON.stringify(loop.stats)}\n`);
       process.exit(0);
     } catch (err) {

@@ -2,6 +2,7 @@
 'use strict';
 
 const { version } = require('../../package.json');
+const { sendRequest } = require('./ipc.js');
 
 function printHelp() {
   process.stdout.write(
@@ -13,10 +14,10 @@ function printHelp() {
       '',
       'Commands:',
       '  run --config <path>   Start a peer (headless attach) from agent.toml',
-      '  stop <peer-name>      Graceful shutdown of a running peer (not yet implemented)',
-      '  status [<peer-name>]  Report peer state (not yet implemented)',
-      '  cost [<peer-name>]    Report cost counters (not yet implemented)',
-      '  trace <cmb-id>        Print ancestor lineage for a CMB (not yet implemented)',
+      '  stop <peer-name>      Graceful shutdown of a running peer',
+      '  status <peer-name>    Report peer state, uptime, budget usage',
+      '  cost <peer-name>      Report token + cost counters',
+      '  trace <peer-name> <cmb-id>   Print ancestor lineage for a CMB',
       '',
       '  --help, -h            This message',
       '  --version, -v         Print version',
@@ -51,6 +52,75 @@ async function dispatchRun(args) {
   }
 }
 
+async function dispatchIpc(cmd, args) {
+  const peerName = args[0];
+  if (!peerName) {
+    process.stderr.write(`xmesh-agent ${cmd}: missing peer-name argument\n`);
+    return 2;
+  }
+  try {
+    const extra = {};
+    if (cmd === 'trace') {
+      const cmbId = args[1];
+      if (!cmbId) {
+        process.stderr.write('xmesh-agent trace: missing cmb-id argument\n');
+        return 2;
+      }
+      extra.cmbId = cmbId;
+    }
+    const res = await sendRequest(peerName, cmd, extra);
+    if (!res.ok) {
+      process.stderr.write(`xmesh-agent ${cmd}: ${res.error}\n`);
+      return 1;
+    }
+    process.stdout.write(formatResult(cmd, res) + '\n');
+    return 0;
+  } catch (err) {
+    process.stderr.write(`xmesh-agent ${cmd}: ${err.message}\n`);
+    return 1;
+  }
+}
+
+function formatResult(cmd, res) {
+  const { ok, ...body } = res;
+  if (cmd === 'status') {
+    return [
+      `peer:       ${body.peer}`,
+      `group:      ${body.group}`,
+      `model:      ${body.model}`,
+      `uptime_ms:  ${body.uptimeMs}`,
+      `running:    ${body.stats.running}`,
+      `emitted:    ${body.stats.cmbsEmitted}`,
+      `suppressed: ${body.stats.cmbsSuppressed}`,
+      `cost_usd:   ${body.stats.costUsdTotal.toFixed(6)}`,
+      `budget:     minute=${body.budget.currentCounts.minute}/${body.budget.maxWakesPerMinute} hour=${body.budget.currentCounts.hour}/${body.budget.maxWakesPerHour} day=${body.budget.currentCounts.day}/${body.budget.maxWakesPerDay}`,
+    ].join('\n');
+  }
+  if (cmd === 'cost') {
+    return [
+      `peer:       ${body.peer}`,
+      `cost_usd:   ${body.costUsdTotal.toFixed(6)}`,
+      `emitted:    ${body.cmbsEmitted}`,
+      `suppressed: ${body.cmbsSuppressed}`,
+      `caps:       per_hour=$${body.caps.perHour} per_day=$${body.caps.perDay} per_run=$${body.caps.perRun}`,
+    ].join('\n');
+  }
+  if (cmd === 'trace') {
+    const lines = [`root: ${body.root}`];
+    for (const link of body.chain) {
+      const prefix = '  '.repeat(link.depth);
+      if (link.missing) { lines.push(`${prefix}[${link.id}] (not found)`); continue; }
+      const fields = Object.entries(link.fields || {})
+        .map(([k, v]) => `${k}="${typeof v === 'string' ? v : v?.text || ''}"`)
+        .join(' ');
+      lines.push(`${prefix}[${link.id}] by ${link.source} | ${fields}`);
+    }
+    return lines.join('\n');
+  }
+  if (cmd === 'stop') return `stop accepted: ${body.accepted}`;
+  return JSON.stringify(body, null, 2);
+}
+
 async function main(argv) {
   const args = argv.slice(2);
   if (args.length === 0 || args.includes('-h') || args.includes('--help')) {
@@ -69,8 +139,7 @@ async function main(argv) {
     case 'status':
     case 'cost':
     case 'trace':
-      process.stderr.write(`xmesh-agent ${cmd}: not implemented yet (scaffold stage)\n`);
-      return 3;
+      return dispatchIpc(cmd, args.slice(1));
     default:
       process.stderr.write(`xmesh-agent: unknown command "${cmd}". Try --help.\n`);
       return 2;
@@ -84,4 +153,4 @@ if (require.main === module) {
   });
 }
 
-module.exports = { main };
+module.exports = { main, formatResult };
