@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.1.0-alpha.12 — 2026-04-24
+
+- Phase-1 identity signing primitive (`src/safety/identity.js`) —
+  ed25519 keypair generation, storage (~/.xmesh-agent/keys/, 0600 on
+  private key), canonical envelope serialisation + sign + verify
+- Trust pinning: `trustKey()` + `listTrustedKeys()` write to
+  `~/.xmesh-agent/trusted-keys/<group>/` for peer-public-key registry
+- CLI: `keygen <peer> [--force]`, `fingerprint <peer>`,
+  `trust add --group <g> --peer <p> --public-key <b64url>`, `trust list`
+- Spec delta + wire integration (@sym-bot/sym 0.6.0) deferred to Phase 2
+  per `sym-strategy/architecture/xmesh_identity_signing_v0.1.md`
+
 ## 0.1.0-alpha.11 — 2026-04-24
 
 - Circuit breaker for model adapter (`src/safety/circuit-breaker.js`) —

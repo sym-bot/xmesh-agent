@@ -16,6 +16,10 @@ function printHelp() {
       '  run --config <path>       Start a peer (headless attach) from agent.toml',
       '  dry-run --config <path>   Validate config + adapters without joining mesh',
       '  schema                    Print the JSON Schema for agent.toml',
+      '  keygen <peer> [--force]   Generate ed25519 identity keypair (identity signing v0.1)',
+      '  fingerprint <peer>        Print fingerprint of peer\'s public key',
+      '  trust add --group <g> --peer <p> --public-key <b64url>',
+      '  trust list --group <g>',
       '  stop <peer-name>          Graceful shutdown of a running peer',
       '  status <peer-name>        Report peer state, uptime, budget usage',
       '  cost <peer-name>          Report token + cost counters',
@@ -165,6 +169,35 @@ async function main(argv) {
       const { printSchema } = require('./schema.js');
       printSchema();
       return 0;
+    }
+    case 'keygen': {
+      const { keygen } = require('./keys.js');
+      const rest = args.slice(1);
+      const peer = rest.find((a) => !a.startsWith('--'));
+      if (!peer) { process.stderr.write('xmesh-agent keygen: missing <peer> argument\n'); return 2; }
+      return keygen(peer, { force: rest.includes('--force') });
+    }
+    case 'fingerprint': {
+      const { fingerprint } = require('./keys.js');
+      const peer = args[1];
+      if (!peer) { process.stderr.write('xmesh-agent fingerprint: missing <peer> argument\n'); return 2; }
+      return fingerprint(peer);
+    }
+    case 'trust': {
+      const { trustAdd, trustList } = require('./keys.js');
+      const sub = args[1];
+      if (sub === 'add') {
+        return trustAdd({
+          group: parseFlag(args, '--group'),
+          peer: parseFlag(args, '--peer'),
+          publicKey: parseFlag(args, '--public-key'),
+        });
+      }
+      if (sub === 'list') {
+        return trustList({ group: parseFlag(args, '--group') });
+      }
+      process.stderr.write(`xmesh-agent trust: unknown subcommand "${sub}"; expected add | list\n`);
+      return 2;
     }
     case 'stop':
     case 'status':
