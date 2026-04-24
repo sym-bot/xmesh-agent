@@ -1,0 +1,47 @@
+# Reviewer peer running on local Ollama — zero cloud, zero API key.
+# Requires: `ollama pull llama3.2:3b` and `ollama serve` running.
+# Demonstrates the "any model" claim extended to local inference.
+
+[identity]
+name = "reviewer-03-local"
+role = "reviewer"
+
+[mesh]
+group = "xmesh-demo"
+
+[role_weights]
+focus = 1.0
+issue = 2.5
+intent = 1.2
+motivation = 0.8
+commitment = 2.0
+perspective = 0.5
+mood = 0.6
+
+[model]
+adapter = "ollama"
+model_name = "llama3.2:3b"
+# base_url = "http://localhost:11434"   # default; override for remote GPU box
+max_tokens_per_call = 512
+
+[context]
+k_lineage = 3
+n_own = 5
+n_group = 10
+max_context_tokens = 4000
+
+[budget]
+max_wakes_per_minute = 5
+max_wakes_per_hour = 50
+max_wakes_per_day = 500
+# cost caps inoperative — local inference is $0
+max_cost_usd_per_hour = 999
+max_cost_usd_per_day = 999
+max_cost_usd_per_run = 999
+
+[safety]
+cycle_depth = 5
+approval_gates = "default"
+
+[attach]
+mode = "headless"

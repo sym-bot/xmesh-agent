@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.0-alpha.2 — 2026-04-24
+
+- Ollama local model adapter (`src/model/ollama.js`) — zero-cost inference
+  against local `ollama serve`; cost always reports $0
+- OLLAMA_HOST env var override for remote GPU boxes
+- `examples/scenarios/reviewer-ollama.toml` — local-only peer sample
+- eslint globals updated to include `fetch` + `URL`
+
 ## 0.1.0-alpha.1 — 2026-04-24
 
 - OpenAI model adapter (`src/model/openai.js`) — GPT-5 / GPT-4o / o1 families,

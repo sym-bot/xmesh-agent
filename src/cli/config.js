@@ -4,7 +4,7 @@ const fs = require('node:fs');
 const toml = require('@iarna/toml');
 
 const REQUIRED_SECTIONS = ['identity', 'mesh', 'role_weights', 'model'];
-const SUPPORTED_ADAPTERS = ['anthropic', 'openai'];
+const SUPPORTED_ADAPTERS = ['anthropic', 'openai', 'ollama'];
 
 function loadConfig(path) {
   const raw = fs.readFileSync(path, 'utf8');
@@ -37,6 +37,7 @@ function normalise(p) {
     model: {
       adapter: p.model.adapter,
       apiKey: p.model.api_key || null,
+      baseUrl: p.model.base_url || null,
       modelName: p.model.model_name || 'claude-opus-4-7',
       maxTokensPerCall: p.model.max_tokens_per_call || 1024,
     },
