@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.1.0-alpha.10 — 2026-04-24
+
+- Gitleaks secret-scan job in CI — runs on every push/PR, independent of
+  the test matrix (so a secret leak fails CI even if tests pass)
+- `.gitleaks.toml` — allowlists the fake API keys in test fixtures
+  (`sk-ant-fake`, `sk-openai-env`, etc.) and excludes lockfiles
+
 ## 0.1.0-alpha.9 — 2026-04-24
 
 - Role-vs-weights sanity check (`src/core/role-sanity.js`) — compares

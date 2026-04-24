@@ -1,0 +1,24 @@
+# gitleaks config — allowlists + project-specific rules
+# Docs: https://github.com/gitleaks/gitleaks
+
+title = "xmesh-agent gitleaks config"
+
+[extend]
+useDefault = true
+
+[allowlist]
+description = "False-positive allowlist for xmesh-agent"
+paths = [
+  '''package-lock\.json$''',
+  '''node_modules/.*''',
+]
+regexes = [
+  # Example keys in docs + test fixtures
+  '''sk-ant-fake''',
+  '''sk-ant-\.\.\.''',
+  '''sk-ant-env''',
+  '''sk-env-key''',
+  '''sk-openai-env''',
+  '''sk-openai-\.\.\.''',
+  '''sk-ant-[a-z-]+-for-tests''',
+]
