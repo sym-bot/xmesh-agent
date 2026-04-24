@@ -82,7 +82,7 @@ async function dispatchIpc(cmd, args) {
 }
 
 function formatResult(cmd, res) {
-  const { ok, ...body } = res;
+  const { ok: _ok, ...body } = res;
   if (cmd === 'status') {
     return [
       `peer:       ${body.peer}`,

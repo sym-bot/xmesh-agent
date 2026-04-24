@@ -142,7 +142,7 @@ async function assembleContext({ admittedCmb, role, mesh, limits = {} }) {
 const DROP_ORDER = ['group-recent', 'own-recent', 'lineage'];
 
 function _truncate(sections, maxTokens) {
-  let kept = [...sections];
+  const kept = [...sections];
   let total = kept.reduce((s, x) => s + estimateTokens(x.text), 0);
   for (const dropName of DROP_ORDER) {
     if (total <= maxTokens) break;

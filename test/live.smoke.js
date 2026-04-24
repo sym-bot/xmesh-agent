@@ -15,7 +15,7 @@ function uniqueGroup() {
   return 'xmesh-smoke-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 6);
 }
 
-test('live smoke: two SymNode peers discover via Bonjour and exchange a CMB', { timeout: 30_000 }, async (t) => {
+test('live smoke: two SymNode peers discover via Bonjour and exchange a CMB', { timeout: 30_000 }, async () => {
   const group = uniqueGroup();
   const weights = { focus: 2.0, issue: 1.5, intent: 1.5, motivation: 1.0, commitment: 1.5, perspective: 0.5, mood: 0.8 };
 

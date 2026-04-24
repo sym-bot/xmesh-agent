@@ -2,9 +2,7 @@
 
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const { EventEmitter } = require('node:events');
 const { AgentLoop } = require('../src/core/loop.js');
-const { MeshAdapter } = require('../src/mesh/node.js');
 const { WakeBudget } = require('../src/safety/budget.js');
 
 const silent = { info: () => {}, warn: () => {}, error: () => {} };
