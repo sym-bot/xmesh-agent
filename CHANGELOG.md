@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.1.3 — 2026-04-24
+
+- README rewritten for public release: clearer "why", correct quickstart
+  paths after `npm i -g`, Anthropic vs OpenAI key disambiguation,
+  honest Phase-1 identity caveat, broadcast-routing default surfaced,
+  trust-signal badges (npm version + license + node version), accurate
+  test counts (225 unit + 4 smoke), removed dead cross-refs to
+  private sym-strategy doc.
+
 ## 0.1.2 — 2026-04-24
 
 - **Behavior fix:** AgentLoop response routing now defaults to broadcast
