@@ -1,0 +1,44 @@
+# Reviewer peer — identifies issues and blockers in specs and code.
+# SVAF alpha_f emphasises issue + commitment per runtime doc §3.3.
+
+[identity]
+name = "reviewer-01"
+role = "reviewer"
+
+[mesh]
+group = "xmesh-demo"
+
+[role_weights]
+focus = 1.0
+issue = 2.5
+intent = 1.2
+motivation = 0.8
+commitment = 2.0
+perspective = 0.5
+mood = 0.6
+
+[model]
+adapter = "anthropic"
+model_name = "claude-sonnet-4-6"
+max_tokens_per_call = 1024
+
+[context]
+k_lineage = 3
+n_own = 5
+n_group = 10
+max_context_tokens = 8000
+
+[budget]
+max_wakes_per_minute = 5
+max_wakes_per_hour = 50
+max_wakes_per_day = 200
+max_cost_usd_per_hour = 0.50
+max_cost_usd_per_day = 2.00
+max_cost_usd_per_run = 2.00
+
+[safety]
+cycle_depth = 5
+approval_gates = "default"
+
+[attach]
+mode = "headless"
