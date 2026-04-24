@@ -4,6 +4,7 @@ const fs = require('node:fs');
 const toml = require('@iarna/toml');
 
 const REQUIRED_SECTIONS = ['identity', 'mesh', 'role_weights', 'model'];
+const SUPPORTED_ADAPTERS = ['anthropic', 'openai'];
 
 function loadConfig(path) {
   const raw = fs.readFileSync(path, 'utf8');
@@ -13,6 +14,11 @@ function loadConfig(path) {
   }
   if (!parsed.identity.name) throw new Error('agent.toml [identity] requires name');
   if (!parsed.model.adapter) throw new Error('agent.toml [model] requires adapter');
+  if (!SUPPORTED_ADAPTERS.includes(parsed.model.adapter)) {
+    throw new Error(
+      `agent.toml [model] adapter "${parsed.model.adapter}" not supported; supported: ${SUPPORTED_ADAPTERS.join(', ')}`,
+    );
+  }
   return normalise(parsed);
 }
 
@@ -58,4 +64,4 @@ function normalise(p) {
   };
 }
 
-module.exports = { loadConfig };
+module.exports = { loadConfig, SUPPORTED_ADAPTERS };

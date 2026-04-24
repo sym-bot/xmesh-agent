@@ -69,6 +69,37 @@ adapter = "anthropic"
   assert.throws(() => loadConfig(p), /identity.*name/);
 });
 
+test('loadConfig: rejects unsupported model adapter', () => {
+  const p = writeToml(`
+[identity]
+name = "x"
+[mesh]
+group = "g"
+[role_weights]
+focus = 1
+[model]
+adapter = "cohere"
+`);
+  assert.throws(() => loadConfig(p), /adapter "cohere" not supported/);
+});
+
+test('loadConfig: accepts openai adapter', () => {
+  const p = writeToml(`
+[identity]
+name = "x"
+[mesh]
+group = "g"
+[role_weights]
+focus = 1
+[model]
+adapter = "openai"
+model_name = "gpt-4o"
+`);
+  const cfg = loadConfig(p);
+  assert.equal(cfg.model.adapter, 'openai');
+  assert.equal(cfg.model.modelName, 'gpt-4o');
+});
+
 test('loadConfig: applies defaults for optional sections', () => {
   const p = writeToml(`
 [identity]

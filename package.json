@@ -1,6 +1,6 @@
 {
   "name": "@sym-bot/xmesh-agent",
-  "version": "0.1.0-alpha.0",
+  "version": "0.1.0-alpha.1",
   "description": "Autonomous agent runtime for the xmesh mesh — wake-on-admission reasoning with wake-budget, cycle detection, token cap, and approval gates.",
   "main": "src/index.js",
   "bin": {
@@ -22,7 +22,8 @@
   "dependencies": {
     "@anthropic-ai/sdk": "^0.32.0",
     "@iarna/toml": "^2.2.5",
-    "@sym-bot/sym": "^0.5.1"
+    "@sym-bot/sym": "^0.5.1",
+    "openai": "^4.104.0"
   },
   "engines": {
     "node": ">=18"

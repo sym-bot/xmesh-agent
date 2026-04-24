@@ -3,6 +3,7 @@
 const { loadConfig } = require('./config.js');
 const { MeshAdapter } = require('../mesh/node.js');
 const { AnthropicAdapter } = require('../model/anthropic.js');
+const { OpenAiAdapter } = require('../model/openai.js');
 const { AgentLoop } = require('../core/loop.js');
 const { WakeBudget } = require('../safety/budget.js');
 const { startServer } = require('./ipc.js');
@@ -11,6 +12,12 @@ function pickModelAdapter(modelCfg) {
   if (modelCfg.adapter === 'anthropic') {
     return new AnthropicAdapter({
       apiKey: modelCfg.apiKey || process.env.ANTHROPIC_API_KEY,
+      model: modelCfg.modelName,
+    });
+  }
+  if (modelCfg.adapter === 'openai') {
+    return new OpenAiAdapter({
+      apiKey: modelCfg.apiKey || process.env.OPENAI_API_KEY,
       model: modelCfg.modelName,
     });
   }
