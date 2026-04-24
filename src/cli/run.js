@@ -8,6 +8,7 @@ const { OllamaAdapter } = require('../model/ollama.js');
 const { ClaudeCodeAttach } = require('../attach/claude-code.js');
 const { RotatingJsonLogger } = require('../core/logger.js');
 const { StateStore } = require('../core/state-store.js');
+const { shouldAdviseLegacyMigration, legacyMigrationAdvisory } = require('../runtime/paths.js');
 const { AgentLoop } = require('../core/loop.js');
 const { WakeBudget } = require('../safety/budget.js');
 const { startServer } = require('./ipc.js');
@@ -38,6 +39,9 @@ async function runFromConfig(configPath) {
   const cfg = loadConfig(configPath);
   if (cfg.attach.mode !== 'headless') {
     throw new Error(`attach mode ${cfg.attach.mode} not supported in Phase 1 (only "headless")`);
+  }
+  if (shouldAdviseLegacyMigration()) {
+    process.stderr.write(`[run] ${legacyMigrationAdvisory()}\n`);
   }
 
   const mesh = new MeshAdapter({

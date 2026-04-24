@@ -2,13 +2,11 @@
 
 const fs = require('node:fs');
 const path = require('node:path');
-const os = require('node:os');
+const { stateDir } = require('../runtime/paths.js');
 
 const SCHEMA_VERSION = 1;
 
-function defaultDir() {
-  return process.env.XMESH_AGENT_RUNTIME_DIR || path.join(os.homedir(), '.xmesh-agent', 'state');
-}
+function defaultDir() { return stateDir(); }
 
 function statePath(peerName, baseDir = defaultDir()) {
   return path.join(baseDir, `${peerName}.json`);

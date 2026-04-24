@@ -3,17 +3,10 @@
 const crypto = require('node:crypto');
 const fs = require('node:fs');
 const path = require('node:path');
-const os = require('node:os');
+const { keysDir, trustedKeysDir } = require('../runtime/paths.js');
 
-function defaultKeyDir() {
-  const base = process.env.XMESH_AGENT_RUNTIME_DIR || path.join(os.homedir(), '.xmesh-agent');
-  return path.join(base, 'keys');
-}
-
-function defaultTrustDir() {
-  const base = process.env.XMESH_AGENT_RUNTIME_DIR || path.join(os.homedir(), '.xmesh-agent');
-  return path.join(base, 'trusted-keys');
-}
+function defaultKeyDir() { return keysDir(); }
+function defaultTrustDir() { return trustedKeysDir(); }
 
 function privKeyPath(peerName, dir = defaultKeyDir()) {
   return path.join(dir, `${peerName}.key`);
@@ -41,8 +34,12 @@ function rawPublicKeyFromSpki(publicKey) {
   return spki.slice(spki.length - 32);
 }
 
+function fullFingerprintOf(publicRaw) {
+  return crypto.createHash('sha256').update(publicRaw).digest('hex');
+}
+
 function fingerprintOf(publicRaw) {
-  return crypto.createHash('sha256').update(publicRaw).digest('hex').slice(0, 16);
+  return fullFingerprintOf(publicRaw).slice(0, 16);
 }
 
 function saveKeyPair(peerName, kp, dir = defaultKeyDir()) {
@@ -151,6 +148,7 @@ module.exports = {
   loadKeyPair,
   loadMeta,
   fingerprintOf,
+  fullFingerprintOf,
   signEnvelope,
   verifyEnvelope,
   canonicalise,

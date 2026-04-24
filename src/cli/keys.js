@@ -7,19 +7,22 @@ const {
   trustKey,
   listTrustedKeys,
   fingerprintOf,
+  fullFingerprintOf,
 } = require('../safety/identity.js');
 
 function keygen(peerName, { force = false, out = process.stdout } = {}) {
   const existing = loadMeta(peerName);
   if (existing && !force) {
-    out.write(`key already exists for ${peerName} — fingerprint ${existing.fingerprint}\nuse --force to rotate\n`);
+    out.write(`key already exists for ${peerName} — keyprint ${existing.fingerprint}\nuse --force to rotate\n`);
     return 1;
   }
   const kp = generateKeyPair();
   const meta = saveKeyPair(peerName, kp);
+  const full = fullFingerprintOf(kp.publicRaw);
   out.write(`keygen: ${peerName}\n`);
   out.write(`  algorithm:   ${meta.algorithm}\n`);
-  out.write(`  fingerprint: ${meta.fingerprint}\n`);
+  out.write(`  keyprint:    ${meta.fingerprint}  (16-hex short form)\n`);
+  out.write(`  fingerprint: ${full}  (64-hex full form — use this for trust add)\n`);
   out.write(`  created:     ${meta.createdAt}\n`);
   out.write(`  public key:  ${meta.publicKeyBase64Url}\n`);
   return 0;
@@ -31,7 +34,12 @@ function fingerprint(peerName, { out = process.stdout } = {}) {
     out.write(`no key for peer "${peerName}"\n`);
     return 1;
   }
-  out.write(`${meta.fingerprint}  ${peerName}\n`);
+  const fullHex = Buffer.from(meta.publicKeyBase64Url, 'base64url');
+  const full = fullFingerprintOf(fullHex);
+  out.write(`peer:        ${peerName}\n`);
+  out.write(`keyprint:    ${meta.fingerprint}\n`);
+  out.write(`fingerprint: ${full}\n`);
+  out.write(`public key:  ${meta.publicKeyBase64Url}\n`);
   return 0;
 }
 
@@ -47,9 +55,13 @@ function trustAdd({ group, peer, publicKey }, { out = process.stderr } = {}) {
     out.write(`trust add: expected 32-byte ed25519 public key, got ${raw.length} bytes\n`);
     return 2;
   }
-  const fp = fingerprintOf(raw);
-  trustKey({ group, peer, publicRaw: raw, fingerprint: fp });
-  out.write(`trusted ${peer} in group "${group}" — fingerprint ${fp}\n`);
+  const keyprint = fingerprintOf(raw);
+  const full = fullFingerprintOf(raw);
+  trustKey({ group, peer, publicRaw: raw, fingerprint: keyprint });
+  out.write(`trusted ${peer} in group "${group}"\n`);
+  out.write(`  keyprint:    ${keyprint}\n`);
+  out.write(`  fingerprint: ${full}\n`);
+  out.write(`  ^ verify this matches the peer's reported full fingerprint before sharing CMBs.\n`);
   return 0;
 }
 

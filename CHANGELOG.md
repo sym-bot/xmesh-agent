@@ -1,5 +1,27 @@
 # Changelog
 
+## 0.1.0-alpha.13 — 2026-04-24
+
+- **BREAKING (alpha):** runtime dir renamed from `~/.xmesh-agent/` →
+  `~/.xmesh/` per CMO Q3 — brand alignment with `xmesh.dev`. The npm
+  package name (`@sym-bot/xmesh-agent`) is unchanged; only the
+  user-facing filesystem path moves.
+- New shared module `src/runtime/paths.js` — single source of truth for
+  baseDir / keysDir / trustedKeysDir / stateDir / socketsDir
+- Env override renamed `XMESH_AGENT_RUNTIME_DIR` → `XMESH_RUNTIME_DIR`
+  with legacy var still accepted as fallback
+- One-shot deprecation advisory at `xmesh-agent run` startup if
+  `~/.xmesh-agent/` exists and `~/.xmesh/` does not — operator-driven
+  migration with explicit `mv` command, no automatic file moves
+- `fullFingerprintOf()` exported alongside `fingerprintOf()` —
+  64-hex full SHA-256 vs 16-hex short form
+- `xmesh-agent keygen` + `fingerprint` now print BOTH keyprint (16-hex)
+  and fingerprint (64-hex) per CMO Q4 — keyprint for casual display,
+  fingerprint for trust decisions
+- `xmesh-agent trust add` now prints full 64-hex fingerprint with an
+  explicit verification advisory ("verify this matches the peer's
+  reported full fingerprint before sharing CMBs")
+
 ## 0.1.0-alpha.12 — 2026-04-24
 
 - Phase-1 identity signing primitive (`src/safety/identity.js`) —

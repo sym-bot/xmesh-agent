@@ -22,12 +22,12 @@ const {
 
 function tmpRuntimeDir() {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'xmesh-id-'));
-  process.env.XMESH_AGENT_RUNTIME_DIR = dir;
+  process.env.XMESH_RUNTIME_DIR = dir;
   return dir;
 }
 
 function cleanup(dir) {
-  delete process.env.XMESH_AGENT_RUNTIME_DIR;
+  delete process.env.XMESH_RUNTIME_DIR;
   try { fs.rmSync(dir, { recursive: true, force: true }); } catch {}
 }
 

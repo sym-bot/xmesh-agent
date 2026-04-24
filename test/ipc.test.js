@@ -9,7 +9,7 @@ const { startServer, sendRequest, socketPath } = require('../src/cli/ipc.js');
 
 function tmpRuntimeDir() {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'xmesh-ipc-test-'));
-  process.env.XMESH_AGENT_RUNTIME_DIR = dir;
+  process.env.XMESH_RUNTIME_DIR = dir;
   return dir;
 }
 
@@ -95,7 +95,7 @@ test('IPC: sendRequest fails when no server is running', async () => {
   }
 });
 
-test('IPC: socketPath follows XMESH_AGENT_RUNTIME_DIR override', () => {
+test('IPC: socketPath follows XMESH_RUNTIME_DIR override', () => {
   const dir = tmpRuntimeDir();
   try {
     const p = socketPath('xyz');

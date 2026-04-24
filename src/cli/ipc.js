@@ -2,11 +2,11 @@
 
 const net = require('node:net');
 const path = require('node:path');
-const os = require('node:os');
 const fs = require('node:fs');
+const { socketsDir } = require('../runtime/paths.js');
 
 function socketDir() {
-  const base = process.env.XMESH_AGENT_RUNTIME_DIR || path.join(os.homedir(), '.xmesh-agent');
+  const base = socketsDir();
   fs.mkdirSync(base, { recursive: true });
   return base;
 }

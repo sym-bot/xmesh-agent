@@ -222,3 +222,25 @@ rm -f ~/.xmesh-agent/*.sock
 Structured JSON logging is available since 0.1.0-alpha.5: set
 `[logging] file_path = "..."` in `agent.toml` and logs go to disk as JSON
 lines with automatic size-based rotation (default 5 MB × 5 files).
+
+## Runtime directory layout
+
+Since 0.1.0-alpha.13 all runtime state lives under `~/.xmesh/`:
+
+```
+~/.xmesh/
+  keys/                  per-peer ed25519 keypairs (0600 on .key)
+  trusted-keys/<group>/  pinned peer public keys per group
+  state/                 per-peer lifetime stats JSON sidecars
+  <peer>.sock            IPC sockets for stop/status/cost/trace
+```
+
+Override the base dir with `XMESH_RUNTIME_DIR=/some/path` (legacy
+`XMESH_AGENT_RUNTIME_DIR` still accepted as fallback).
+
+Migrating from earlier alphas (which used `~/.xmesh-agent/`):
+```
+mv ~/.xmesh-agent ~/.xmesh
+```
+The runtime detects the old dir on `xmesh-agent run` startup and prints
+a one-shot advisory pointing at this command. No automatic file moves.
