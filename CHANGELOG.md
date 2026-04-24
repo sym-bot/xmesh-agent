@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.1 — 2026-04-24
+
+- `examples/scenarios/writer-openai.toml` + `test-writer-openai.toml` —
+  full 3-peer demo can run on OpenAI gpt-4o-mini end-to-end (mirror
+  of the Anthropic writer + reviewer + test-writer set)
+- `test/openai.smoke.js` — live OpenAI API smoke skip-gated on
+  `OPENAI_API_KEY`. Asserts emit_cmb tool_use + non-zero usage + cost.
+
 ## 0.1.0 — 2026-04-24
 
 First production-grade public release. Phase-1 of `xmesh-agent` is complete:

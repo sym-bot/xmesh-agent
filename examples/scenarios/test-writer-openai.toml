@@ -1,0 +1,44 @@
+# Test-writer peer running on OpenAI gpt-4o-mini.
+# Set OPENAI_API_KEY in env.
+
+[identity]
+name = "test-writer-02-openai"
+role = "test-writer"
+
+[mesh]
+group = "xmesh-demo"
+
+[role_weights]
+focus = 1.2
+issue = 2.0
+intent = 1.0
+motivation = 0.8
+commitment = 2.5
+perspective = 0.5
+mood = 0.6
+
+[model]
+adapter = "openai"
+model_name = "gpt-4o-mini"
+max_tokens_per_call = 1024
+
+[context]
+k_lineage = 3
+n_own = 5
+n_group = 10
+max_context_tokens = 8000
+
+[budget]
+max_wakes_per_minute = 5
+max_wakes_per_hour = 50
+max_wakes_per_day = 200
+max_cost_usd_per_hour = 0.50
+max_cost_usd_per_day = 2.00
+max_cost_usd_per_run = 2.00
+
+[safety]
+cycle_depth = 5
+approval_gates = "default"
+
+[attach]
+mode = "headless"
