@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.1.0-alpha.6 — 2026-04-24
+
+- Persistent per-peer state (`src/core/state-store.js`) — lifetime cost,
+  CMBs emitted, suppressions, run count persisted to
+  `~/.xmesh-agent/state/<peer>.json` with atomic tmp-rename writes
+- `xmesh-agent cost <peer>` now reports both this-run and lifetime totals
+- `xmesh-agent status <peer>` includes lifetime totals
+- Startup log prints prior totals when previous runs exist
+- Schema versioned (v1); old-version files are reset, not crashed on
+
 ## 0.1.0-alpha.5 — 2026-04-24
 
 - Structured JSON logging (`src/core/logger.js`) — RotatingJsonLogger writes

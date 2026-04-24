@@ -7,6 +7,7 @@ const { OpenAiAdapter } = require('../model/openai.js');
 const { OllamaAdapter } = require('../model/ollama.js');
 const { ClaudeCodeAttach } = require('../attach/claude-code.js');
 const { RotatingJsonLogger } = require('../core/logger.js');
+const { StateStore } = require('../core/state-store.js');
 const { AgentLoop } = require('../core/loop.js');
 const { WakeBudget } = require('../safety/budget.js');
 const { startServer } = require('./ipc.js');
@@ -89,12 +90,29 @@ async function runFromConfig(configPath) {
     process.stderr.write(`[run] claude-code advisory: ${advisoryResult.advisory}\n`);
   }
 
+  const stateStore = new StateStore({ peerName: cfg.identity.name });
+  stateStore.onRunStart({
+    configPath,
+    model: cfg.model.adapter + '/' + cfg.model.modelName,
+    group: cfg.mesh.group,
+  });
+
   await loop.start();
   process.stderr.write(
     `[run] xmesh-agent started — peer=${cfg.identity.name} group=${cfg.mesh.group} model=${cfg.model.modelName}\n`,
   );
+  if (stateStore.state.totals.runs > 1) {
+    const t = stateStore.state.totals;
+    process.stderr.write(
+      `[run] prior totals — runs=${t.runs - 1} emitted=${t.cmbsEmitted} cost=$${t.costUsdTotal.toFixed(6)} (first seen ${stateStore.state.firstSeenIso})\n`,
+    );
+  }
 
   const startedAt = Date.now();
+  const statsTimer = setInterval(() => {
+    stateStore.recordStats(loop.stats);
+  }, 10_000);
+  statsTimer.unref();
 
   const ipc = await startServer({
     peerName: cfg.identity.name,
@@ -111,18 +129,23 @@ async function runFromConfig(configPath) {
           maxWakesPerDay: cfg.budget.maxWakesPerDay,
           currentCounts: budget.peek(),
         },
+        lifetime: stateStore.totals(),
       }),
-      cost: () => ({
-        peer: cfg.identity.name,
-        costUsdTotal: loop.stats.costUsdTotal,
-        cmbsEmitted: loop.stats.cmbsEmitted,
-        cmbsSuppressed: loop.stats.cmbsSuppressed,
-        caps: {
-          perHour: cfg.budget.maxCostUsdPerHour,
-          perDay: cfg.budget.maxCostUsdPerDay,
-          perRun: cfg.budget.maxCostUsdPerRun,
-        },
-      }),
+      cost: () => {
+        stateStore.recordStats(loop.stats);
+        return {
+          peer: cfg.identity.name,
+          costUsdTotal: loop.stats.costUsdTotal,
+          cmbsEmitted: loop.stats.cmbsEmitted,
+          cmbsSuppressed: loop.stats.cmbsSuppressed,
+          caps: {
+            perHour: cfg.budget.maxCostUsdPerHour,
+            perDay: cfg.budget.maxCostUsdPerDay,
+            perRun: cfg.budget.maxCostUsdPerRun,
+          },
+          lifetime: stateStore.totals(),
+        };
+      },
       trace: async (req) => {
         const cmbId = req.cmbId;
         if (!cmbId) throw new Error('trace requires cmbId');
@@ -151,10 +174,13 @@ async function runFromConfig(configPath) {
   const shutdown = async (signal) => {
     process.stderr.write(`[run] ${signal} received — draining\n`);
     try {
+      clearInterval(statsTimer);
+      stateStore.recordStats(loop.stats);
+      stateStore.onRunStop({ reason: signal });
       await loop.stop();
       await ipc.close();
       logger.close();
-      process.stderr.write(`[run] stopped cleanly — stats=${JSON.stringify(loop.stats)}\n`);
+      process.stderr.write(`[run] stopped cleanly — stats=${JSON.stringify(loop.stats)} lifetime=${JSON.stringify(stateStore.totals())}\n`);
       process.exit(0);
     } catch (err) {
       process.stderr.write(`[run] shutdown error: ${err.message}\n`);

@@ -114,13 +114,19 @@ function formatResult(cmd, res) {
     ].join('\n');
   }
   if (cmd === 'cost') {
-    return [
+    const lines = [
       `peer:       ${body.peer}`,
-      `cost_usd:   ${body.costUsdTotal.toFixed(6)}`,
+      `cost_usd:   ${body.costUsdTotal.toFixed(6)}  (this run)`,
       `emitted:    ${body.cmbsEmitted}`,
       `suppressed: ${body.cmbsSuppressed}`,
       `caps:       per_hour=$${body.caps.perHour} per_day=$${body.caps.perDay} per_run=$${body.caps.perRun}`,
-    ].join('\n');
+    ];
+    if (body.lifetime) {
+      lines.push(
+        `lifetime:   cost=$${body.lifetime.costUsdTotal.toFixed(6)} emitted=${body.lifetime.cmbsEmitted} suppressed=${body.lifetime.cmbsSuppressed} runs=${body.lifetime.runs}`,
+      );
+    }
+    return lines.join('\n');
   }
   if (cmd === 'trace') {
     const lines = [`root: ${body.root}`];
