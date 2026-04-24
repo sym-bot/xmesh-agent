@@ -13,3 +13,4 @@ dist/
 *.swp
 agent.toml
 !examples/agent.toml.example
+*.tgz
