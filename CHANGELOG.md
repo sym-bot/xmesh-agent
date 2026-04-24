@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.1.0-alpha.14 — 2026-04-24
+
+- `xmesh-agent migrate` command — automated `~/.xmesh-agent` →
+  `~/.xmesh` rename. Dry-run by default; `--apply` performs the move.
+- Refuses to apply when socket files present (running peers must be
+  stopped first) or when both legacy + current dirs exist (conflict
+  resolution must be manual).
+
 ## 0.1.0-alpha.13 — 2026-04-24
 
 - **BREAKING (alpha):** runtime dir renamed from `~/.xmesh-agent/` →

@@ -16,6 +16,7 @@ function printHelp() {
       '  run --config <path>       Start a peer (headless attach) from agent.toml',
       '  dry-run --config <path>   Validate config + adapters without joining mesh',
       '  schema                    Print the JSON Schema for agent.toml',
+      '  migrate [--apply]         Migrate ~/.xmesh-agent → ~/.xmesh (dry-run by default)',
       '  keygen <peer> [--force]   Generate ed25519 identity keypair (identity signing v0.1)',
       '  fingerprint <peer>        Print fingerprint of peer\'s public key',
       '  trust add --group <g> --peer <p> --public-key <b64url>',
@@ -169,6 +170,10 @@ async function main(argv) {
       const { printSchema } = require('./schema.js');
       printSchema();
       return 0;
+    }
+    case 'migrate': {
+      const { migrate } = require('./migrate.js');
+      return migrate({ apply: args.includes('--apply') });
     }
     case 'keygen': {
       const { keygen } = require('./keys.js');
