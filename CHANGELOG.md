@@ -7,7 +7,22 @@
   a "next steps" prompt. Supports `--role` (writer / reviewer /
   test-writer / auditor / generator / spec / generic), `--adapter`
   (anthropic / openai / ollama), `--group`, `--model`, `--cost-cap`,
-  `--out`, `--force`. Round-trip tested against `loadConfig`.
+  `--out`, `--force`. Round-trip tested against `loadConfig`. Uses
+  `flag: 'wx'` exclusive-create on writeFileSync — eliminates TOCTOU
+  race window between existence check and write.
+- **Security:** IPC handler dispatch (`src/cli/ipc.js`) now guards
+  against prototype-chain method names. `handlers[req.cmd]` previously
+  resolved `cmd=toString` to `Object.prototype.toString`, bypassing
+  the unknown-cmd guard. Fixed via `Object.prototype.hasOwnProperty`
+  check + function-type validation. CodeQL js/unvalidated-dynamic-method-call.
+- 5 new bundled scenarios in `examples/scenarios/`:
+  `security-reviewer.toml` (auditor role, attacker-perspective lens),
+  `doc-writer.toml` (long-form docs on gpt-4o), `spec-drafter.toml`
+  (architecture-level specs on Claude Opus), and a mixed-vendor triad
+  (`mixed-vendor-{writer,reviewer,test-writer}.toml`) demonstrating
+  the "any model" claim with Anthropic + OpenAI + Ollama on the same
+  wire. Total 11 scenarios (was 6).
+- scenarios/README.md updated with full table + 5 recommended triads.
 
 ## 0.1.3 — 2026-04-24
 
