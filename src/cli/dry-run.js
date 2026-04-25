@@ -1,11 +1,15 @@
 'use strict';
 
+const fs = require('node:fs');
+const toml = require('@iarna/toml');
 const { loadConfig } = require('./config.js');
 const { AnthropicAdapter } = require('../model/anthropic.js');
 const { OpenAiAdapter } = require('../model/openai.js');
 const { OllamaAdapter } = require('../model/ollama.js');
 const { ClaudeCodeAttach } = require('../attach/claude-code.js');
 const { checkRoleSanity } = require('../core/role-sanity.js');
+const { SCHEMA } = require('./schema.js');
+const { validate } = require('./schema-validate.js');
 
 async function dryRun(configPath, { out = process.stdout, err = process.stderr } = {}) {
   const checks = [];
@@ -24,6 +28,22 @@ async function dryRun(configPath, { out = process.stdout, err = process.stderr }
   } catch (e) {
     record('load config', false, e.message);
     return { ok: false, checks };
+  }
+
+  try {
+    const raw = fs.readFileSync(configPath, 'utf8');
+    const parsed = toml.parse(raw);
+    const errors = validate(parsed, SCHEMA);
+    if (errors.length === 0) {
+      record('schema validation', true, 'config matches xmesh-agent agent.toml schema');
+    } else {
+      const summary = errors.length > 3
+        ? `${errors.slice(0, 3).join('; ')}; +${errors.length - 3} more`
+        : errors.join('; ');
+      record('schema validation', false, summary);
+    }
+  } catch (e) {
+    record('schema validation', false, `validator error: ${e.message}`);
   }
 
   try {
