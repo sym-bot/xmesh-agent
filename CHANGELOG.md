@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.1.6 — 2026-04-25
+
+- `xmesh-agent doctor` — one-command health check across the local
+  setup. Reports node version, baseDir, identity keys (with mode
+  warnings if not 0600), trusted-keys groups, persistent state +
+  lifetime totals, running peer IPC sockets (pings them for liveness),
+  and environment variables. Exits 0 on healthy / 1 on issues with
+  concrete fix suggestions per issue.
+
 ## 0.1.5 — 2026-04-25
 
 - Friendlier error messages across the operator entry path:
