@@ -316,14 +316,21 @@ Real-API smoke tests are skip-gated. Set `ANTHROPIC_API_KEY` / `OPENAI_API_KEY` 
 
 ---
 
+## Documentation
+
+- **[`docs/getting-started.md`](docs/getting-started.md)** — five-minute quickstart from `npm i` to three peers coordinating
+- **[`docs/concepts.md`](docs/concepts.md)** — vocabulary: CMB, CAT7, SVAF, α weights, lineage, the autonomous loop
+- **[`docs/cookbook.md`](docs/cookbook.md)** — 14 recipes: coding triad, mixed-vendor mesh, cross-host, custom α, etc.
+- **[`examples/scenarios/README.md`](examples/scenarios/README.md)** — 11 ready-to-run agent.toml templates
+- **[`OPERATIONS.md`](OPERATIONS.md)** — launch-day runbook + kill-switch playbook
+- **[`PUBLISHING.md`](PUBLISHING.md)** — release rehearsal + npm-publish steps
+- **[`examples/cross-host-runbook.md`](examples/cross-host-runbook.md)** — Mac+Win cross-host verification
+
 ## Related
 
 - **Spec:** [sym.bot/spec/mmp](https://sym.bot/spec/mmp) — Mesh Memory Protocol v0.2.3 (CC-BY-4.0)
 - **Substrate:** [`@sym-bot/sym`](https://github.com/sym-bot/sym) — mesh transport, SVAF kernel, CMB store
 - **Claude Code shim:** [`@sym-bot/mesh-channel`](https://github.com/sym-bot/sym-mesh-channel) — MCP plugin that pairs a Claude Code session into the mesh
-- **Operations runbook:** [`OPERATIONS.md`](OPERATIONS.md) — launch-day procedures + kill-switch playbook
-- **Publishing runbook:** [`PUBLISHING.md`](PUBLISHING.md) — release rehearsal + npm-publish steps
-- **Cross-host runbook:** [`examples/cross-host-runbook.md`](examples/cross-host-runbook.md) — Mac+Win verification
 
 ---
 
