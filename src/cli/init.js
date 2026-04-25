@@ -121,10 +121,6 @@ function init(args, { out = process.stdout, err = process.stderr } = {}) {
   const adapterDefaults = ADAPTER_DEFAULTS[opts.adapter];
   const modelName = opts.model || adapterDefaults.modelName;
   const outputPath = opts.output || `${opts.peerName}.toml`;
-  if (fs.existsSync(outputPath) && !opts.force) {
-    err.write(`xmesh-agent init: ${outputPath} already exists — use --force to overwrite\n`);
-    return 1;
-  }
   const toml = buildToml({
     peerName: opts.peerName,
     role: opts.role,
@@ -133,7 +129,15 @@ function init(args, { out = process.stdout, err = process.stderr } = {}) {
     modelName,
     costCap: opts.costCap,
   });
-  fs.writeFileSync(outputPath, toml);
+  try {
+    fs.writeFileSync(outputPath, toml, { flag: opts.force ? 'w' : 'wx' });
+  } catch (e) {
+    if (e.code === 'EEXIST') {
+      err.write(`xmesh-agent init: ${outputPath} already exists — use --force to overwrite\n`);
+      return 1;
+    }
+    throw e;
+  }
   out.write(`wrote ${outputPath}\n`);
   out.write(`  peer:    ${opts.peerName}\n`);
   out.write(`  role:    ${opts.role}${ROLE_EXPECTATIONS[opts.role] ? ' (known role; α weights tuned)' : ' (generic α weights)'}\n`);
