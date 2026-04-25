@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.1.8 — 2026-04-25
+
+- `dry-run` now validates the parsed `agent.toml` against the JSON
+  Schema in `src/cli/schema.js`. Catches typos in section names,
+  unknown properties at any depth, wrong types, enum violations
+  (e.g. `model.adapter = "cohere"`), missing required fields, minimum
+  / minLength violations.
+- New module `src/cli/schema-validate.js` — minimal Draft-2020-12
+  validator covering the subset our schema uses (additionalProperties,
+  required, type, enum, minimum, minLength). Zero new dependencies.
+- New "schema validation" check in dry-run output, between load-config
+  and claude-code-advisory.
+- 11 new unit tests including a drift-guard that validates every
+  scenario in `examples/scenarios/` against the SCHEMA.
+
 ## 0.1.7 — 2026-04-25
 
 - **GitHub Action** (`action.yml` at the repo root) — composite action
