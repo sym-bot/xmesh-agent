@@ -312,7 +312,7 @@ Real-API smoke tests are skip-gated. Set `ANTHROPIC_API_KEY` / `OPENAI_API_KEY` 
 - **0.1.x** is alpha. API surface is stable enough to build on; CLI commands and config schema may evolve before 1.0.
 - **Test coverage:** 225 unit tests across 14 source modules; CI green on Node 18, 20, 22.
 - **Production verification:** end-to-end real-API run with three peers on `gpt-4o-mini` validated 2026-04-24 — three model calls, three CAT7 CMBs, three lineage chains, total cost $0.00023.
-- **Next:** wire-signed CMBs (`@sym-bot/sym` v0.6.0 + MMP spec v0.3.0), interactive attach modes (Cursor + Codex shims), shared team-DAG primitive.
+- **What's coming:** see [`ROADMAP.md`](ROADMAP.md) for the in-flight, designed, and considering buckets.
 
 ---
 
