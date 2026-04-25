@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.1.7 — 2026-04-25
+
+- **GitHub Action** (`action.yml` at the repo root) — composite action
+  that drops a xmesh-agent peer into any GitHub Actions workflow.
+  Inputs: config OR scaffold flags (role / adapter / model / group /
+  peer-name), cost-cap-usd, duration-seconds, anthropic-api-key,
+  openai-api-key, xmesh-agent-version. Outputs: cmbs-emitted, cost-usd,
+  config-path. Five steps: setup-node → install xmesh-agent → resolve
+  config (or scaffold inline) → dry-run validate → run with bounded
+  duration + cost cap.
+- `docs/github-action.md` — quickstart (review-bot on every PR),
+  inputs/outputs reference, multi-peer mesh-in-CI pattern using a
+  relay (Bonjour doesn't cross runners), custom-config example, cost
+  discipline guidance, troubleshooting.
+
 ## 0.1.6 — 2026-04-25
 
 - `xmesh-agent doctor` — one-command health check across the local
