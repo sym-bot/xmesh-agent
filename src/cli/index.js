@@ -13,6 +13,7 @@ function printHelp() {
       '  xmesh-agent <command> [options]',
       '',
       'Commands:',
+      '  init <peer> [--role <r>]  Scaffold a starter agent.toml for <peer>',
       '  run --config <path>       Start a peer (headless attach) from agent.toml',
       '  dry-run --config <path>   Validate config + adapters without joining mesh',
       '  schema                    Print the JSON Schema for agent.toml',
@@ -162,6 +163,10 @@ async function main(argv) {
   }
   const cmd = args[0];
   switch (cmd) {
+    case 'init': {
+      const { init } = require('./init.js');
+      return init(args.slice(1));
+    }
     case 'run':
       return dispatchRun(args.slice(1));
     case 'dry-run':
