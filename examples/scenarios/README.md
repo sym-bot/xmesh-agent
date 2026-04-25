@@ -1,4 +1,30 @@
-# xmesh-agent demo scenario — 3-peer coding mesh
+# xmesh-agent demo scenarios
+
+This directory ships ready-to-run agent.toml scenarios for several common patterns. Drop one into `xmesh-agent run --config <path>` after setting the appropriate API key env var.
+
+## Scenarios
+
+| File | Role | Adapter | Use case |
+|---|---|---|---|
+| `writer.toml` / `writer-openai.toml` | writer | Anthropic / OpenAI | Drafts specs from issues |
+| `reviewer.toml` / `reviewer-openai.toml` / `reviewer-ollama.toml` | reviewer | Anthropic / OpenAI / Ollama | Flags issues + commitment gaps |
+| `test-writer.toml` / `test-writer-openai.toml` | test-writer | Anthropic / OpenAI | Generates regression tests |
+| `security-reviewer.toml` | auditor | Anthropic Opus | Security audit pass with attacker-perspective lens |
+| `doc-writer.toml` | writer | OpenAI gpt-4o | Drafts user-facing documentation |
+| `spec-drafter.toml` | spec | Anthropic Opus | Architecture-level specs |
+| `mixed-vendor-{writer,reviewer,test-writer}.toml` | triad | Anthropic + OpenAI + Ollama | Demonstrates "any model" — three vendors on the same wire |
+
+## Recommended triads
+
+- **Coding** — `writer.toml` + `reviewer.toml` + `test-writer.toml`
+- **Coding (OpenAI)** — `*-openai.toml` triad
+- **Coding + security** — coding triad + `security-reviewer.toml` (4 peers, security peer admits all CMBs and emits issue-CMBs when it spots a concern)
+- **Spec → docs flow** — `spec-drafter.toml` + `doc-writer.toml` (specs flow through SVAF to docs writer)
+- **Mixed-vendor showcase** — `mixed-vendor-*.toml` triad (3 peers, 3 vendors, $0.001 / run since one is local Ollama)
+
+---
+
+## Original 3-peer coding mesh
 
 Runtime doc §6.1 Phase-1 acceptance scenario. Three headless peers exchange CMBs
 autonomously for ≥ 5 minutes, total cost < $5, ≥ 10 CMBs per peer, no infinite loops.
