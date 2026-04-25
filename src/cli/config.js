@@ -5,18 +5,62 @@ const toml = require('@iarna/toml');
 
 const REQUIRED_SECTIONS = ['identity', 'mesh', 'role_weights', 'model'];
 const SUPPORTED_ADAPTERS = ['anthropic', 'openai', 'ollama'];
+const REQUIRED_CAT7_FIELDS = ['focus', 'issue', 'intent', 'motivation', 'commitment', 'perspective', 'mood'];
 
 function loadConfig(path) {
-  const raw = fs.readFileSync(path, 'utf8');
-  const parsed = toml.parse(raw);
-  for (const s of REQUIRED_SECTIONS) {
-    if (!parsed[s]) throw new Error(`agent.toml missing required section: [${s}]`);
+  let raw;
+  try { raw = fs.readFileSync(path, 'utf8'); }
+  catch (e) {
+    if (e.code === 'ENOENT') {
+      throw new Error(
+        `agent.toml not found at ${path}\n` +
+        `  hint: scaffold a starter config with \`xmesh-agent init <peer-name>\``,
+      );
+    }
+    if (e.code === 'EACCES') {
+      throw new Error(`agent.toml at ${path} is not readable (permission denied)`);
+    }
+    throw e;
   }
-  if (!parsed.identity.name) throw new Error('agent.toml [identity] requires name');
-  if (!parsed.model.adapter) throw new Error('agent.toml [model] requires adapter');
+  let parsed;
+  try { parsed = toml.parse(raw); }
+  catch (e) {
+    throw new Error(
+      `agent.toml at ${path} is not valid TOML: ${e.message}\n` +
+      `  hint: validate with \`xmesh-agent dry-run --config ${path}\` or check syntax at https://toml.io`,
+    );
+  }
+  for (const s of REQUIRED_SECTIONS) {
+    if (!parsed[s]) {
+      throw new Error(
+        `agent.toml missing required section: [${s}]\n` +
+        `  hint: see examples/agent.toml.example or run \`xmesh-agent schema\` for the full schema`,
+      );
+    }
+  }
+  if (!parsed.identity.name) {
+    throw new Error(
+      'agent.toml [identity] requires `name` (your peer\'s unique name on the mesh)\n' +
+      '  hint: pick a stable identifier like "reviewer-01" — it must be unique within the mesh group',
+    );
+  }
+  if (!parsed.model.adapter) {
+    throw new Error(
+      `agent.toml [model] requires \`adapter\` (one of: ${SUPPORTED_ADAPTERS.join(', ')})`,
+    );
+  }
   if (!SUPPORTED_ADAPTERS.includes(parsed.model.adapter)) {
     throw new Error(
-      `agent.toml [model] adapter "${parsed.model.adapter}" not supported; supported: ${SUPPORTED_ADAPTERS.join(', ')}`,
+      `agent.toml [model] adapter "${parsed.model.adapter}" not supported\n` +
+      `  supported: ${SUPPORTED_ADAPTERS.join(', ')}\n` +
+      `  hint: contributions for new adapters welcome — see CONTRIBUTING.md`,
+    );
+  }
+  const missingWeights = REQUIRED_CAT7_FIELDS.filter((f) => !(f in (parsed.role_weights || {})));
+  if (missingWeights.length > 0) {
+    throw new Error(
+      `agent.toml [role_weights] missing CAT7 field(s): ${missingWeights.join(', ')}\n` +
+      `  required: ${REQUIRED_CAT7_FIELDS.join(', ')} (all seven, each as a number)`,
     );
   }
   return normalise(parsed);

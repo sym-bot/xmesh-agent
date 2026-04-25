@@ -15,16 +15,26 @@ const { startServer } = require('./ipc.js');
 
 function pickModelAdapter(modelCfg) {
   if (modelCfg.adapter === 'anthropic') {
-    return new AnthropicAdapter({
-      apiKey: modelCfg.apiKey || process.env.ANTHROPIC_API_KEY,
-      model: modelCfg.modelName,
-    });
+    const apiKey = modelCfg.apiKey || process.env.ANTHROPIC_API_KEY;
+    if (!apiKey) {
+      throw new Error(
+        'ANTHROPIC_API_KEY not set\n' +
+        '  export ANTHROPIC_API_KEY=sk-ant-...\n' +
+        '  get a key: https://console.anthropic.com/settings/keys',
+      );
+    }
+    return new AnthropicAdapter({ apiKey, model: modelCfg.modelName });
   }
   if (modelCfg.adapter === 'openai') {
-    return new OpenAiAdapter({
-      apiKey: modelCfg.apiKey || process.env.OPENAI_API_KEY,
-      model: modelCfg.modelName,
-    });
+    const apiKey = modelCfg.apiKey || process.env.OPENAI_API_KEY;
+    if (!apiKey) {
+      throw new Error(
+        'OPENAI_API_KEY not set\n' +
+        '  export OPENAI_API_KEY=sk-proj-...\n' +
+        '  get a key: https://platform.openai.com/api-keys',
+      );
+    }
+    return new OpenAiAdapter({ apiKey, model: modelCfg.modelName });
   }
   if (modelCfg.adapter === 'ollama') {
     return new OllamaAdapter({
@@ -32,7 +42,10 @@ function pickModelAdapter(modelCfg) {
       model: modelCfg.modelName,
     });
   }
-  throw new Error(`unsupported model adapter: ${modelCfg.adapter}`);
+  throw new Error(
+    `unsupported model adapter: ${modelCfg.adapter}\n` +
+    '  supported: anthropic, openai, ollama',
+  );
 }
 
 async function runFromConfig(configPath) {

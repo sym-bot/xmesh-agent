@@ -38,21 +38,23 @@ async function dryRun(configPath, { out = process.stdout, err = process.stderr }
   try {
     if (cfg.model.adapter === 'anthropic') {
       const hasKey = Boolean(cfg.model.apiKey || process.env.ANTHROPIC_API_KEY);
-      if (!hasKey) { record('model adapter', false, 'ANTHROPIC_API_KEY not set'); }
-      else {
+      if (!hasKey) {
+        record('model adapter', false, 'ANTHROPIC_API_KEY not set — run `export ANTHROPIC_API_KEY=sk-ant-...` (get a key at https://console.anthropic.com/settings/keys)');
+      } else {
         new AnthropicAdapter({ apiKey: cfg.model.apiKey || process.env.ANTHROPIC_API_KEY, model: cfg.model.modelName });
         record('model adapter', true, `anthropic ${cfg.model.modelName} (key present)`);
       }
     } else if (cfg.model.adapter === 'openai') {
       const hasKey = Boolean(cfg.model.apiKey || process.env.OPENAI_API_KEY);
-      if (!hasKey) { record('model adapter', false, 'OPENAI_API_KEY not set'); }
-      else {
+      if (!hasKey) {
+        record('model adapter', false, 'OPENAI_API_KEY not set — run `export OPENAI_API_KEY=sk-proj-...` (get a key at https://platform.openai.com/api-keys)');
+      } else {
         new OpenAiAdapter({ apiKey: cfg.model.apiKey || process.env.OPENAI_API_KEY, model: cfg.model.modelName });
         record('model adapter', true, `openai ${cfg.model.modelName} (key present)`);
       }
     } else if (cfg.model.adapter === 'ollama') {
       const a = new OllamaAdapter({ baseUrl: cfg.model.baseUrl, model: cfg.model.modelName });
-      record('model adapter', true, `ollama ${cfg.model.modelName} baseUrl=${a.baseUrl}`);
+      record('model adapter', true, `ollama ${cfg.model.modelName} baseUrl=${a.baseUrl} (verify ollama is running: \`curl ${a.baseUrl}/api/tags\`)`);
     }
   } catch (e) {
     record('model adapter', false, e.message);
@@ -87,7 +89,12 @@ async function dryRun(configPath, { out = process.stdout, err = process.stderr }
 
   const allOk = checks.every((c) => c.ok);
   out.write(`\n${allOk ? 'PASS' : 'FAIL'} — ${checks.filter((c) => c.ok).length}/${checks.length} checks passed\n`);
-  if (!allOk) err.write('dry-run found issues — fix before running `xmesh-agent run`\n');
+  if (!allOk) {
+    err.write('\ndry-run found issues — fix the FAIL line(s) above before running `xmesh-agent run`\n');
+    err.write('  see docs/getting-started.md for setup or `xmesh-agent init <peer>` to scaffold a fresh config\n');
+  } else {
+    out.write('\nready to run: `xmesh-agent run --config ' + configPath + '`\n');
+  }
   return { ok: allOk, checks };
 }
 

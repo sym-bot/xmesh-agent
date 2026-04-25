@@ -63,6 +63,12 @@ role = "x"
 group = "g"
 [role_weights]
 focus = 1
+issue = 1
+intent = 1
+motivation = 1
+commitment = 1
+perspective = 1
+mood = 1
 [model]
 adapter = "anthropic"
 `);
@@ -77,6 +83,12 @@ name = "x"
 group = "g"
 [role_weights]
 focus = 1
+issue = 1
+intent = 1
+motivation = 1
+commitment = 1
+perspective = 1
+mood = 1
 [model]
 adapter = "cohere"
 `);
@@ -91,6 +103,12 @@ name = "x"
 group = "g"
 [role_weights]
 focus = 1
+issue = 1
+intent = 1
+motivation = 1
+commitment = 1
+perspective = 1
+mood = 1
 [model]
 adapter = "openai"
 model_name = "gpt-4o"
@@ -98,6 +116,41 @@ model_name = "gpt-4o"
   const cfg = loadConfig(p);
   assert.equal(cfg.model.adapter, 'openai');
   assert.equal(cfg.model.modelName, 'gpt-4o');
+});
+
+test('loadConfig: missing file gives a friendly hint', () => {
+  assert.throws(
+    () => loadConfig('/no/such/path/agent.toml'),
+    /not found.*xmesh-agent init/s,
+  );
+});
+
+test('loadConfig: malformed TOML gives a parse-error hint', () => {
+  const p = writeToml('[identity\nname = "x"');
+  assert.throws(
+    () => loadConfig(p),
+    /not valid TOML.*toml\.io/s,
+  );
+});
+
+test('loadConfig: missing CAT7 weight names the field', () => {
+  const p = writeToml(`
+[identity]
+name = "p"
+[mesh]
+group = "g"
+[role_weights]
+focus = 1
+issue = 1
+intent = 1
+motivation = 1
+commitment = 1
+perspective = 1
+# mood missing
+[model]
+adapter = "ollama"
+`);
+  assert.throws(() => loadConfig(p), /missing CAT7 field.*mood/s);
 });
 
 test('loadConfig: applies defaults for optional sections', () => {
@@ -108,6 +161,12 @@ name = "x"
 group = "g"
 [role_weights]
 focus = 1
+issue = 1
+intent = 1
+motivation = 1
+commitment = 1
+perspective = 1
+mood = 1
 [model]
 adapter = "anthropic"
 `);

@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.1.5 — 2026-04-25
+
+- Friendlier error messages across the operator entry path:
+  - `loadConfig` — file-not-found names the path + suggests
+    `xmesh-agent init`; malformed TOML cites the parse error + links
+    https://toml.io; missing required section / CAT7 weight / model
+    adapter all link to remediation
+  - `pickModelAdapter` — missing API key gives the exact `export`
+    command + the vendor's key-management URL
+  - `dryRun` — model adapter check now includes the export hint inline;
+    on PASS prints the exact `xmesh-agent run --config <path>` command;
+    on FAIL points at `docs/getting-started.md` + the init command
+- CAT7 weight completeness now checked at config-load time (was
+  dry-run only) — fails earlier with a clearer message
+
 ## 0.1.4 — 2026-04-25
 
 - `xmesh-agent init <peer-name>` — scaffold a starter `agent.toml` with
