@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.1.4 — 2026-04-25
+
+- `xmesh-agent init <peer-name>` — scaffold a starter `agent.toml` with
+  role-specific α weights, adapter defaults, sensible budget caps, and
+  a "next steps" prompt. Supports `--role` (writer / reviewer /
+  test-writer / auditor / generator / spec / generic), `--adapter`
+  (anthropic / openai / ollama), `--group`, `--model`, `--cost-cap`,
+  `--out`, `--force`. Round-trip tested against `loadConfig`.
+
 ## 0.1.3 — 2026-04-24
 
 - README rewritten for public release: clearer "why", correct quickstart
