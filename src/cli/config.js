@@ -4,7 +4,7 @@ const fs = require('node:fs');
 const toml = require('@iarna/toml');
 
 const REQUIRED_SECTIONS = ['identity', 'mesh', 'role_weights', 'model'];
-const SUPPORTED_ADAPTERS = ['anthropic', 'openai', 'ollama'];
+const SUPPORTED_ADAPTERS = ['anthropic', 'openai', 'ollama', 'mistral'];
 const REQUIRED_CAT7_FIELDS = ['focus', 'issue', 'intent', 'motivation', 'commitment', 'perspective', 'mood'];
 
 function loadConfig(path) {

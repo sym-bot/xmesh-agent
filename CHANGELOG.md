@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.1.9 — 2026-04-25
+
+- **Mistral model adapter** (`src/model/mistral.js`) — fourth vendor.
+  Pricing table covers mistral-large / medium / small / codestral /
+  open-mistral-nemo / pixtral. Mistral's API is OpenAI-compatible so
+  the adapter delegates to the OpenAI SDK with `baseURL` override
+  (zero new dep). Defaults to `mistral-small-latest`.
+- `xmesh-agent init --adapter mistral` scaffolds with sensible defaults.
+- `MISTRAL_API_KEY` env var; friendly error on missing key.
+- `examples/scenarios/reviewer-mistral.toml` — sample peer config.
+- 12 new unit tests including object-arguments tool_call handling
+  (Mistral sometimes returns parsed args, OpenAI returns strings).
+
 ## 0.1.8 — 2026-04-25
 
 - `dry-run` now validates the parsed `agent.toml` against the JSON

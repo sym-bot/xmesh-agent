@@ -19,6 +19,7 @@ const ADAPTER_DEFAULTS = Object.freeze({
   anthropic: { modelName: 'claude-haiku-4-5-20251001', envKey: 'ANTHROPIC_API_KEY' },
   openai:    { modelName: 'gpt-4o-mini',               envKey: 'OPENAI_API_KEY' },
   ollama:    { modelName: 'llama3.2:3b',               envKey: null },
+  mistral:   { modelName: 'mistral-small-latest',      envKey: 'MISTRAL_API_KEY' },
 });
 
 function buildToml({ peerName, role, group, adapter, modelName, costCap }) {

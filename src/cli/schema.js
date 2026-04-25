@@ -49,7 +49,7 @@ const SCHEMA = Object.freeze({
       required: ['adapter'],
       additionalProperties: false,
       properties: {
-        adapter: { type: 'string', enum: ['anthropic', 'openai', 'ollama'] },
+        adapter: { type: 'string', enum: ['anthropic', 'openai', 'ollama', 'mistral'] },
         api_key: { type: ['string', 'null'], description: 'Inline API key (prefer env: ANTHROPIC_API_KEY / OPENAI_API_KEY).' },
         base_url: { type: ['string', 'null'], description: 'Ollama adapter only — override http://localhost:11434.' },
         model_name: { type: 'string', description: 'Vendor-specific model ID (e.g. claude-opus-4-7, gpt-4o, llama3.2:3b).' },
