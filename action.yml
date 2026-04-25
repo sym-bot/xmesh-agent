@@ -1,0 +1,160 @@
+name: 'xmesh-agent'
+description: 'Run a xmesh-agent peer in your GitHub Actions workflow — autonomous agent on the xmesh mesh'
+author: 'SYM.BOT'
+branding:
+  icon: 'cpu'
+  color: 'orange'
+
+inputs:
+  config:
+    description: 'Path to agent.toml (relative to GITHUB_WORKSPACE). If omitted, --role + --adapter are used to scaffold one inline.'
+    required: false
+    default: ''
+  role:
+    description: 'Peer role when scaffolding (writer / reviewer / test-writer / auditor / generator / spec / generic). Ignored if config is provided.'
+    required: false
+    default: 'reviewer'
+  adapter:
+    description: 'Model adapter when scaffolding (anthropic / openai / ollama). Ignored if config is provided.'
+    required: false
+    default: 'anthropic'
+  model:
+    description: 'Vendor-specific model name when scaffolding. Ignored if config is provided.'
+    required: false
+    default: ''
+  group:
+    description: 'Mesh group name when scaffolding. Ignored if config is provided.'
+    required: false
+    default: 'xmesh-ci'
+  peer-name:
+    description: 'Peer name when scaffolding. Defaults to <role>-<run-id>. Ignored if config is provided.'
+    required: false
+    default: ''
+  cost-cap-usd:
+    description: 'Per-run cost cap in USD. Defaults to $1.00.'
+    required: false
+    default: '1.00'
+  duration-seconds:
+    description: 'Maximum runtime in seconds. Defaults to 300 (5 min). Peer auto-stops at this deadline.'
+    required: false
+    default: '300'
+  anthropic-api-key:
+    description: 'Anthropic API key. Pass via secrets.ANTHROPIC_API_KEY.'
+    required: false
+    default: ''
+  openai-api-key:
+    description: 'OpenAI API key. Pass via secrets.OPENAI_API_KEY.'
+    required: false
+    default: ''
+  xmesh-agent-version:
+    description: 'Version of @sym-bot/xmesh-agent to install. Defaults to latest.'
+    required: false
+    default: 'latest'
+
+outputs:
+  config-path:
+    description: 'Path to the agent.toml that was used (scaffolded or provided).'
+    value: ${{ steps.run-peer.outputs.config-path }}
+  cmbs-emitted:
+    description: 'Number of CMBs the peer emitted during the run.'
+    value: ${{ steps.run-peer.outputs.cmbs-emitted }}
+  cost-usd:
+    description: 'Total cost in USD for this peer''s run.'
+    value: ${{ steps.run-peer.outputs.cost-usd }}
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Set up Node 18+
+      uses: actions/setup-node@v6
+      with:
+        node-version: '20'
+
+    - name: Install xmesh-agent
+      shell: bash
+      run: |
+        npm install -g "@sym-bot/xmesh-agent@${{ inputs.xmesh-agent-version }}"
+        xmesh-agent --version
+
+    - name: Resolve config
+      id: resolve-config
+      shell: bash
+      env:
+        ANTHROPIC_API_KEY: ${{ inputs.anthropic-api-key }}
+        OPENAI_API_KEY: ${{ inputs.openai-api-key }}
+      run: |
+        set -euo pipefail
+        if [ -n "${{ inputs.config }}" ]; then
+          CONFIG_PATH="${{ inputs.config }}"
+          if [ ! -f "$CONFIG_PATH" ]; then
+            echo "::error::config file not found: $CONFIG_PATH"
+            exit 1
+          fi
+          echo "path=$CONFIG_PATH" >> "$GITHUB_OUTPUT"
+        else
+          PEER_NAME="${{ inputs.peer-name }}"
+          if [ -z "$PEER_NAME" ]; then
+            PEER_NAME="${{ inputs.role }}-${GITHUB_RUN_ID}"
+          fi
+          MODEL_FLAG=""
+          if [ -n "${{ inputs.model }}" ]; then
+            MODEL_FLAG="--model ${{ inputs.model }}"
+          fi
+          xmesh-agent init "$PEER_NAME" \
+            --role "${{ inputs.role }}" \
+            --adapter "${{ inputs.adapter }}" \
+            --group "${{ inputs.group }}" \
+            --cost-cap "${{ inputs.cost-cap-usd }}" \
+            $MODEL_FLAG \
+            --out "${PEER_NAME}.toml"
+          echo "path=${PEER_NAME}.toml" >> "$GITHUB_OUTPUT"
+        fi
+
+    - name: Validate config (dry-run)
+      shell: bash
+      env:
+        ANTHROPIC_API_KEY: ${{ inputs.anthropic-api-key }}
+        OPENAI_API_KEY: ${{ inputs.openai-api-key }}
+      run: xmesh-agent dry-run --config "${{ steps.resolve-config.outputs.path }}"
+
+    - name: Run peer (bounded by duration-seconds)
+      id: run-peer
+      shell: bash
+      env:
+        ANTHROPIC_API_KEY: ${{ inputs.anthropic-api-key }}
+        OPENAI_API_KEY: ${{ inputs.openai-api-key }}
+      run: |
+        set -euo pipefail
+        CONFIG="${{ steps.resolve-config.outputs.path }}"
+        PEER_NAME=$(grep -E '^name\s*=' "$CONFIG" | head -1 | sed -E 's/^name\s*=\s*"([^"]+)"$/\1/')
+
+        echo "::group::xmesh-agent run (max ${{ inputs.duration-seconds }}s)"
+        xmesh-agent run --config "$CONFIG" > peer.log 2>&1 &
+        PEER_PID=$!
+
+        sleep ${{ inputs.duration-seconds }} &
+        TIMER_PID=$!
+
+        if wait -n $PEER_PID $TIMER_PID; then
+          echo "peer exited before deadline"
+        else
+          echo "deadline reached, stopping peer"
+        fi
+
+        kill $TIMER_PID 2>/dev/null || true
+        if kill -0 $PEER_PID 2>/dev/null; then
+          xmesh-agent stop "$PEER_NAME" || kill -TERM $PEER_PID
+          wait $PEER_PID 2>/dev/null || true
+        fi
+        echo "::endgroup::"
+
+        echo "::group::Peer log"
+        cat peer.log
+        echo "::endgroup::"
+
+        EMITTED=$(grep -c '"evt":"emitted"' peer.log || echo 0)
+        COST=$(grep -oE '"costUsd":[0-9.]+' peer.log | tail -1 | cut -d: -f2 || echo 0)
+        echo "cmbs-emitted=${EMITTED}" >> "$GITHUB_OUTPUT"
+        echo "cost-usd=${COST}" >> "$GITHUB_OUTPUT"
+        echo "config-path=$CONFIG" >> "$GITHUB_OUTPUT"
+        echo "Peer summary: emitted=${EMITTED} cost=\$${COST}"
