@@ -95,6 +95,54 @@ test('IPC: sendRequest fails when no server is running', async () => {
   }
 });
 
+test('IPC: prototype-chain method names are rejected as unknown-cmd', async () => {
+  const dir = tmpRuntimeDir();
+  try {
+    const server = await startServer({
+      peerName: 'peer-proto',
+      handlers: { status: () => ({ emitted: 0 }) },
+    });
+    for (const malicious of ['toString', 'constructor', 'hasOwnProperty', '__proto__', 'valueOf']) {
+      const res = await sendRequest('peer-proto', malicious);
+      assert.equal(res.ok, false, `${malicious} must not dispatch`);
+      assert.match(res.error, /unknown-cmd/);
+    }
+    await server.close();
+  } finally {
+    cleanup(dir);
+  }
+});
+
+test('IPC: numeric or non-string cmd rejected', async () => {
+  const dir = tmpRuntimeDir();
+  try {
+    const server = await startServer({
+      peerName: 'peer-typed',
+      handlers: { status: () => ({}) },
+    });
+    const conn = require('node:net').createConnection(require('../src/cli/ipc.js').socketPath('peer-typed'));
+    const result = await new Promise((resolve, reject) => {
+      let buf = '';
+      conn.setEncoding('utf8');
+      conn.on('data', (c) => {
+        buf += c;
+        if (buf.includes('\n')) {
+          conn.end();
+          resolve(JSON.parse(buf.split('\n')[0]));
+        }
+      });
+      conn.on('error', reject);
+      conn.on('connect', () => conn.write(JSON.stringify({ cmd: 42 }) + '\n'));
+      setTimeout(() => reject(new Error('timeout')), 3000);
+    });
+    assert.equal(result.ok, false);
+    assert.match(result.error, /unknown-cmd/);
+    await server.close();
+  } finally {
+    cleanup(dir);
+  }
+});
+
 test('IPC: socketPath follows XMESH_RUNTIME_DIR override', () => {
   const dir = tmpRuntimeDir();
   try {
