@@ -6,6 +6,7 @@ const { loadConfig } = require('./config.js');
 const { AnthropicAdapter } = require('../model/anthropic.js');
 const { OpenAiAdapter } = require('../model/openai.js');
 const { OllamaAdapter } = require('../model/ollama.js');
+const { MistralAdapter } = require('../model/mistral.js');
 const { ClaudeCodeAttach } = require('../attach/claude-code.js');
 const { checkRoleSanity } = require('../core/role-sanity.js');
 const { SCHEMA } = require('./schema.js');
@@ -75,6 +76,14 @@ async function dryRun(configPath, { out = process.stdout, err = process.stderr }
     } else if (cfg.model.adapter === 'ollama') {
       const a = new OllamaAdapter({ baseUrl: cfg.model.baseUrl, model: cfg.model.modelName });
       record('model adapter', true, `ollama ${cfg.model.modelName} baseUrl=${a.baseUrl} (verify ollama is running: \`curl ${a.baseUrl}/api/tags\`)`);
+    } else if (cfg.model.adapter === 'mistral') {
+      const hasKey = Boolean(cfg.model.apiKey || process.env.MISTRAL_API_KEY);
+      if (!hasKey) {
+        record('model adapter', false, 'MISTRAL_API_KEY not set — run `export MISTRAL_API_KEY=...` (get a key at https://console.mistral.ai/api-keys)');
+      } else {
+        new MistralAdapter({ apiKey: cfg.model.apiKey || process.env.MISTRAL_API_KEY, model: cfg.model.modelName });
+        record('model adapter', true, `mistral ${cfg.model.modelName} (key present)`);
+      }
     }
   } catch (e) {
     record('model adapter', false, e.message);

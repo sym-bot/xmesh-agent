@@ -5,6 +5,7 @@ const { MeshAdapter } = require('../mesh/node.js');
 const { AnthropicAdapter } = require('../model/anthropic.js');
 const { OpenAiAdapter } = require('../model/openai.js');
 const { OllamaAdapter } = require('../model/ollama.js');
+const { MistralAdapter } = require('../model/mistral.js');
 const { ClaudeCodeAttach } = require('../attach/claude-code.js');
 const { RotatingJsonLogger } = require('../core/logger.js');
 const { StateStore } = require('../core/state-store.js');
@@ -42,9 +43,20 @@ function pickModelAdapter(modelCfg) {
       model: modelCfg.modelName,
     });
   }
+  if (modelCfg.adapter === 'mistral') {
+    const apiKey = modelCfg.apiKey || process.env.MISTRAL_API_KEY;
+    if (!apiKey) {
+      throw new Error(
+        'MISTRAL_API_KEY not set\n' +
+        '  export MISTRAL_API_KEY=...\n' +
+        '  get a key: https://console.mistral.ai/api-keys',
+      );
+    }
+    return new MistralAdapter({ apiKey, baseUrl: modelCfg.baseUrl, model: modelCfg.modelName });
+  }
   throw new Error(
     `unsupported model adapter: ${modelCfg.adapter}\n` +
-    '  supported: anthropic, openai, ollama',
+    '  supported: anthropic, openai, ollama, mistral',
   );
 }
 
