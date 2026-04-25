@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.1.10 — 2026-04-25
+
+- `xmesh-agent watch` — live multi-peer status table (refresh in
+  place). Polls every running peer's IPC socket for status, renders
+  as a single colored table: peer / model / group / uptime / CMBs
+  emitted+suppressed / cost / budget usage / circuit breaker state.
+  Stale sockets show STALE; non-responding peers show ERROR.
+- Flags: `--interval <ms>` (default 2000), `--once` (one-shot, no
+  refresh loop), `--no-color`.
+- Lower-friction operator UX than running `status` per peer in a loop.
+
 ## 0.1.9 — 2026-04-25
 
 - **Mistral model adapter** (`src/model/mistral.js`) — fourth vendor.

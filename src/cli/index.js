@@ -25,6 +25,7 @@ function printHelp() {
       '  trust list --group <g>',
       '  stop <peer-name>          Graceful shutdown of a running peer',
       '  status <peer-name>        Report peer state, uptime, budget usage',
+      '  watch [--interval <ms>]   Live multi-peer status table (refresh in place)',
       '  cost <peer-name>          Report token + cost counters',
       '  trace <peer-name> <cmb-id>   Print ancestor lineage for a CMB',
       '',
@@ -181,6 +182,17 @@ async function main(argv) {
       const { doctor } = require('./doctor.js');
       const result = await doctor();
       return result.ok ? 0 : 1;
+    }
+    case 'watch': {
+      const { watch, watchOnce } = require('./watch.js');
+      const intervalArg = parseFlag(args, '--interval');
+      const intervalMs = intervalArg ? Number(intervalArg) : 2000;
+      if (args.includes('--once')) {
+        await watchOnce({ color: !args.includes('--no-color') });
+      } else {
+        await watch({ intervalMs, color: !args.includes('--no-color') });
+      }
+      return 0;
     }
     case 'migrate': {
       const { migrate } = require('./migrate.js');
