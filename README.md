@@ -321,6 +321,7 @@ Real-API smoke tests are skip-gated. Set `ANTHROPIC_API_KEY` / `OPENAI_API_KEY` 
 - **[`docs/getting-started.md`](docs/getting-started.md)** — five-minute quickstart from `npm i` to three peers coordinating
 - **[`docs/concepts.md`](docs/concepts.md)** — vocabulary: CMB, CAT7, SVAF, α weights, lineage, the autonomous loop
 - **[`docs/cookbook.md`](docs/cookbook.md)** — 14 recipes: coding triad, mixed-vendor mesh, cross-host, custom α, etc.
+- **[`docs/comparison.md`](docs/comparison.md)** — xmesh-agent vs LangGraph / CrewAI / AutoGen / MCP — when to pick which
 - **[`docs/github-action.md`](docs/github-action.md)** — drop xmesh-agent into any GitHub Actions workflow as a peer
 - **[`examples/scenarios/README.md`](examples/scenarios/README.md)** — 11 ready-to-run agent.toml templates
 - **[`OPERATIONS.md`](OPERATIONS.md)** — launch-day runbook + kill-switch playbook
