@@ -41,8 +41,12 @@ function startServer({ peerName, handlers }) {
           writeJson(conn, { ok: false, error: 'invalid-json' });
           continue;
         }
+        if (typeof req.cmd !== 'string' || !Object.prototype.hasOwnProperty.call(handlers, req.cmd)) {
+          writeJson(conn, { ok: false, error: `unknown-cmd: ${req.cmd}` });
+          continue;
+        }
         const handler = handlers[req.cmd];
-        if (!handler) {
+        if (typeof handler !== 'function') {
           writeJson(conn, { ok: false, error: `unknown-cmd: ${req.cmd}` });
           continue;
         }
