@@ -88,7 +88,7 @@ test('dryRun: flags invalid config as load failure', async () => {
   assert.ok(result.checks[0].name === 'load config' && !result.checks[0].ok);
 });
 
-test('dryRun: flags missing SVAF field weight', async () => {
+test('dryRun: flags missing SVAF field weight at load config (CAT7 completeness check)', async () => {
   const toml = `
 [identity]
 name = "p"
@@ -108,8 +108,9 @@ adapter = "ollama"
   const p = writeToml(toml);
   const result = await dryRun(p, { out: new SinkStream(), err: new SinkStream() });
   assert.equal(result.ok, false);
-  const w = result.checks.find((c) => c.name === 'SVAF α_f weights');
+  const w = result.checks.find((c) => c.name === 'load config');
   assert.ok(w && !w.ok);
+  assert.match(w.detail, /mood/, 'error message names the missing field');
   assert.match(w.detail, /mood/);
 });
 
