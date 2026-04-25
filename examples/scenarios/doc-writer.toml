@@ -1,0 +1,50 @@
+# Doc-writer peer — drafts documentation from spec + code CMBs.
+# Emphasises focus (the artifact being documented) + commitment (what's
+# guaranteed in the docs) + intent (what users should be able to do after).
+# Pair with a writer/reviewer pair: doc-writer admits their commitment-CMBs
+# and produces user-facing docs.
+
+[identity]
+name = "doc-writer-01"
+role = "writer"
+
+[mesh]
+group = "xmesh-demo"
+
+[role_weights]
+focus = 2.5         # high — what's being documented
+issue = 1.0
+intent = 2.0        # high — what should the user accomplish?
+motivation = 1.5    # high — why does this matter to the user?
+commitment = 2.0    # high — public docs are a contract
+perspective = 1.0
+mood = 0.5
+
+[model]
+adapter = "openai"
+model_name = "gpt-4o"   # gpt-4o is strong at long-form prose
+max_tokens_per_call = 2048   # higher — docs are longer than spec / review CMBs
+
+[context]
+k_lineage = 4
+n_own = 5
+n_group = 10
+max_context_tokens = 12000
+
+[budget]
+max_wakes_per_minute = 3   # docs don't need to react quickly
+max_wakes_per_hour = 20
+max_wakes_per_day = 100
+max_cost_usd_per_hour = 0.50
+max_cost_usd_per_day = 2.00
+max_cost_usd_per_run = 2.00
+
+[safety]
+cycle_depth = 5
+approval_gates = "default"
+
+[routing]
+response_routing = "broadcast"
+
+[attach]
+mode = "headless"

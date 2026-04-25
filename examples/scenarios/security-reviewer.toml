@@ -1,0 +1,50 @@
+# Security-reviewer peer — audits CMBs for security implications.
+# Emphasises perspective (looking from outside attack surface) + issue (concrete
+# vulnerabilities) + commitment (what gets fixed).
+# Use case: pair this peer with a writer/test-writer triad to flag security
+# concerns before they reach prod.
+
+[identity]
+name = "security-reviewer-01"
+role = "auditor"
+
+[mesh]
+group = "xmesh-demo"
+
+[role_weights]
+focus = 1.0
+issue = 2.5         # high — flags vulnerabilities aggressively
+intent = 0.8
+motivation = 0.8
+commitment = 1.5
+perspective = 2.5   # high — auditor lens, view from attacker's perspective
+mood = 0.6
+
+[model]
+adapter = "anthropic"
+model_name = "claude-opus-4-7"   # security review benefits from the strongest model
+max_tokens_per_call = 1024
+
+[context]
+k_lineage = 5     # deeper lineage walk — security trail matters
+n_own = 5
+n_group = 15      # see more group context for cross-cutting concerns
+max_context_tokens = 12000
+
+[budget]
+max_wakes_per_minute = 5
+max_wakes_per_hour = 30
+max_wakes_per_day = 200
+max_cost_usd_per_hour = 1.0
+max_cost_usd_per_day = 5.0
+max_cost_usd_per_run = 3.0   # higher than other roles — Opus + deeper context
+
+[safety]
+cycle_depth = 5
+approval_gates = "default"
+
+[routing]
+response_routing = "broadcast"
+
+[attach]
+mode = "headless"

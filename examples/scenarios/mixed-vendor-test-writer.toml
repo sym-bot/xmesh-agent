@@ -1,0 +1,48 @@
+# Mixed-vendor demo — test-writer running on local Ollama (zero cloud cost).
+# Requires `ollama serve` on localhost:11434 with llama3.2:3b pulled.
+
+[identity]
+name = "mvendor-test-writer"
+role = "test-writer"
+
+[mesh]
+group = "xmesh-mixed-vendor-demo"
+
+[role_weights]
+focus = 1.2
+issue = 2.0
+intent = 1.0
+motivation = 0.8
+commitment = 2.5
+perspective = 0.5
+mood = 0.6
+
+[model]
+adapter = "ollama"
+model_name = "llama3.2:3b"
+max_tokens_per_call = 512
+
+[context]
+k_lineage = 3
+n_own = 5
+n_group = 10
+max_context_tokens = 4000
+
+[budget]
+max_wakes_per_minute = 5
+max_wakes_per_hour = 50
+max_wakes_per_day = 500
+# Local inference is free — caps inoperative
+max_cost_usd_per_hour = 999
+max_cost_usd_per_day = 999
+max_cost_usd_per_run = 999
+
+[safety]
+cycle_depth = 5
+approval_gates = "default"
+
+[routing]
+response_routing = "broadcast"
+
+[attach]
+mode = "headless"

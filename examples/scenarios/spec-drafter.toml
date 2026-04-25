@@ -1,0 +1,49 @@
+# Spec-drafter peer — drafts architectural specs from issue / motivation CMBs.
+# Emphasises intent (what to build) + focus (the artifact) + motivation (the why).
+# This is a higher-tier writer than the basic writer scenario — designs at
+# architecture level rather than feature level.
+
+[identity]
+name = "spec-drafter-01"
+role = "spec"
+
+[mesh]
+group = "xmesh-demo"
+
+[role_weights]
+focus = 2.5
+issue = 1.5     # spec authors need to anticipate issues
+intent = 2.5    # what should this thing do?
+motivation = 2.0   # why does it matter
+commitment = 1.5
+perspective = 0.8
+mood = 0.5
+
+[model]
+adapter = "anthropic"
+model_name = "claude-opus-4-7"
+max_tokens_per_call = 2048
+
+[context]
+k_lineage = 5
+n_own = 5
+n_group = 12
+max_context_tokens = 12000
+
+[budget]
+max_wakes_per_minute = 3
+max_wakes_per_hour = 20
+max_wakes_per_day = 100
+max_cost_usd_per_hour = 1.0
+max_cost_usd_per_day = 5.0
+max_cost_usd_per_run = 3.0
+
+[safety]
+cycle_depth = 5
+approval_gates = "default"
+
+[routing]
+response_routing = "broadcast"
+
+[attach]
+mode = "headless"
