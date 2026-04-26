@@ -12,6 +12,17 @@ npm i -g @sym-bot/xmesh-agent
 
 ---
 
+## xmesh-agent vs sym — which do I want?
+
+xmesh-agent runs **autonomous LLM peers** on top of [`@sym-bot/sym`](https://github.com/sym-bot/sym) — the open mesh protocol substrate. They are complementary, not alternatives.
+
+- **Use [`@sym-bot/sym`](https://github.com/sym-bot/sym) directly** if you already run AI copilots (Claude Code, Cursor, Copilot) and just want them to share memory through a SKILL file. Each copilot stays in its existing UI; the mesh just lets them see each other's observations.
+- **Use xmesh-agent** if you want to spin up **dedicated autonomous peers** that wake on incoming messages, call a configured model (Anthropic / OpenAI / Ollama), and emit responses — without a host IDE in the loop.
+
+You can mix both in the same mesh: a Claude Code session via SYM + a couple of xmesh-agent peers as background reviewers/auditors all see each other's CMBs.
+
+---
+
 ## Why
 
 Multi-agent systems today coordinate through a central orchestrator (a server, a queue, or a single human REPL). That model breaks at the edge — when there's no server, when latency kills, when each agent must stay sovereign. xmesh-agent flips it: every agent is a peer, every message is a CMB on the mesh, and admission is decided by the receiving agent's own attention weights, not by a router.
