@@ -13,6 +13,19 @@ npm run lint       # ESLint flat config
 npm run smoke      # live tests; Bonjour always; vendor adapters skip without keys
 ```
 
+### Optional: lefthook pre-commit hook
+
+A `lefthook.yml` is included for contributors who want lint + tests to run automatically before commit / push. Lefthook is not added to `devDependencies` (the runtime stays dep-light); install the binary yourself once:
+
+```bash
+brew install lefthook   # or see https://github.com/evilmartians/lefthook for other installs
+lefthook install        # registers the .git/hooks/* shims
+```
+
+After install, `git commit` runs `npm run lint` and `git push` runs `npm test`. Skip on a one-off basis with `LEFTHOOK=0 git commit ...`. Remove with `lefthook uninstall`.
+
+This is opt-in — CI still runs the full matrix on every PR regardless.
+
 ## Workflow
 
 1. **Open an issue first** for non-trivial changes. Bug fix, doc tweak, or test addition? Skip the issue and just send a PR. New feature, new CLI command, behaviour change, or API surface delta? Issue first so we can discuss scope.

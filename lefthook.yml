@@ -1,0 +1,24 @@
+# lefthook — optional local git hook runner
+#
+# Opt-in for contributors who want lint + tests to run automatically
+# before commit / push. Not a CI substitute — CI still runs the full
+# matrix. Install once with `lefthook install` after `brew install
+# lefthook` (or the binary release of your choice). Run `lefthook
+# uninstall` to remove.
+#
+# Skip on a one-off basis with `LEFTHOOK=0 git commit ...`.
+#
+# We intentionally do NOT add lefthook to package.json devDependencies —
+# the runtime stays dep-light and the hook is opt-in per-contributor.
+
+pre-commit:
+  parallel: true
+  commands:
+    lint:
+      run: npm run lint
+      stage_fixed: false
+
+pre-push:
+  commands:
+    test:
+      run: npm test
