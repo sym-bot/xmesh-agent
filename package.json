@@ -9,6 +9,7 @@
   "scripts": {
     "test": "node --test test/*.test.js",
     "test:coverage": "node --test --experimental-test-coverage test/*.test.js",
+    "test:coverage:check": "node scripts/check-coverage.js",
     "smoke": "node --test test/*.smoke.js",
     "lint": "eslint src/ test/"
   },

@@ -32,7 +32,7 @@ Polish + extension within the existing single-process / no-wire-change envelope.
 
 - **More example scenarios** — auditor, security-reviewer, doc-writer roles with role-specific α weights
 - **Improved error messages** — friendlier output when `agent.toml` is malformed, when API keys are wrong, when Bonjour discovery times out
-- **Coverage threshold in CI** — enforce ≥ 80% line coverage on new code
+- **Coverage threshold in CI** — ≥ 80% line coverage gate on the Node 22 lane (currently at ~98%)
 - **Pre-commit hook** — optional lefthook setup for local lint + test before push
 - **`xmesh-agent init <peer>`** — scaffolds a starter `agent.toml` + keypair + role profile
 - **Live Anthropic + OpenAI smoke required (not just skip-gated) when keys are present in CI** — catches adapter regressions across model-vendor SDK bumps

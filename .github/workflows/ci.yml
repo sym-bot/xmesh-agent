@@ -23,6 +23,9 @@ jobs:
       - run: npm ci
       - run: npm run lint
       - run: npm test
+      - name: Coverage threshold (>= 80% line coverage)
+        if: matrix.node == '22'
+        run: npm run test:coverage:check
       - name: Verify package tarball contents
         if: matrix.node == '22'
         run: |
