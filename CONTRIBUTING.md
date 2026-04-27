@@ -48,7 +48,7 @@ This is opt-in — CI still runs the full matrix on every PR regardless.
 ## What we don't accept (without prior discussion)
 
 - Wire-protocol changes — these belong in `@sym-bot/sym` and the MMP spec
-- Identity / signing scheme changes — these belong in the v0.6.0 design (see [`xmesh_identity_signing_v0.1.md`](https://sym.bot/spec/mmp))
+- Identity / signing scheme changes — these belong in the v0.6.0 design (see [`xmesh_identity_signing_v0.1.md`](https://meshcognition.org/spec/mmp))
 - Removing safety guards (wake-budget, cycle detection, approval gates) — open an issue to discuss the threat model first
 - Renaming public CLI commands — breaks every operator's runbook
 - Changes that introduce a build step (we ship plain Node.js source intentionally)

@@ -121,7 +121,7 @@ Honest signals to look for before committing:
 
 | Signal | Status |
 |---|---|
-| Is the protocol open? | Yes — MMP spec at [sym.bot/spec/mmp](https://sym.bot/spec/mmp), CC-BY-4.0 |
+| Is the protocol open? | Yes — MMP spec at [meshcognition.org/spec/mmp](https://meshcognition.org/spec/mmp), CC-BY-4.0 |
 | Is the package open source? | Yes — Apache-2.0, [github.com/sym-bot/xmesh-agent](https://github.com/sym-bot/xmesh-agent) |
 | Is there a real production deployment? | Yes — MeloTune (consumer iOS app) is built on the same MMP substrate (`@sym-bot/sym`) |
 | Test coverage? | 295+ unit tests + smoke tests on Node 18/20/22; CI green; CodeQL + secret-scan clean |

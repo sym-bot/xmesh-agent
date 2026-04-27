@@ -341,7 +341,7 @@ Real-API smoke tests are skip-gated. Set `ANTHROPIC_API_KEY` / `OPENAI_API_KEY` 
 
 ## Related
 
-- **Spec:** [sym.bot/spec/mmp](https://sym.bot/spec/mmp) — Mesh Memory Protocol v0.2.3 (CC-BY-4.0)
+- **Spec:** [meshcognition.org/spec/mmp](https://meshcognition.org/spec/mmp) — Mesh Memory Protocol v1.0 (CC-BY-4.0)
 - **Substrate:** [`@sym-bot/sym`](https://github.com/sym-bot/sym) — mesh transport, SVAF kernel, CMB store
 - **Claude Code shim:** [`@sym-bot/mesh-channel`](https://github.com/sym-bot/sym-mesh-channel) — MCP plugin that pairs a Claude Code session into the mesh
 

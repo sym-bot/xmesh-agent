@@ -162,7 +162,7 @@ Both are required for the canonical claim "agent-to-agent mesh for collective in
 
 ## Further reading
 
-- **MMP spec** — https://sym.bot/spec/mmp (current v0.2.3; v0.3.0 with wire signing in Phase 2)
+- **MMP spec** — https://meshcognition.org/spec/mmp (current v1.0; v0.3.0 with wire signing in Phase 2)
 - **MMP paper** — arXiv:2604.19540
 - **SVAF paper** — arXiv:2604.03955
 - **MeloTune paper** — arXiv:2604.10815 (proves the protocol on a consumer app)
