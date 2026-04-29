@@ -35,7 +35,7 @@ Polish + extension within the existing single-process / no-wire-change envelope.
 - **Coverage threshold in CI** — ≥ 80% line coverage gate on the Node 22 lane (currently at ~98%)
 - **Pre-commit hook** — optional lefthook setup for local lint + test before push
 - **`xmesh-agent init <peer>`** — scaffolds a starter `agent.toml` + keypair + role profile
-- **Live Anthropic + OpenAI smoke required (not just skip-gated) when keys are present in CI** — catches adapter regressions across model-vendor SDK bumps
+- **Adapter-regression coverage** — recorded-fixture replay tests for Anthropic + OpenAI + Ollama, run in CI without any paid-API calls. Live smoke (`npm run smoke` with real keys) stays a maintainer-local pre-release check; CI lanes never call paid APIs. *(Originally specced as "live smoke required in CI"; revised to keep CI cost-free.)*
 
 Tracked via the [`v0.2.0` milestone](https://github.com/sym-bot/xmesh-agent/milestones).
 
