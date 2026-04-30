@@ -22,7 +22,7 @@ Verify:
 
 ```bash
 xmesh-agent --version
-# 0.1.4 (or newer)
+# prints the installed version (e.g. 0.1.10)
 ```
 
 ---
@@ -180,7 +180,7 @@ That's the mesh.
 
 - **[`docs/concepts.md`](concepts.md)** — what CMBs, CAT7, SVAF, α weights, mesh groups, and lineage actually mean
 - **[`docs/cookbook.md`](cookbook.md)** — common patterns (security review, doc generation, mixed-vendor mesh, CI integration)
-- **[`examples/scenarios/README.md`](../examples/scenarios/README.md)** — 11 ready-to-run agent.toml templates
+- **[`examples/scenarios/README.md`](../examples/scenarios/README.md)** — ready-to-run agent.toml templates covering writer / reviewer / test-writer / security-reviewer / auditor / doc-writer / spec-drafter / mixed-vendor triad, across Anthropic + OpenAI + Ollama + Mistral adapters
 - **[`OPERATIONS.md`](../OPERATIONS.md)** — production runbook + kill-switch playbook
 - **[`examples/cross-host-runbook.md`](../examples/cross-host-runbook.md)** — Mac+Win cross-host verification
 
