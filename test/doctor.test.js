@@ -103,13 +103,13 @@ test('doctor: stale-socket detection adds an issue + suggestion', async () => {
   } finally { cleanup(dir); }
 });
 
-test('doctor: env section reports all five known env vars', async () => {
+test('doctor: env section reports all six known env vars (incl. Mistral)', async () => {
   const dir = tmpRuntime();
   try {
     const out = new SinkStream();
     await doctor({ out, err: new SinkStream() });
     const text = out.text();
-    for (const k of ['ANTHROPIC_API_KEY', 'OPENAI_API_KEY', 'OLLAMA_HOST', 'SYM_RELAY_URL', 'SYM_RELAY_TOKEN']) {
+    for (const k of ['ANTHROPIC_API_KEY', 'OPENAI_API_KEY', 'MISTRAL_API_KEY', 'OLLAMA_HOST', 'SYM_RELAY_URL', 'SYM_RELAY_TOKEN']) {
       assert.match(text, new RegExp(k + ':'));
     }
   } finally { cleanup(dir); }

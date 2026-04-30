@@ -110,7 +110,7 @@ async function doctor({ out = process.stdout, err = process.stderr } = {}) {
   }
 
   out.write(`environment\n`);
-  for (const k of ['ANTHROPIC_API_KEY', 'OPENAI_API_KEY', 'OLLAMA_HOST', 'SYM_RELAY_URL', 'SYM_RELAY_TOKEN']) {
+  for (const k of ['ANTHROPIC_API_KEY', 'OPENAI_API_KEY', 'MISTRAL_API_KEY', 'OLLAMA_HOST', 'SYM_RELAY_URL', 'SYM_RELAY_TOKEN']) {
     const present = process.env[k];
     out.write(`  ${k}: ${present ? `set (${present.length} chars)` : 'not set'}\n`);
   }
