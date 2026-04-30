@@ -1,0 +1,59 @@
+# Auditor peer — generic change-trail / policy-compliance auditor.
+# Distinct from security-reviewer.toml (which is attack-surface focused).
+# This auditor watches for: undocumented changes, missing changelog entries,
+# commitment gaps (work asserted but not traceable), policy drift (org rules,
+# licence compliance, accessibility, GDPR-style data handling).
+#
+# Use case: drop into any triad as a fourth peer. Admits all CMBs to walk
+# the lineage chain; emits issue-CMBs when it spots an audit gap and
+# commitment-CMBs when an item is properly traced + closed.
+#
+# Triad pairing examples:
+#   coding triad + auditor — every spec/review/test gets an audit-trail check
+#   spec → docs flow + auditor — flags spec changes not reflected in docs
+#   mixed-vendor triad + auditor — same coverage across heterogeneous models
+
+[identity]
+name = "auditor-01"
+role = "auditor"
+
+[mesh]
+group = "xmesh-demo"
+
+[role_weights]
+focus = 1.0
+issue = 2.0          # high — surfaces audit gaps
+intent = 0.8
+motivation = 1.0
+commitment = 2.0     # high — auditor cares whether work is properly closed
+perspective = 2.5    # high — auditor lens, view from compliance/governance angle
+mood = 0.5
+
+[model]
+adapter = "anthropic"
+model_name = "claude-haiku-4-5-20251001"   # haiku — audit passes are pattern-matching, not deep reasoning
+max_tokens_per_call = 1024
+
+[context]
+k_lineage = 6        # deeper than other roles — change trail is the whole point
+n_own = 4
+n_group = 12         # see broad context to spot cross-CMB drift
+max_context_tokens = 10000
+
+[budget]
+max_wakes_per_minute = 4
+max_wakes_per_hour = 30
+max_wakes_per_day = 200
+max_cost_usd_per_hour = 0.30   # haiku — keeps the audit lane cheap
+max_cost_usd_per_day = 1.50
+max_cost_usd_per_run = 0.50
+
+[safety]
+cycle_depth = 5
+approval_gates = "default"
+
+[routing]
+response_routing = "broadcast"
+
+[attach]
+mode = "headless"

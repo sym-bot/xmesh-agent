@@ -10,6 +10,7 @@ This directory ships ready-to-run agent.toml scenarios for several common patter
 | `reviewer.toml` / `reviewer-openai.toml` / `reviewer-ollama.toml` | reviewer | Anthropic / OpenAI / Ollama | Flags issues + commitment gaps |
 | `test-writer.toml` / `test-writer-openai.toml` | test-writer | Anthropic / OpenAI | Generates regression tests |
 | `security-reviewer.toml` | auditor | Anthropic Opus | Security audit pass with attacker-perspective lens |
+| `auditor.toml` | auditor | Anthropic Haiku | Change-trail / policy-compliance audit (lineage walk, undocumented-change detection) |
 | `doc-writer.toml` | writer | OpenAI gpt-4o | Drafts user-facing documentation |
 | `spec-drafter.toml` | spec | Anthropic Opus | Architecture-level specs |
 | `mixed-vendor-{writer,reviewer,test-writer}.toml` | triad | Anthropic + OpenAI + Ollama | Demonstrates "any model" — three vendors on the same wire |
@@ -19,6 +20,7 @@ This directory ships ready-to-run agent.toml scenarios for several common patter
 - **Coding** — `writer.toml` + `reviewer.toml` + `test-writer.toml`
 - **Coding (OpenAI)** — `*-openai.toml` triad
 - **Coding + security** — coding triad + `security-reviewer.toml` (4 peers, security peer admits all CMBs and emits issue-CMBs when it spots a concern)
+- **Coding + audit-trail** — coding triad + `auditor.toml` (4 peers, auditor walks lineage to flag undocumented / untraceable changes — cheap haiku lane)
 - **Spec → docs flow** — `spec-drafter.toml` + `doc-writer.toml` (specs flow through SVAF to docs writer)
 - **Mixed-vendor showcase** — `mixed-vendor-*.toml` triad (3 peers, 3 vendors, $0.001 / run since one is local Ollama)
 
