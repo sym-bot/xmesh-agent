@@ -75,7 +75,24 @@ The security-reviewer uses Claude Opus + 12k context for deeper analysis. Costs 
 
 ---
 
-## Recipe 5 — Spec → docs flow
+## Recipe 5 — Coding + audit-trail (governance lane)
+
+Drop `auditor.toml` onto a coding triad as a 4th peer. Where `security-reviewer.toml` looks for attack-surface vulnerabilities, `auditor.toml` watches for **change-trail / governance** gaps: undocumented changes, missing changelog entries, commitment-CMBs with no traceable lineage, drift from declared policy (licence, accessibility, GDPR-style data handling).
+
+```bash
+xmesh-agent run --config examples/scenarios/writer.toml
+xmesh-agent run --config examples/scenarios/reviewer.toml
+xmesh-agent run --config examples/scenarios/test-writer.toml
+xmesh-agent run --config examples/scenarios/auditor.toml   # 4th peer
+```
+
+The auditor uses Claude Haiku + `k_lineage = 6` (deeper than other roles, since the change trail is the whole point) and caps at `$0.50/run`. Adding it to a triad roughly doubles the wake count of a typical cycle but adds <10% to total cost — a cheap governance overlay.
+
+When to pair with `security-reviewer.toml` instead: you want **both** lenses on the same mesh. They emit different issue-CMBs (vulnerabilities vs. audit gaps), so neither suppresses the other; budgets are independent.
+
+---
+
+## Recipe 6 — Spec → docs flow
 
 Architecture-level spec drafter feeds a docs writer:
 
@@ -92,7 +109,7 @@ spec-drafter emits architecture CMBs. doc-writer admits commitment-bearing ones 
 
 ---
 
-## Recipe 6 — Mixed-vendor showcase
+## Recipe 7 — Mixed-vendor showcase
 
 Three peers, three vendors, same wire:
 
@@ -115,7 +132,7 @@ All three coordinate via MMP. Different vendors, identical wire protocol. Total 
 
 ---
 
-## Recipe 7 — Pair Claude Code into the mesh
+## Recipe 8 — Pair Claude Code into the mesh
 
 Use the separate `@sym-bot/mesh-channel` MCP plugin so an interactive Claude Code session becomes a mesh peer:
 
@@ -137,7 +154,7 @@ This is the **interactive attach mode** — opposite of `xmesh-agent run` (headl
 
 ---
 
-## Recipe 8 — Just verify the runtime works
+## Recipe 9 — Just verify the runtime works
 
 No mesh, no cycle, just confirm the model adapter end-to-end:
 
@@ -153,7 +170,7 @@ Runs Bonjour smoke + Anthropic smoke (or OpenAI if that key is set instead) + re
 
 ---
 
-## Recipe 9 — Inspect a CMB's lineage
+## Recipe 10 — Inspect a CMB's lineage
 
 When something interesting happens in the mesh, follow the breadcrumbs:
 
@@ -177,7 +194,7 @@ Every response traces back to its admitted parent. Debug-by-provenance.
 
 ---
 
-## Recipe 10 — Stop everything safely
+## Recipe 11 — Stop everything safely
 
 ```bash
 for peer in writer-01 reviewer-01 test-writer-01; do
@@ -189,7 +206,7 @@ Each peer drains in-flight model calls, closes its IPC socket, exits 0 with fina
 
 ---
 
-## Recipe 11 — Cost budget exceeded — what now
+## Recipe 12 — Cost budget exceeded — what now
 
 Per-run cost cap is enforced; peer auto-stops when crossed. To resume:
 
@@ -203,13 +220,13 @@ xmesh-agent run --config <peer>.toml   # resumes
 
 ---
 
-## Recipe 12 — Cross-host (Mac + Windows on the same LAN)
+## Recipe 13 — Cross-host (Mac + Windows on the same LAN)
 
 See [`examples/cross-host-runbook.md`](../examples/cross-host-runbook.md) for the seven-step verification runbook. Bonjour discovers across hosts on the same LAN automatically.
 
 ---
 
-## Recipe 13 — Cross-network (WAN)
+## Recipe 14 — Cross-network (WAN)
 
 When peers aren't on the same LAN, use the relay:
 
@@ -224,7 +241,7 @@ Both peers configure the same relay URL + token. They discover each other via th
 
 ---
 
-## Recipe 14 — Custom α weights for a specific domain
+## Recipe 15 — Custom α weights for a specific domain
 
 The bundled scenarios use general role tunings. For your specific domain, override:
 
