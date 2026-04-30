@@ -5,7 +5,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
-const { startServer, sendRequest, socketPath } = require('../src/cli/ipc.js');
+const { startServer, sendRequest, socketPath, listAvailablePeers } = require('../src/cli/ipc.js');
 
 function tmpRuntimeDir() {
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'xmesh-ipc-test-'));
@@ -90,6 +90,52 @@ test('IPC: sendRequest fails when no server is running', async () => {
   const dir = tmpRuntimeDir();
   try {
     await assert.rejects(sendRequest('ghost-peer', 'status'), /no running peer/);
+  } finally {
+    cleanup(dir);
+  }
+});
+
+test('IPC: not-found error includes "no peers running" hint when sockets dir is empty', async () => {
+  const dir = tmpRuntimeDir();
+  try {
+    await assert.rejects(
+      sendRequest('ghost-peer', 'status'),
+      (err) => /no peers are currently running/.test(err.message)
+        && /xmesh-agent run --config/.test(err.message),
+    );
+  } finally {
+    cleanup(dir);
+  }
+});
+
+test('IPC: not-found error lists available peers + suggests `xmesh-agent watch`', async () => {
+  const dir = tmpRuntimeDir();
+  try {
+    const a = await startServer({ peerName: 'reviewer-01', handlers: { status: () => ({}) } });
+    const b = await startServer({ peerName: 'writer-01', handlers: { status: () => ({}) } });
+    await assert.rejects(
+      sendRequest('typo-peer', 'status'),
+      (err) => /available peers on this host: reviewer-01, writer-01/.test(err.message)
+        && /xmesh-agent watch/.test(err.message),
+    );
+    await a.close();
+    await b.close();
+  } finally {
+    cleanup(dir);
+  }
+});
+
+test('IPC: listAvailablePeers returns sorted peer names from .sock files only', async () => {
+  const dir = tmpRuntimeDir();
+  try {
+    assert.deepEqual(listAvailablePeers(), []);
+    const a = await startServer({ peerName: 'zeta', handlers: { status: () => ({}) } });
+    const b = await startServer({ peerName: 'alpha', handlers: { status: () => ({}) } });
+    // Drop a non-.sock file in the dir to confirm it's filtered out.
+    fs.writeFileSync(path.join(dir, 'noise.txt'), 'ignore me');
+    assert.deepEqual(listAvailablePeers(), ['alpha', 'zeta']);
+    await a.close();
+    await b.close();
   } finally {
     cleanup(dir);
   }

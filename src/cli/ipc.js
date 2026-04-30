@@ -15,6 +15,17 @@ function socketPath(peerName) {
   return path.join(socketDir(), `${peerName}.sock`);
 }
 
+function listAvailablePeers() {
+  try {
+    return fs.readdirSync(socketDir())
+      .filter((f) => f.endsWith('.sock'))
+      .map((f) => f.replace(/\.sock$/, ''))
+      .sort();
+  } catch {
+    return [];
+  }
+}
+
 function writeJson(conn, obj) {
   conn.write(JSON.stringify(obj) + '\n');
 }
@@ -80,7 +91,18 @@ function startServer({ peerName, handlers }) {
 
 async function sendRequest(peerName, cmd, args = {}) {
   const sockPath = socketPath(peerName);
-  if (!fs.existsSync(sockPath)) throw new Error(`no running peer named "${peerName}" at ${sockPath}`);
+  if (!fs.existsSync(sockPath)) {
+    const available = listAvailablePeers();
+    let hint;
+    if (available.length === 0) {
+      hint = '  no peers are currently running on this host\n' +
+             '  start one: `xmesh-agent run --config <agent.toml>`';
+    } else {
+      hint = `  available peers on this host: ${available.join(', ')}\n` +
+             '  see live status: `xmesh-agent watch`';
+    }
+    throw new Error(`no running peer named "${peerName}" (looked at ${sockPath})\n${hint}`);
+  }
   return new Promise((resolve, reject) => {
     const conn = net.createConnection(sockPath);
     let buf = '';
@@ -108,4 +130,4 @@ async function sendRequest(peerName, cmd, args = {}) {
   });
 }
 
-module.exports = { startServer, sendRequest, socketPath, socketDir };
+module.exports = { startServer, sendRequest, socketPath, socketDir, listAvailablePeers };
