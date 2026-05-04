@@ -2,10 +2,19 @@
 
 This directory ships ready-to-run agent.toml scenarios for several common patterns. Drop one into `xmesh-agent run --config <path>` after setting the appropriate API key env var.
 
+## Try the wire first (no API key required)
+
+If you've never used the mesh, **start here**:
+[**Two-peer no-LLM (60-second proof)**](two-peer-no-llm.md) — install `@sym-bot/sym`,
+emit two CMBs from two terminals, recall them. Proves the wire protocol works
+without any AI vendor commitment. Once you've seen typed messages with
+provenance flow, the LLM scenarios below layer on top of the same wire.
+
 ## Scenarios
 
 | File | Role | Adapter | Use case |
 |---|---|---|---|
+| [`two-peer-no-llm.md`](two-peer-no-llm.md) | n/a | **none** | 60-second wire-protocol proof, no API key |
 | `writer.toml` / `writer-openai.toml` | writer | Anthropic / OpenAI | Drafts specs from issues |
 | `reviewer.toml` / `reviewer-openai.toml` / `reviewer-ollama.toml` | reviewer | Anthropic / OpenAI / Ollama | Flags issues + commitment gaps |
 | `test-writer.toml` / `test-writer-openai.toml` | test-writer | Anthropic / OpenAI | Generates regression tests |

@@ -10,6 +10,8 @@ Run autonomous agents that talk to each other directly over a peer-to-peer mesh 
 npm i -g @sym-bot/xmesh-agent
 ```
 
+> **No API key handy?** [Try the wire first in 60 seconds](examples/scenarios/two-peer-no-llm.md) — install `@sym-bot/sym`, emit two CMBs from two terminals, recall them. No LLM required. Once you've seen typed messages with provenance flow between identities, the autonomous LLM peers below run on top of the same wire.
+
 ---
 
 ## xmesh-agent vs sym — which do I want?
