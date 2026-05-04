@@ -21,7 +21,7 @@
     "LICENSE"
   ],
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.91.0",
+    "@anthropic-ai/sdk": "^0.92.0",
     "@iarna/toml": "^2.2.5",
     "@sym-bot/sym": "^0.5.1",
     "openai": "^6.34.0"
