@@ -1,15 +1,20 @@
 # Changelog
 
+## 0.1.12 — 2026-05-12
+
+- Strip internal references from v0.1.11 changelog entry + test names.
+  No behavioral change.
+
 ## 0.1.11 — 2026-05-12
 
-- **MeshAdapter `payload` slot (m035 substrate primitive).** `send` and
-  `observe` accept an optional `payload` param alongside `fields` and
-  `parents`. Forwarded to `SymNode.remember(fields, { payload, … })`
-  (requires `@sym-bot/sym` ≥ 0.5.8) and attached to the CMB; rides the
-  wire frame to peers; surfaced on the receive side by
-  `_normalizeEntry` so `onCmbAccepted(handler)` callbacks see
-  `entry.payload`. Used by substrate-level protocols that carry data
-  beyond CAT7 — LLM request/response primitive, sym.day ATTACH-DATABASE.
+- **MeshAdapter `payload` slot.** `send` and `observe` accept an
+  optional `payload` param alongside `fields` and `parents`. Forwarded
+  to `SymNode.remember(fields, { payload, … })` (requires
+  `@sym-bot/sym` ≥ 0.5.8) and attached to the CMB; rides the wire
+  frame to peers; surfaced on the receive side by `_normalizeEntry` so
+  `onCmbAccepted(handler)` callbacks see `entry.payload`. Used by
+  substrate-level protocols that carry data beyond CAT7 — LLM
+  request/response primitive, sym.day ATTACH-DATABASE pattern.
 - Back-compat: omitting `payload` keeps `opts.payload` off the
   underlying remember call (no surface change for v0.1.10 callers);
   incoming peer CMBs without payload surface as `entry.payload === null`.

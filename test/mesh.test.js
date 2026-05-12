@@ -144,7 +144,7 @@ test('MeshAdapter: onIdentityCollision fires on collision event', async () => {
   assert.equal(got.name, 'test-peer');
 });
 
-test('MeshAdapter: observe forwards opts.payload to SymNode.remember (m035)', async () => {
+test('MeshAdapter: observe forwards opts.payload to SymNode.remember', async () => {
   const { adapter, getNode } = makeAdapter();
   await adapter.start();
   const payload = { request_id: 'r1', user_message: 'hello' };
@@ -152,7 +152,7 @@ test('MeshAdapter: observe forwards opts.payload to SymNode.remember (m035)', as
   assert.deepEqual(getNode().remembered[0].opts.payload, payload);
 });
 
-test('MeshAdapter: send forwards opts.payload to SymNode.remember (m035)', async () => {
+test('MeshAdapter: send forwards opts.payload to SymNode.remember', async () => {
   const { adapter, getNode } = makeAdapter({
     peers: [{ id: 'peer-id-1', peerId: 'peer-id-1', name: 'responder' }],
   });
@@ -170,7 +170,7 @@ test('MeshAdapter: observe without payload omits opts.payload (back-compat)', as
   assert.equal('payload' in getNode().remembered[0].opts, false);
 });
 
-test('MeshAdapter: onCmbAccepted surfaces cmb.payload on incoming peer CMB (m035)', async () => {
+test('MeshAdapter: onCmbAccepted surfaces cmb.payload on incoming peer CMB', async () => {
   const { adapter, getNode } = makeAdapter();
   await adapter.start();
   const received = [];
