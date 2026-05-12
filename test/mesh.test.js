@@ -20,11 +20,9 @@ class FakeSymNode extends EventEmitter {
   async start() { this.started = true; }
   async stop() { this.stopped = true; this.started = false; }
   remember(fields, opts = {}) {
-    const entry = {
-      key: 'cmb-' + this.remembered.length,
-      cmb: { fields, createdBy: this.name, lineage: { parents: opts.parents?.map((p) => p.key) || [], ancestors: [] } },
-      source: this.name,
-    };
+    const cmb = { fields, createdBy: this.name, lineage: { parents: opts.parents?.map((p) => p.key) || [], ancestors: [] } };
+    if (opts.payload !== undefined && opts.payload !== null) cmb.payload = opts.payload;
+    const entry = { key: 'cmb-' + this.remembered.length, cmb, source: this.name };
     this.remembered.push({ fields, opts, entry });
     this._store.set(entry.key, entry);
     return entry;
@@ -144,6 +142,77 @@ test('MeshAdapter: onIdentityCollision fires on collision event', async () => {
   adapter.onIdentityCollision((info) => { got = info; });
   getNode().emit('identity-collision', { nodeId: 'x', name: 'test-peer' });
   assert.equal(got.name, 'test-peer');
+});
+
+test('MeshAdapter: observe forwards opts.payload to SymNode.remember (m035)', async () => {
+  const { adapter, getNode } = makeAdapter();
+  await adapter.start();
+  const payload = { request_id: 'r1', user_message: 'hello' };
+  await adapter.observe({ fields: { focus: { text: 'llm-request' } }, payload });
+  assert.deepEqual(getNode().remembered[0].opts.payload, payload);
+});
+
+test('MeshAdapter: send forwards opts.payload to SymNode.remember (m035)', async () => {
+  const { adapter, getNode } = makeAdapter({
+    peers: [{ id: 'peer-id-1', peerId: 'peer-id-1', name: 'responder' }],
+  });
+  await adapter.start();
+  const payload = { request_id: 'r2', system_prompt: 'You are…', user_message: 'echo' };
+  await adapter.send({ to: 'responder', fields: { focus: { text: 'llm-request' } }, payload });
+  assert.equal(getNode().remembered[0].opts.to, 'peer-id-1');
+  assert.deepEqual(getNode().remembered[0].opts.payload, payload);
+});
+
+test('MeshAdapter: observe without payload omits opts.payload (back-compat)', async () => {
+  const { adapter, getNode } = makeAdapter();
+  await adapter.start();
+  await adapter.observe({ fields: { focus: { text: 'plain' } } });
+  assert.equal('payload' in getNode().remembered[0].opts, false);
+});
+
+test('MeshAdapter: onCmbAccepted surfaces cmb.payload on incoming peer CMB (m035)', async () => {
+  const { adapter, getNode } = makeAdapter();
+  await adapter.start();
+  const received = [];
+  adapter.onCmbAccepted((cmb) => received.push(cmb));
+
+  getNode().emit('cmb-accepted', {
+    key: 'cmb-peer-payload-1',
+    source: 'other-peer',
+    cmb: {
+      createdBy: 'other-peer',
+      fields: { focus: { text: 'llm-response from peer' } },
+      lineage: { ancestors: [] },
+      payload: { request_id: 'r1', text: 'Hello back.', model: 'claude-opus-4-7' },
+    },
+  });
+
+  assert.equal(received.length, 1);
+  assert.deepEqual(received[0].payload, {
+    request_id: 'r1',
+    text: 'Hello back.',
+    model: 'claude-opus-4-7',
+  });
+});
+
+test('MeshAdapter: onCmbAccepted surfaces payload=null when peer CMB has no payload (back-compat)', async () => {
+  const { adapter, getNode } = makeAdapter();
+  await adapter.start();
+  const received = [];
+  adapter.onCmbAccepted((cmb) => received.push(cmb));
+
+  getNode().emit('cmb-accepted', {
+    key: 'cmb-peer-cat7-only',
+    source: 'other-peer',
+    cmb: {
+      createdBy: 'other-peer',
+      fields: { focus: { text: 'plain CAT7' } },
+      lineage: { ancestors: [] },
+    },
+  });
+
+  assert.equal(received.length, 1);
+  assert.equal(received[0].payload, null);
 });
 
 test('MeshAdapter: peers() returns connected peer list', async () => {
