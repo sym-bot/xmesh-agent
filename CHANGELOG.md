@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.1.12 — 2026-05-12
+
+- **MeshAdapter `payload` slot.** `send` and `observe` accept an
+  optional `payload` param alongside `fields` and `parents`. Forwarded
+  to `SymNode.remember(fields, { payload, … })` (requires
+  `@sym-bot/sym` ≥ 0.5.8) and attached to the CMB; rides the wire
+  frame to peers; surfaced on the receive side by `_normalizeEntry` so
+  `onCmbAccepted(handler)` callbacks see `entry.payload`. Used by
+  substrate-level protocols that carry data beyond CAT7 — LLM
+  request/response primitive, sym.day SQLite ATTACH-DATABASE pattern.
+- Back-compat: omitting `payload` keeps `opts.payload` off the
+  underlying remember call (no surface change for v0.1.10 callers);
+  incoming peer CMBs without payload surface as `entry.payload === null`.
+
 ## 0.1.10 — 2026-04-25
 
 - `xmesh-agent watch` — live multi-peer status table (refresh in

@@ -78,17 +78,21 @@ class MeshAdapter {
     this._identityCollisionHandler = handler;
   }
 
-  async observe({ fields, parents }) {
+  async observe({ fields, parents, payload }) {
     this._assertStarted();
-    return this._node.remember(fields, parents ? { parents } : {});
+    const opts = {};
+    if (parents) opts.parents = parents;
+    if (payload !== undefined && payload !== null) opts.payload = payload;
+    return this._node.remember(fields, opts);
   }
 
-  async send({ to, fields, parents }) {
+  async send({ to, fields, parents, payload }) {
     this._assertStarted();
     const peerId = this._resolvePeerName(to);
     if (!peerId) throw new Error(`unknown peer: ${to}`);
     const opts = { to: peerId };
     if (parents) opts.parents = parents;
+    if (payload !== undefined && payload !== null) opts.payload = payload;
     return this._node.remember(fields, opts);
   }
 
@@ -145,6 +149,7 @@ class MeshAdapter {
       source: entry?.source || cmb?.createdBy || null,
       createdBy: cmb?.createdBy || entry?.source || null,
       fields: cmb?.fields || {},
+      payload: cmb?.payload ?? null,
       ancestors: cmb?.lineage?.ancestors || [],
       parents: cmb?.lineage?.parents || [],
       content: entry?.content || null,
