@@ -1,189 +1,143 @@
-# @sym-bot/xmesh-agent
+<div align="center">
 
-[![npm](https://img.shields.io/npm/v/@sym-bot/xmesh-agent.svg)](https://www.npmjs.com/package/@sym-bot/xmesh-agent)
-[![license](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
-[![node](https://img.shields.io/badge/node-%E2%89%A518-brightgreen.svg)](#requirements)
+# xmesh-agent
 
-Run autonomous agents that talk to each other directly over a peer-to-peer mesh — **any model, any copilot, open protocol**.
+### Autonomous LLM agents that wake on each other's messages —<br>reason with _any_ model, answer agent-to-agent, no host IDE.
+
+<p>
+  <a href="https://www.npmjs.com/package/@sym-bot/xmesh-agent"><img src="https://img.shields.io/npm/v/@sym-bot/xmesh-agent" alt="npm"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-Apache%202.0-blue" alt="License"></a>
+  <a href="#requirements"><img src="https://img.shields.io/badge/node-%E2%89%A518-brightgreen" alt="node"></a>
+  <a href="https://meshcognition.org/spec/mmp"><img src="https://img.shields.io/badge/protocol-MMP_v1.0-orange" alt="MMP Spec"></a>
+  <a href="https://arxiv.org/abs/2604.19540"><img src="https://img.shields.io/badge/arXiv-2604.19540-b31b1b.svg" alt="MMP paper"></a>
+  <a href="https://arxiv.org/abs/2604.03955"><img src="https://img.shields.io/badge/arXiv-2604.03955-b31b1b.svg" alt="SVAF paper"></a>
+</p>
+
+**wake on a message&nbsp; → &nbsp;reason with any model&nbsp; → &nbsp;answer, agent-to-agent&nbsp; → &nbsp;peers self-select**
+
+`npm install -g @sym-bot/xmesh-agent`
+
+**▸ [Open the one-page overview](https://htmlpreview.github.io/?https://github.com/sym-bot/xmesh-agent/blob/main/docs/overview.html)**
+
+*The autonomous agent runtime for [xmesh.dev](https://xmesh.dev) — built on the open [SYM](https://github.com/sym-bot/sym) mesh.*
+
+</div>
+
+> Copilots wait for you. **xmesh-agent peers don't.** They run headless in the background, wake the moment a relevant message crosses the mesh, reason with their own configured model, and answer — agent-to-agent, with no orchestrator in the middle and no IDE in the loop. Spin up a writer, a reviewer, and a test-writer; seed one task; watch them coordinate.
 
 ```bash
 npm i -g @sym-bot/xmesh-agent
+xmesh-agent run --config examples/scenarios/reviewer-openai.toml
 ```
 
 > **No API key handy?** [Try the wire first in 60 seconds](examples/scenarios/two-peer-no-llm.md) — install `@sym-bot/sym`, emit two CMBs from two terminals, recall them. No LLM required. Once you've seen typed messages with provenance flow between identities, the autonomous LLM peers below run on top of the same wire.
 
 ---
 
-## xmesh-agent vs sym — which do I want?
+## What is xmesh-agent?
 
-xmesh-agent runs **autonomous LLM peers** on top of [`@sym-bot/sym`](https://github.com/sym-bot/sym) — the open mesh protocol substrate. They are complementary, not alternatives.
+**xmesh-agent runs autonomous LLM peers on the open mesh — agents that act on their own instead of waiting for you to drive them.**
 
-- **Use [`@sym-bot/sym`](https://github.com/sym-bot/sym) directly** if you already run AI copilots (Claude Code, Cursor, Copilot) and just want them to share memory through a SKILL file. Each copilot stays in its existing UI; the mesh just lets them see each other's observations.
-- **Use xmesh-agent** if you want to spin up **dedicated autonomous peers** that wake on incoming messages, call a configured model (Anthropic / OpenAI / Ollama), and emit responses — without a host IDE in the loop.
-
-You can mix both in the same mesh: a Claude Code session via SYM + a couple of xmesh-agent peers as background reviewers/auditors all see each other's CMBs.
-
----
-
-## Why
-
-Multi-agent systems today coordinate through a central orchestrator (a server, a queue, or a single human REPL). That model breaks at the edge — when there's no server, when latency kills, when each agent must stay sovereign. xmesh-agent flips it: every agent is a peer, every message is a CMB on the mesh, and admission is decided by the receiving agent's own attention weights, not by a router.
+First, the word: **the mesh is just agents connected directly to each other** — agent-to-agent, no central server in the middle. A peer is one process that wakes on an incoming message, calls a model, and emits a response; every other peer decides *for itself* whether that response is relevant. There's no router and no orchestrator — admission is the receiving agent's own call.
 
 **Two functions, one runtime:**
 
-1. **Real-time duplex agent-to-agent communication.** Peers exchange messages directly via local-network discovery (Bonjour) or an optional WebSocket relay. No polling. No central coordinator.
-2. **Autonomous collective intelligence.** Each peer wakes on incoming messages, reasons via its configured model, and emits a response. The receiving peer decides per-field whether to admit — using its own α (alpha) weights over seven semantic categories. Aligned peers converge. Divergent peers stay sovereign.
+1. **Real-time duplex agent-to-agent communication.** Peers exchange messages directly via local-network discovery (Bonjour) or an optional WebSocket relay. No polling, no central coordinator.
+2. **Autonomous collective intelligence.** Each peer wakes on incoming messages, reasons via its configured model, and emits a response. The receiver decides per-field whether to admit — using its own α (alpha) weights over seven semantic categories. Aligned peers converge; divergent peers stay sovereign.
 
 The substrate is **MMP** (Mesh Memory Protocol — `arXiv:2604.19540`) and **SVAF** (Symbolic-Vector Attention Fusion — `arXiv:2604.03955`). Messages are **CMBs** (Cognitive Memory Blocks) carrying the **CAT7** schema: focus, issue, intent, motivation, commitment, perspective, mood.
 
----
+> **xmesh-agent vs [`@sym-bot/sym`](https://github.com/sym-bot/sym) — which do I want?** They're complementary, not alternatives. Use **sym** directly if you already run AI copilots (Claude Code, Cursor, Copilot) and just want them to share memory through a SKILL file — each copilot stays in its own UI. Use **xmesh-agent** if you want **dedicated autonomous peers** that wake on incoming messages and call a model on their own, with no host IDE. Mix both in one mesh: a Claude Code session via SYM plus a couple of xmesh-agent peers as background reviewers all see each other's CMBs.
+
+## Why do you need it?
+
+Multi-agent systems today coordinate through a central orchestrator — a server, a queue, or a single human REPL. That model breaks at the edge: when there's no server, when latency kills, when each agent must stay sovereign. Wiring agents together means integration code between every pair, and it only connects the agents you thought to wire.
+
+**xmesh-agent flips it.** Every agent is a peer, every message is a CMB on the mesh, and admission is decided by the *receiving* agent's own attention weights — not by a router you configure and maintain. An agent you forgot you had can still answer. An agent with nothing to add costs nothing — its gate rejects silently, no tokens spent.
+
+## How do you use it?
+
+### 1. Install
+
+```bash
+npm install -g @sym-bot/xmesh-agent
+```
+
+### 2. Define a peer
+
+A peer is one `agent.toml` — its identity, its group, its role α-weights (what it pays attention to), and its model:
+
+```toml
+[identity]
+name = "reviewer-01"
+role = "reviewer"
+
+[mesh]
+group = "my-team"
+
+[role_weights]      # what this peer attends to (SVAF α)
+focus = 1.0
+issue = 2.5         # a reviewer weights "issue" heavily
+commitment = 2.0
+
+[model]
+adapter = "openai"
+model_name = "gpt-4o-mini"
+
+[attach]
+mode = "headless"
+```
+
+Validate before running — config + adapter + budgets, no mesh join, no model call:
+
+```bash
+xmesh-agent dry-run --config path/to/reviewer-01.toml
+```
+
+### 3. Run the peer, then seed a task
+
+```bash
+export OPENAI_API_KEY=sk-proj-...           # or ANTHROPIC_API_KEY, or run Ollama
+xmesh-agent run --config path/to/reviewer-01.toml   # logs "[run] xmesh-agent started", waits
+
+# from another terminal — broadcast a task into the group:
+sym observe --group my-team \
+  --focus "implement rate-limit middleware on /api/login" \
+  --intent "draft a spec, review it, add tests"
+```
+
+Within seconds the peer logs `model-call` then `emitted`. Add more peers (writer, test-writer) to the same group and they coordinate end-to-end — each waking on the others' responses, each running its own SVAF admission. Watch and control:
+
+```bash
+xmesh-agent status <peer>      # state, uptime, budget usage
+xmesh-agent cost <peer>        # this-run + lifetime cost
+xmesh-agent trace <peer> <id>  # ancestor lineage of a CMB
+xmesh-agent stop <peer>        # graceful shutdown
+```
+
+> Five-minute walkthrough from `npm i` to three peers coordinating: **[docs/getting-started.md](docs/getting-started.md)**.
 
 ## Three model adapters out of the box
 
 | Adapter | Models | Credential |
 |---|---|---|
-| `anthropic` | `claude-opus-4-7`, `claude-sonnet-4-6`, `claude-haiku-4-5-20251001` | `ANTHROPIC_API_KEY` |
+| `anthropic` | `claude-opus-4-8`, `claude-sonnet-4-6`, `claude-haiku-4-5-20251001` | `ANTHROPIC_API_KEY` |
 | `openai` | `gpt-5`, `gpt-5-mini`, `gpt-4o`, `gpt-4o-mini`, `o1` | `OPENAI_API_KEY` |
 | `ollama` | any local model (`llama3.2:3b`, `qwen2.5-coder`, …) | none — `ollama serve` on `localhost:11434` |
 
 Same agent loop, same wire protocol, different inference backend. That's the "any model" claim made mechanical.
 
----
+## Why this is different from multi-agent frameworks
 
-## Requirements
-
-- Node.js ≥ 18
-- macOS, Linux, or Windows (WSL or native)
-- One of: Anthropic API key, OpenAI API key, or local Ollama install
-- For multi-peer demos: peers must be on the same LAN (Bonjour) or share a relay URL + token
-
----
-
-## Quickstart — single peer, smoke test
-
-This proves the runtime + your chosen model adapter work end-to-end. Costs ~$0.0001 on `gpt-4o-mini`.
-
-```bash
-# 1. Install
-npm i -g @sym-bot/xmesh-agent
-
-# 2. Locate the bundled examples (path depends on your npm prefix)
-EXAMPLES="$(dirname $(realpath $(which xmesh-agent)))/../lib/node_modules/@sym-bot/xmesh-agent/examples"
-# (or just: clone the repo with `git clone https://github.com/sym-bot/xmesh-agent`)
-
-# 3. Set credentials for the adapter you'll use
-export OPENAI_API_KEY=sk-proj-...     # or ANTHROPIC_API_KEY=sk-ant-...
-
-# 4. Validate config + adapter without joining the mesh
-xmesh-agent dry-run --config "$EXAMPLES/scenarios/reviewer-openai.toml"
-```
-
-Expected output:
-
-```
-xmesh-agent dry-run — no mesh join, no model call, no CMB emission
-config: .../examples/scenarios/reviewer-openai.toml
-
-  ok    load config  — peer=reviewer-02-openai group=xmesh-demo adapter=openai
-  ok    claude-code advisory  — (info) Claude config has no "sym-mesh-channel" MCP server entry; install @sym-bot/mesh-channel first
-  ok    model adapter  — openai gpt-4o-mini (key present)
-  ok    SVAF α_f weights  — focus=1 issue=2.5 ...
-  ok    budget sanity  — wakes=5/min cost=$2/run
-  ok    cycle depth  — 5
-  ok    role sanity  — role "reviewer" α_f emphasis matches expectations
-  ok    attach mode  — headless
-
-PASS — 8/8 checks passed
-```
-
----
-
-## Quickstart — 3-peer autonomous demo
-
-Three peers (writer, reviewer, test-writer) coordinate end-to-end on a synthetic engineering task. Bundled scenarios in `examples/scenarios/`.
-
-**Setup (one terminal):**
-
-```bash
-git clone https://github.com/sym-bot/xmesh-agent
-cd xmesh-agent
-npm install
-export OPENAI_API_KEY=sk-proj-...
-
-# (optional) generate identity keypairs — Phase-1 primitive, not yet wire-required
-xmesh-agent keygen writer-02-openai
-xmesh-agent keygen reviewer-02-openai
-xmesh-agent keygen test-writer-02-openai
-```
-
-**Run (three more terminals — one per peer):**
-
-```bash
-# Terminal A
-xmesh-agent run --config examples/scenarios/writer-openai.toml
-
-# Terminal B
-xmesh-agent run --config examples/scenarios/reviewer-openai.toml
-
-# Terminal C
-xmesh-agent run --config examples/scenarios/test-writer-openai.toml
-```
-
-Each peer logs `[run] xmesh-agent started` and waits for a triggering CMB.
-
-**Seed a CMB to start the cycle (fifth terminal):**
-
-```bash
-# Option A: install the sym CLI and broadcast directly
-npm i -g @sym-bot/sym
-sym observe --group xmesh-demo \
-  --focus "implement rate-limit middleware on /api/login" \
-  --intent "draft a spec, review it, add tests"
-
-# Option B: pair a Claude Code session into the mesh and use the
-# sym_observe MCP tool — see https://github.com/sym-bot/sym-mesh-channel
-```
-
-Within a few seconds each peer logs `model-call` then `emitted`. Watch the mesh from a sixth terminal:
-
-```bash
-xmesh-agent status writer-02-openai
-xmesh-agent cost writer-02-openai
-xmesh-agent trace writer-02-openai <cmb-id>
-```
-
-**Stop cleanly:**
-
-```bash
-xmesh-agent stop writer-02-openai
-xmesh-agent stop reviewer-02-openai
-xmesh-agent stop test-writer-02-openai
-```
-
-The bundled scenarios cap each peer at $2 per run and 5 wakes per minute — total worst case $6, expected actual ~$0.001 on `gpt-4o-mini`.
-
----
-
-## CLI
-
-```
-xmesh-agent run --config <path>            Start a peer (headless attach mode)
-xmesh-agent dry-run --config <path>        Validate config + adapter without joining mesh
-xmesh-agent stop <peer>                    Graceful shutdown via IPC socket
-xmesh-agent status <peer>                  Peer state, uptime, budget usage, lifetime totals
-xmesh-agent cost <peer>                    This-run + lifetime cost
-xmesh-agent trace <peer> <cmb-id>          Print ancestor lineage of a CMB
-xmesh-agent keygen <peer> [--force]        Generate ed25519 identity keypair (Phase-1; not yet wire-active)
-xmesh-agent fingerprint <peer>             Print keyprint (16-hex) + fingerprint (64-hex)
-xmesh-agent trust add --group <g> --peer <p> --public-key <b64url>
-xmesh-agent trust list --group <g>
-xmesh-agent migrate [--apply]              Move legacy ~/.xmesh-agent/ to ~/.xmesh/
-xmesh-agent schema                         Print JSON Schema for agent.toml (for editor integrations)
-```
-
-Each `--help` works. Stop / status / cost / trace require the peer's IPC socket at `~/.xmesh/<peer>.sock` to be present (peer must be running).
-
----
+| | CrewAI / AutoGen / LangGraph | xmesh-agent |
+|---|---|---|
+| **Who decides which agent answers?** | You configure routing | The receiving agent decides, per message |
+| **Unknown agents contribute?** | No — only agents you wired | Yes — any coupled peer |
+| **Irrelevant agents waste tokens?** | Often — broadcast to all | Never — gate rejects silently |
+| **Answer traceable?** | Depends on implementation | Always — lineage DAG |
+| **Runs headless, no host IDE?** | Usually in-process | Native — background peers |
+| **Cross-process / cross-device?** | Single-process (usually) | Native — Bonjour LAN + relay |
+| **Protocol open?** | Framework-specific | Open spec ([MMP](https://meshcognition.org/spec/mmp)) + arXiv papers |
 
 ## Architecture
 
@@ -204,153 +158,73 @@ A peer is the tuple **(model adapter, attach mode, role α weights)** sharing on
         model adapter    attach mode      mesh adapter
                                                      │
         Anthropic        headless                    │
-        OpenAI           Claude Code (advisory)      │
-        Ollama                                       ▼
-                                              @sym-bot/sym
-                                              (MMP transport,
-                                               SVAF kernel,
-                                               CMB store + lineage)
+        OpenAI           Claude Code (advisory)      ▼
+        Ollama                                @sym-bot/sym
+                                              (MMP transport, SVAF
+                                               kernel, CMB store + lineage)
 ```
 
 Each axis is independently swappable. The mesh adapter is fixed (MMP via `@sym-bot/sym`) — that's the open-protocol commitment.
-
----
 
 ## Safety envelope
 
 Built-in guardrails for autonomous agents on real repos:
 
 - **Wake-budget** — burst (10/min), sustained (100/hr), daily (1000) caps with soft-warn at 80%
-- **Cycle detection** — suppresses emission when the proposed CMB's ancestor chain loops back to this peer; commitment-field exception lets a peer close out a task
+- **Cycle detection** — suppresses emission when a CMB's ancestor chain loops back to this peer; a commitment-field exception lets a peer close out a task
 - **Token + cost cap** — per-call max-tokens; per-run cost cap with auto-stop on overrun
 - **Approval gates** — pattern-matched fields (`git push`, `commit to main`, `deploy`, `.env`, `secrets`) blocked from emission
-- **Circuit breaker** — opens after 5 consecutive model failures; half-opens after 60s; exponential backoff (1s → 30s); transient-error detection (HTTP 429/502/503/504, rate-limit messages, ECONNRESET)
-- **Identity-collision exit** — peer exits cleanly if another peer claims the same name on the relay
+- **Circuit breaker** — opens after 5 consecutive model failures; half-opens after 60s; exponential backoff; transient-error detection (HTTP 429/502/503/504, `ECONNRESET`)
+- **Identity-collision exit** — a peer exits cleanly if another claims the same name on the relay
 
-All defaults documented in `examples/agent.toml.example`. Override per peer.
-
----
-
-## Response routing
-
-Since v0.1.2, the loop emits responses via **broadcast** by default — every peer in the group sees every response and runs its own SVAF admission. This is the canonical agent-to-agent behaviour.
-
-Other modes via `[routing] response_routing` in `agent.toml`:
-
-- `broadcast` (default) — every peer sees every response
-- `targeted` — response goes only to the originator (useful when the originator gates a workflow)
-- `auto` — broadcast in small mesh (≤2 peers), targeted otherwise
-
----
+All defaults live in `examples/agent.toml.example`; override per peer.
 
 ## Identity
 
-**Today:** ed25519 keypair generation + storage + signing/verification primitives are shipped. `xmesh-agent keygen <peer>` generates a key at `~/.xmesh/keys/<peer>.{key,pub,json}` (private key 0600). `xmesh-agent trust add` pins a peer's public key to `~/.xmesh/trusted-keys/<group>/`.
+ed25519 keypair generation, storage, and signing/verification primitives ship today: `xmesh-agent keygen <peer>` writes a key to `~/.xmesh/keys/`, `xmesh-agent trust add` pins a peer's public key. **Caveat:** the wire path does not yet sign or verify CMBs — the identity material is generated and ready, and protocol-level signing (admission modes `tofu` / `strict` / `open`, with a mixed-version migration window) is the next planned ship. See [ROADMAP.md](ROADMAP.md).
 
-**Today's caveat:** the wire path does not yet sign or verify CMBs. Identity material is generated and ready; the protocol-level integration is the next planned ship.
-
-**Next:** wire signing in `@sym-bot/sym` v0.6.0 with envelope delta in MMP spec v0.3.0. Three admission modes — `tofu` (trust-on-first-use, default), `strict` (pre-loaded keys only), `open` (legacy interop). Mixed-version migration window so older peers keep working.
-
----
-
-## Configuration
-
-A peer is one `agent.toml`. Minimal example:
-
-```toml
-[identity]
-name = "reviewer-01"
-role = "reviewer"
-
-[mesh]
-group = "my-team"
-
-[role_weights]
-focus = 1.0
-issue = 2.5
-intent = 1.2
-motivation = 0.8
-commitment = 2.0
-perspective = 0.5
-mood = 0.6
-
-[model]
-adapter = "openai"
-model_name = "gpt-4o-mini"
-
-[attach]
-mode = "headless"
-```
-
-Full schema with every option: `xmesh-agent schema`. Annotated example: `examples/agent.toml.example`. Validate before running: `xmesh-agent dry-run --config <path>`.
-
----
-
-## Repo layout
+## CLI
 
 ```
-src/
-  core/      loop, lifecycle, context assembly, structured logger, state store
-  model/     adapter interface + Anthropic / OpenAI / Ollama implementations
-  attach/    headless attach mode + Claude Code compat advisory
-  mesh/      @sym-bot/sym wrapper
-  safety/    budget, cycle, gates, circuit breaker, identity (ed25519)
-  cli/       run, stop, status, cost, trace, keygen, fingerprint, trust, migrate, schema, dry-run
-  runtime/   shared paths (~/.xmesh/...)
-test/        node:test — 225 unit + 4 smoke (Bonjour / Anthropic / OpenAI / relay)
-examples/    agent.toml.example + scenarios/ + cross-host-runbook.md
-.github/     CI matrix (Node 18/20/22 + lint + secret-scan + install rehearsal)
+xmesh-agent run --config <path>        Start a peer (headless)
+xmesh-agent dry-run --config <path>    Validate config + adapter without joining the mesh
+xmesh-agent stop | status | cost <peer>   Lifecycle + budget + cost
+xmesh-agent trace <peer> <cmb-id>      Print the ancestor lineage of a CMB
+xmesh-agent keygen | fingerprint | trust  ed25519 identity (Phase-1)
+xmesh-agent schema                     Print the agent.toml JSON Schema (for editors)
+xmesh-agent migrate [--apply]          Move legacy ~/.xmesh-agent/ to ~/.xmesh/
 ```
 
----
+Every command has `--help`. Lifecycle commands need the peer's IPC socket at `~/.xmesh/<peer>.sock` (peer must be running).
 
-## Run the test suite
+## Requirements
 
-```bash
-git clone https://github.com/sym-bot/xmesh-agent
-cd xmesh-agent
-npm install
-
-npm test           # 225 unit tests
-npm run lint       # ESLint flat-config
-npm run smoke      # live tests — Bonjour always; Anthropic/OpenAI/relay skip without env
-```
-
-Real-API smoke tests are skip-gated. Set `ANTHROPIC_API_KEY` / `OPENAI_API_KEY` / `SYM_RELAY_URL`+`SYM_RELAY_TOKEN` to enable.
-
----
+- Node.js ≥ 18 · macOS, Linux, or Windows
+- One of: Anthropic API key, OpenAI API key, or a local Ollama install
+- Multi-peer: peers on the same LAN (Bonjour), or sharing a relay URL + token
 
 ## Project status
 
-- **0.1.x** is alpha. API surface is stable enough to build on; CLI commands and config schema may evolve before 1.0.
-- **Test coverage:** 225 unit tests across 14 source modules; CI green on Node 18, 20, 22.
-- **Production verification:** end-to-end real-API run with three peers on `gpt-4o-mini` validated 2026-04-24 — three model calls, three CAT7 CMBs, three lineage chains, total cost $0.00023.
-- **What's coming:** see [`ROADMAP.md`](ROADMAP.md) for the in-flight, designed, and considering buckets.
-
----
+**0.1.x is alpha** — the API surface is stable enough to build on; CLI and config schema may evolve before 1.0. 303 unit tests across the source modules; CI green on Node 18, 20, 22. End-to-end real-API run with three peers on `gpt-4o-mini` validated 2026-04-24 — three model calls, three CAT7 CMBs, three lineage chains, total cost $0.00023. What's coming: [ROADMAP.md](ROADMAP.md).
 
 ## Documentation
 
-- **[`docs/getting-started.md`](docs/getting-started.md)** — five-minute quickstart from `npm i` to three peers coordinating
-- **[`docs/concepts.md`](docs/concepts.md)** — vocabulary: CMB, CAT7, SVAF, α weights, lineage, the autonomous loop
-- **[`docs/cookbook.md`](docs/cookbook.md)** — 14 recipes: coding triad, mixed-vendor mesh, cross-host, custom α, etc.
-- **[`docs/comparison.md`](docs/comparison.md)** — xmesh-agent vs LangGraph / CrewAI / AutoGen / MCP — when to pick which
-- **[`docs/github-action.md`](docs/github-action.md)** — drop xmesh-agent into any GitHub Actions workflow as a peer
-- **[`examples/scenarios/README.md`](examples/scenarios/README.md)** — 11 ready-to-run agent.toml templates
-- **[`OPERATIONS.md`](OPERATIONS.md)** — launch-day runbook + kill-switch playbook
-- **[`PUBLISHING.md`](PUBLISHING.md)** — release rehearsal + npm-publish steps
-- **[`examples/cross-host-runbook.md`](examples/cross-host-runbook.md)** — Mac+Win cross-host verification
+- **[docs/getting-started.md](docs/getting-started.md)** — five-minute quickstart, `npm i` to three peers
+- **[docs/concepts.md](docs/concepts.md)** — CMB, CAT7, SVAF, α weights, lineage, the autonomous loop
+- **[docs/cookbook.md](docs/cookbook.md)** — recipes: coding triad, mixed-vendor mesh, cross-host, custom α
+- **[docs/comparison.md](docs/comparison.md)** — vs LangGraph / CrewAI / AutoGen / MCP
+- **[docs/github-action.md](docs/github-action.md)** — drop a peer into any GitHub Actions workflow
+- **[OPERATIONS.md](OPERATIONS.md)** — launch-day runbook + kill-switch playbook
 
 ## Related
 
-- **Spec:** [meshcognition.org/spec/mmp](https://meshcognition.org/spec/mmp) — Mesh Memory Protocol v1.0 (CC-BY-4.0)
-- **Substrate:** [`@sym-bot/sym`](https://github.com/sym-bot/sym) — mesh transport, SVAF kernel, CMB store
+- **Runtime home:** [xmesh.dev](https://xmesh.dev) — build & run autonomous agents on the open mesh
+- **Substrate:** [`@sym-bot/sym`](https://github.com/sym-bot/sym) — MMP transport, SVAF kernel, CMB store + lineage
 - **Claude Code shim:** [`@sym-bot/mesh-channel`](https://github.com/sym-bot/sym-mesh-channel) — MCP plugin that pairs a Claude Code session into the mesh
-
----
+- **Spec:** [meshcognition.org/spec/mmp](https://meshcognition.org/spec/mmp) — Mesh Memory Protocol v1.0 (CC-BY-4.0)
 
 ## License
 
-Apache-2.0. Copyright (c) 2026 SYM.BOT.
+Apache-2.0. Copyright (c) 2026 SYM.BOT. Issues + pull requests welcome.
 
-Issues + pull requests welcome.
+**[SYM.BOT](https://sym.bot)** — Glasgow, Scotland.

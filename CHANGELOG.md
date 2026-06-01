@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.1.13 — 2026-06-01
+
+- **Dependency:** bump `@sym-bot/sym` to `^0.7.3` — picks up groups, the
+  cross-platform discovery beacon, and the polyglot real-time node. Full
+  suite green against it (303 unit tests; `dry-run` boots clean).
+- **Docs:** README restyled to the SYM poster format + a self-contained
+  one-page `docs/overview.html`. Positioned as **the autonomous agent
+  runtime for [xmesh.dev](https://xmesh.dev)**; `peer-to-peer` → the
+  ratified `agent-to-agent`; model refs refreshed (`claude-opus-4-8`);
+  trimmed the stale "next: sym v0.6.0 wire signing" version pin.
+- **package.json:** `homepage` → `https://xmesh.dev`; description refresh.
+
 ## 0.1.12 — 2026-05-12
 
 - **MeshAdapter `payload` slot.** `send` and `observe` accept an
