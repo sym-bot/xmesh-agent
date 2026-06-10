@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.1.14 — 2026-06-10
+
+- **Dependency:** bump `@sym-bot/sym` to `^0.7.6` (lockfile was pinned to
+  0.7.3) — picks up same-host loopback discovery (0.7.4), the mesh
+  replay-storm receive-path dedup (0.7.5), and the SVAF decision log
+  (0.7.6). Full suite green against it (303 unit tests).
+
 ## 0.1.13 — 2026-06-01
 
 - **Dependency:** bump `@sym-bot/sym` to `^0.7.3` — picks up groups, the
