@@ -21,6 +21,12 @@ class MeshAdapter {
     this.fieldWeights = opts.fieldWeights;
     this.cognitiveProfile = opts.cognitiveProfile || null;
     this.svafFreshnessSeconds = opts.svafFreshnessSeconds || 7200;
+    // Adaptive integration timescale (liquid substrate): the SVAF memory-decay timescale
+    // shortens after recent guarded/rejected verdicts and lengthens when stable, instead of
+    // a fixed-gain integrator. Enabled by default in the runtime (tune in deployment).
+    this.svafAdaptiveTimescale = opts.svafAdaptiveTimescale ?? true;
+    this.svafMinFreshnessSeconds = opts.svafMinFreshnessSeconds ?? 600;
+    this.svafReactivity = opts.svafReactivity ?? 0.9;
 
     this._nodeFactory = opts._nodeFactory || defaultNodeFactory;
     this._node = null;
@@ -45,6 +51,9 @@ class MeshAdapter {
       cognitiveProfile: this.cognitiveProfile,
       svafFieldWeights: this.fieldWeights,
       svafFreshnessSeconds: this.svafFreshnessSeconds,
+      svafAdaptiveTimescale: this.svafAdaptiveTimescale,
+      svafMinFreshnessSeconds: this.svafMinFreshnessSeconds,
+      svafReactivity: this.svafReactivity,
       discoveryServiceType: resolveServiceType(this.group),
       group: this.group,
       relay: this.relay,
