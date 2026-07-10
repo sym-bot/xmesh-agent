@@ -19,7 +19,7 @@
 
 **▸ [Open the one-page overview](https://htmlpreview.github.io/?https://github.com/sym-bot/xmesh-agent/blob/main/docs/overview.html)**
 
-*The autonomous agent runtime for [xmesh.dev](https://xmesh.dev) — built on the open [SYM](https://github.com/sym-bot/sym) mesh.*
+*The autonomous agent runtime for [xmesh](https://xmesh.bot) — built on the open [SYM](https://github.com/sym-bot/sym) mesh.*
 
 </div>
 
@@ -218,7 +218,7 @@ Every command has `--help`. Lifecycle commands need the peer's IPC socket at `~/
 
 ## Related
 
-- **Runtime home:** [xmesh.dev](https://xmesh.dev) — build & run autonomous agents on the open mesh
+- **Runtime home:** [xmesh.bot](https://xmesh.bot) — build & run autonomous agents on the open mesh
 - **Substrate:** [`@sym-bot/sym`](https://github.com/sym-bot/sym) — MMP transport, SVAF kernel, CMB store + lineage
 - **Claude Code shim:** [`@sym-bot/mesh-channel`](https://github.com/sym-bot/sym-mesh-channel) — MCP plugin that pairs a Claude Code session into the mesh
 - **Spec:** [meshcognition.org/spec/mmp](https://meshcognition.org/spec/mmp) — Mesh Memory Protocol v1.0 (CC-BY-4.0)

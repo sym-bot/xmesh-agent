@@ -1,7 +1,7 @@
 {
   "name": "@sym-bot/xmesh-agent",
-  "version": "0.1.14",
-  "description": "The autonomous agent runtime for xmesh.dev — wake-on-admission reasoning with wake-budget, cycle detection, token cap, and approval gates, agent-to-agent over the open mesh.",
+  "version": "0.1.15",
+  "description": "The autonomous agent runtime for xmesh — wake-on-admission reasoning with wake-budget, cycle detection, token cap, and approval gates, agent-to-agent over the open mesh.",
   "main": "src/index.js",
   "bin": {
     "xmesh-agent": "src/cli/index.js"
@@ -45,7 +45,7 @@
   "publishConfig": {
     "access": "public"
   },
-  "homepage": "https://xmesh.dev",
+  "homepage": "https://xmesh.bot",
   "repository": {
     "type": "git",
     "url": "https://github.com/sym-bot/xmesh-agent.git"
