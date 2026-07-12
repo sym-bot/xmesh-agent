@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.15 — 2026-07-11
+
+- **Brand:** fix stale `xmesh.dev` references → `xmesh` / `xmesh.bot`.
+- Enable the adaptive integration timescale on the SymNode.
+- Depends on `@sym-bot/sym` `^0.7.12` (resolves to the current 0.7.30).
+
 ## 0.1.14 — 2026-06-10
 
 - **Dependency:** bump `@sym-bot/sym` to `^0.7.6` (lockfile was pinned to
