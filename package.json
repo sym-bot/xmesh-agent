@@ -1,7 +1,7 @@
 {
   "name": "@sym-bot/xmesh-agent",
   "version": "0.1.15",
-  "description": "The autonomous agent runtime for xmesh — wake-on-admission reasoning with wake-budget, cycle detection, token cap, and approval gates, agent-to-agent over the open mesh.",
+  "description": "The autonomous agent runtime for xmesh \u2014 wake-on-admission reasoning with wake-budget, cycle detection, token cap, and approval gates, agent-to-agent over the open mesh.",
   "main": "src/index.js",
   "bin": {
     "xmesh-agent": "src/cli/index.js"
@@ -11,7 +11,8 @@
     "test:coverage": "node --test --experimental-test-coverage test/*.test.js",
     "test:coverage:check": "node scripts/check-coverage.js",
     "smoke": "node --test test/*.smoke.js",
-    "lint": "eslint src/ test/"
+    "lint": "eslint src/ test/",
+    "release": "node scripts/release.mjs"
   },
   "files": [
     "src/",
