@@ -1,5 +1,23 @@
 # Changelog
 
+## 0.1.16 — 2026-07-20
+
+- **Dependency (data loss):** raise `@sym-bot/sym` to `^0.7.31`. Versions before
+  0.7.31 delete accumulated cognition on an hourly sweep: CMB retention defaulted
+  to 86400s (24h), and `_runRetentionPurge()` — which runs at start and every hour
+  — compacts entries to `cold` and then removes any cold CMB with no descendants.
+  Observed in production: a node store fell 130 → 116 → 98 CMBs in a few hours,
+  taking its authority-bearing gate record with it, and an identity migration lost
+  its tail mid-flight to the same sweep. 0.7.31 makes retention **unlimited by
+  default**; an explicit finite `retentionSeconds` still opts in, so regulated
+  deployments (HIPAA / MiFID II / SEC) are unaffected.
+- **If you installed this SDK before 2026-07-20, your lockfile may pin a sym
+  between 0.7.12 and 0.7.30 and you are losing memory silently.** The previous
+  `^0.7.12` range admitted 0.7.31, so a fresh install was already safe — a pinned
+  lockfile was not. This release raises the floor so an upgrade cannot be missed.
+  Verify with `npm ls @sym-bot/sym`.
+- No API change. Full suite green (303 unit tests).
+
 ## 0.1.15 — 2026-07-11
 
 - **Brand:** fix stale `xmesh.dev` references → `xmesh` / `xmesh.bot`.
