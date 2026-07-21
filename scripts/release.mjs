@@ -17,7 +17,9 @@ import fs from "node:fs";
 const version = process.argv[2];
 if (!/^\d+\.\d+\.\d+$/.test(version || "")) die(`usage: node scripts/release.mjs <X.Y.Z>  (write the CHANGELOG ## ${version || "X.Y.Z"} entry first)`);
 
-const run = (cmd, opts = {}) => execSync(cmd, { stdio: "pipe", encoding: "utf8", ...opts }).trim();
+// execSync returns null with stdio:"inherit" (used by the npm test / build steps so their
+// output streams); .trim() on that killed the release at the tests step. Coalesce first.
+const run = (cmd, opts = {}) => (execSync(cmd, { stdio: "pipe", encoding: "utf8", ...opts }) ?? "").trim();
 const step = (msg) => process.stdout.write(`\n▸ ${msg}\n`);
 function die(msg) { process.stderr.write(`\n✗ ${msg}\n`); process.exit(1); }
 
@@ -35,7 +37,10 @@ if (run("git rev-list --count HEAD..@{u}") !== "0") die("behind origin/main — 
 
 step(`CHANGELOG has an entry for ${version}`);
 const changelog = fs.existsSync("CHANGELOG.md") ? fs.readFileSync("CHANGELOG.md", "utf8") : "";
-const section = changelog.match(new RegExp(`^## ${version.replace(/\./g, "\\.")}[^\\n]*\\n([\\s\\S]*?)(?=\\n## |$)`, "m"));
+// A bare `$` under the "m" flag matches the end of ANY line, so the lazy capture stopped at
+// the first line break after the header and every well-formed entry read as EMPTY.
+// (?![\\s\\S]) is a true end-of-input anchor; "m" is still needed for `^`.
+const section = changelog.match(new RegExp(`^## ${version.replace(/\./g, "\\.")}[^\\n]*\\n([\\s\\S]*?)(?=\\n## |(?![\\s\\S]))`, "m"));
 if (!section) die(`no "## ${version}" section in CHANGELOG.md — write it first (it becomes the tag + release notes)`);
 const notes = section[1].trim();
 if (!notes) die(`the "## ${version}" CHANGELOG section is empty`);

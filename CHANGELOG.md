@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.1.17 — 2026-07-21 · verify both key prefixes before the cmb1- migration
+
+- Takes `@sym-bot/sym` ^0.7.32 (and through it `@sym-bot/core` ^0.3.49), whose verification
+  accepts a v1 CMB under **either** prefix. The mesh is migrating `cmb1-<64hex>` keys to
+  `cmb-<64hex>`; the prefix used to select the signing scheme, and the digest LENGTH now does
+  (64 hex = v1, 32 hex = legacy). No code change here — xmesh-agent has zero `cmb1-`
+  references and never treated the prefix as the scheme.
+- **This release does not emit the new form.** Emission stays `cmb1-` until cutover: every
+  process must READ both prefixes before any process WRITES the new one, or blocks from an
+  upgraded node fail verification on one that has not restarted.
+- Fixes two bugs in `scripts/release.mjs` that made it unable to complete: the CHANGELOG
+  section regex read every well-formed entry as empty, and `run()` crashed on the
+  `stdio: "inherit"` steps (npm test / build).
+
 ## 0.1.16 — 2026-07-20
 
 - **Dependency (data loss):** raise `@sym-bot/sym` to `^0.7.31`. Versions before
