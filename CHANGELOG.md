@@ -1,5 +1,21 @@
 # Changelog
 
+## 0.3.0 (2026-08-07)
+
+### Changed
+
+- **Repin `@sym-bot/sym` 0.10.5 → 0.11.0 (core 0.7.4 → 0.8.1).** Carries core's verification fix:
+  `verifyCMB` used to return `valid: true` for records it had never checked, and `recomputeKey`
+  could not recompute a single record the library minted.
+
+  This package derives and verifies no content address of its own — zero references to
+  `recomputeKey`, `cmbKeyV1`, `blockKeyV2`, `keyScheme` or `verifyCMB` outside `node_modules` — so
+  a corrected core invalidates nothing here. That was checked rather than assumed, because `sym`
+  DID carry a hand-rolled workaround around the same defect and the bump alone turned it into a
+  regression that would have discarded every pre-boundary record on fetch.
+
+  Resolved after install, not declared: `sym` 0.11.0, `core` 0.8.1. 303/303.
+
 ## 0.1.17 — 2026-07-21 · verify both key prefixes before the cmb1- migration
 
 - Takes `@sym-bot/sym` ^0.7.32 (and through it `@sym-bot/core` ^0.3.49), whose verification
