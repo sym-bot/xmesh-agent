@@ -83,7 +83,7 @@ test('stableStringify: sorts keys deterministically at every level', () => {
   assert.equal(a, b);
 });
 
-test('canonicalise: drops signature + raw fields', () => {
+test('canonicalise: drops signature + raw categories', () => {
   const env = { a: 1, signature: 'sig', raw: { heavy: 'blob' } };
   const c = canonicalise(env);
   assert.ok(!c.includes('signature'));
@@ -100,7 +100,7 @@ test('signEnvelope + verifyEnvelope: round-trip with matching key', () => {
       version: '0.3.0',
       timestamp: 1700000000000,
       createdBy: 'signer',
-      fields: { focus: { text: 'hello' } },
+      categories: { focus: { text: 'hello' } },
     };
     const sig = signEnvelope(envelope, kp.privateKey);
     assert.ok(typeof sig === 'string');
@@ -111,9 +111,9 @@ test('signEnvelope + verifyEnvelope: round-trip with matching key', () => {
 
 test('verifyEnvelope: fails for tampered payload', () => {
   const kp = generateKeyPair();
-  const envelope = { fields: { focus: 'original' } };
+  const envelope = { categories: { focus: 'original' } };
   const sig = signEnvelope(envelope, kp.privateKey);
-  const tampered = { fields: { focus: 'MITM' } };
+  const tampered = { categories: { focus: 'MITM' } };
   assert.equal(verifyEnvelope(tampered, sig, kp.publicKey), false);
 });
 
@@ -163,7 +163,7 @@ test('end-to-end: alice signs, bob verifies via trusted-keys pinning', () => {
       version: '0.3.0',
       timestamp: Date.now(),
       createdBy: 'alice',
-      fields: { focus: { text: 'signed CMB' }, intent: { text: 'verify' } },
+      categories: { focus: { text: 'signed CMB' }, intent: { text: 'verify' } },
       lineage: { parents: [], ancestors: [] },
       identity: {
         publicKey: aliceKp.publicRaw.toString('base64url'),

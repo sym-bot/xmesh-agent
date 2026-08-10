@@ -3,7 +3,7 @@
 const DEFAULT_DEPTH = 5;
 
 function detectCycle({ proposed, resolveAncestors, selfName, depth = DEFAULT_DEPTH }) {
-  if (proposed?.fields?.commitment?.text) {
+  if (proposed?.categories?.commitment?.text) {
     return { suspect: false, reason: 'commitment-exception' };
   }
   if (!Array.isArray(proposed?.ancestors) || proposed.ancestors.length === 0) {

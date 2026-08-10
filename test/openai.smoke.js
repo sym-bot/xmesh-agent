@@ -20,7 +20,7 @@ test(
       systemPrompt: 'You are a reviewer on the xmesh mesh. Always respond by emitting a CAT7 CMB via the emit_cmb tool.',
       messages: [{
         role: 'user',
-        content: 'Admitted CMB from writer-01: focus="add rate limiting on /api/login". Respond with issue + commitment fields via emit_cmb.',
+        content: 'Admitted CMB from writer-01: focus="add rate limiting on /api/login". Respond with issue + commitment categories via emit_cmb.',
       }],
       maxTokens: 400,
       tools: [EMIT_CMB_TOOL],
@@ -40,7 +40,7 @@ test(
     const populatedFields = Object.keys(emitCall.input).filter((k) => emitCall.input[k]);
     assert.ok(populatedFields.length >= 1, `emit_cmb populated at least one field (got: ${populatedFields.join(',')})`);
     process.stderr.write(
-      `[openai-smoke] ok — tokens=${response.usage.inputTokens}/${response.usage.outputTokens} cost=$${response.usage.costUsd.toFixed(6)} fields=${populatedFields.join(',')}\n`,
+      `[openai-smoke] ok — tokens=${response.usage.inputTokens}/${response.usage.outputTokens} cost=$${response.usage.costUsd.toFixed(6)} categories=${populatedFields.join(',')}\n`,
     );
   },
 );

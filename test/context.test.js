@@ -5,7 +5,7 @@ const assert = require('node:assert/strict');
 const {
   assembleContext,
   estimateTokens,
-  renderFields,
+  renderCategories,
   renderCmb,
   rolePreamble,
   walkLineage,
@@ -18,8 +18,8 @@ function fakeMesh({ store = new Map(), recallAll = [] } = {}) {
   };
 }
 
-function cmb({ id, source, fields = {}, ancestors = [] }) {
-  return { id, source, fields, ancestors };
+function cmb({ id, source, categories = {}, ancestors = [] }) {
+  return { id, source, categories, ancestors };
 }
 
 test('estimateTokens: roughly 4 chars per token', () => {
@@ -28,8 +28,8 @@ test('estimateTokens: roughly 4 chars per token', () => {
   assert.equal(estimateTokens('a'.repeat(400)), 100);
 });
 
-test('renderFields: prints only populated CAT7 fields in canonical order', () => {
-  const out = renderFields({
+test('renderCategories: prints only populated CAT7 categories in canonical order', () => {
+  const out = renderCategories({
     mood: { text: 'tired' },
     focus: 'cache invalidation',
     unknown: { text: 'ignored' },
@@ -40,12 +40,12 @@ test('renderFields: prints only populated CAT7 fields in canonical order', () =>
 });
 
 test('renderCmb: header + body with label', () => {
-  const out = renderCmb(cmb({ id: 'c1', source: 'alice', fields: { focus: 'x' } }), { label: 'ADMITTED' });
+  const out = renderCmb(cmb({ id: 'c1', source: 'alice', categories: { focus: 'x' } }), { label: 'ADMITTED' });
   assert.ok(out.startsWith('[ADMITTED] c1 from alice'));
   assert.ok(out.includes('focus: x'));
 });
 
-test('rolePreamble: emphasises high-weight fields only', () => {
+test('rolePreamble: emphasises high-weight categories only', () => {
   const p = rolePreamble({
     name: 'reviewer-01',
     description: 'Engineering reviewer.',
@@ -87,7 +87,7 @@ test('walkLineage: diamond DAG does not re-enqueue visited nodes', async () => {
 
 test('assembleContext: produces systemPrompt + user message with admitted CMB', async () => {
   const mesh = fakeMesh();
-  const admittedCmb = cmb({ id: 'inc-1', source: 'writer-01', fields: { focus: { text: 'spec draft' } } });
+  const admittedCmb = cmb({ id: 'inc-1', source: 'writer-01', categories: { focus: { text: 'spec draft' } } });
   const ctx = await assembleContext({
     admittedCmb,
     role: { name: 'reviewer-01', description: 'reviewer', weights: { issue: 2.5 } },
@@ -102,9 +102,9 @@ test('assembleContext: produces systemPrompt + user message with admitted CMB', 
 });
 
 test('assembleContext: includes lineage ancestors when present', async () => {
-  const store = new Map([['anc-1', cmb({ id: 'anc-1', source: 'alice', fields: { focus: { text: 'ancestor' } }, ancestors: [] })]]);
+  const store = new Map([['anc-1', cmb({ id: 'anc-1', source: 'alice', categories: { focus: { text: 'ancestor' } }, ancestors: [] })]]);
   const mesh = fakeMesh({ store });
-  const admittedCmb = cmb({ id: 'c2', source: 'bob', ancestors: ['anc-1'], fields: { intent: { text: 'review' } } });
+  const admittedCmb = cmb({ id: 'c2', source: 'bob', ancestors: ['anc-1'], categories: { intent: { text: 'review' } } });
   const ctx = await assembleContext({
     admittedCmb,
     role: { name: 'me' },
@@ -116,12 +116,12 @@ test('assembleContext: includes lineage ancestors when present', async () => {
 
 test('assembleContext: separates own vs group recent CMBs', async () => {
   const recallAll = [
-    cmb({ id: 'o1', source: 'me', fields: { focus: { text: 'own-1' } } }),
-    cmb({ id: 'o2', source: 'me', fields: { focus: { text: 'own-2' } } }),
-    cmb({ id: 'g1', source: 'peer', fields: { focus: { text: 'group-1' } } }),
+    cmb({ id: 'o1', source: 'me', categories: { focus: { text: 'own-1' } } }),
+    cmb({ id: 'o2', source: 'me', categories: { focus: { text: 'own-2' } } }),
+    cmb({ id: 'g1', source: 'peer', categories: { focus: { text: 'group-1' } } }),
   ];
   const mesh = fakeMesh({ recallAll });
-  const admittedCmb = cmb({ id: 'trig', source: 'other', fields: { focus: { text: 'trigger' } } });
+  const admittedCmb = cmb({ id: 'trig', source: 'other', categories: { focus: { text: 'trigger' } } });
   const ctx = await assembleContext({
     admittedCmb,
     role: { name: 'me' },
@@ -134,8 +134,8 @@ test('assembleContext: separates own vs group recent CMBs', async () => {
 });
 
 test('assembleContext: excludes admitted CMB from group-recent to avoid double-render', async () => {
-  const admittedCmb = cmb({ id: 'dup', source: 'peer', fields: { focus: { text: 'only once' } } });
-  const recallAll = [admittedCmb, cmb({ id: 'other', source: 'peer2', fields: { focus: { text: 'different' } } })];
+  const admittedCmb = cmb({ id: 'dup', source: 'peer', categories: { focus: { text: 'only once' } } });
+  const recallAll = [admittedCmb, cmb({ id: 'other', source: 'peer2', categories: { focus: { text: 'different' } } })];
   const mesh = fakeMesh({ recallAll });
   const ctx = await assembleContext({
     admittedCmb,
@@ -149,12 +149,12 @@ test('assembleContext: excludes admitted CMB from group-recent to avoid double-r
 test('assembleContext: truncates in drop order when over budget', async () => {
   const bigText = 'x'.repeat(4000);
   const recallAll = [
-    cmb({ id: 'o1', source: 'me', fields: { focus: { text: bigText } } }),
-    cmb({ id: 'g1', source: 'peer', fields: { focus: { text: bigText } } }),
+    cmb({ id: 'o1', source: 'me', categories: { focus: { text: bigText } } }),
+    cmb({ id: 'g1', source: 'peer', categories: { focus: { text: bigText } } }),
   ];
-  const store = new Map([['anc-1', cmb({ id: 'anc-1', source: 'alice', fields: { focus: { text: bigText } } })]]);
+  const store = new Map([['anc-1', cmb({ id: 'anc-1', source: 'alice', categories: { focus: { text: bigText } } })]]);
   const mesh = fakeMesh({ recallAll, store });
-  const admittedCmb = cmb({ id: 'c2', source: 'bob', fields: { focus: { text: 'short' } }, ancestors: ['anc-1'] });
+  const admittedCmb = cmb({ id: 'c2', source: 'bob', categories: { focus: { text: 'short' } }, ancestors: ['anc-1'] });
 
   const ctx = await assembleContext({
     admittedCmb,

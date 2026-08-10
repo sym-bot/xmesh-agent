@@ -87,22 +87,22 @@ class MeshAdapter {
     this._identityCollisionHandler = handler;
   }
 
-  async observe({ fields, parents, payload }) {
+  async observe({ categories, parents, payload }) {
     this._assertStarted();
     const opts = {};
     if (parents) opts.parents = parents;
     if (payload !== undefined && payload !== null) opts.payload = payload;
-    return this._node.remember(fields, opts);
+    return this._node.remember(categories, opts);
   }
 
-  async send({ to, fields, parents, payload }) {
+  async send({ to, categories, parents, payload }) {
     this._assertStarted();
     const peerId = this._resolvePeerName(to);
     if (!peerId) throw new Error(`unknown peer: ${to}`);
     const opts = { to: peerId };
     if (parents) opts.parents = parents;
     if (payload !== undefined && payload !== null) opts.payload = payload;
-    return this._node.remember(fields, opts);
+    return this._node.remember(categories, opts);
   }
 
   async resolveCmb(cmbId) {
@@ -157,7 +157,7 @@ class MeshAdapter {
       id: entry?.key || cmb?.key || null,
       source: entry?.source || cmb?.createdBy || null,
       createdBy: cmb?.createdBy || entry?.source || null,
-      fields: cmb?.fields || {},
+      categories: cmb?.categories || {},
       payload: cmb?.payload ?? null,
       ancestors: cmb?.lineage?.ancestors || [],
       parents: cmb?.lineage?.parents || [],

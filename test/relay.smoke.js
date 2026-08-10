@@ -63,7 +63,7 @@ test(
       );
 
       await alice.observe({
-        fields: {
+        categories: {
           focus: { text: 'relay smoke CMB from alice' },
           intent: { text: 'verify WAN duplex via ' + RELAY_URL },
         },
@@ -76,7 +76,7 @@ test(
 
       assert.ok(received.length >= 1, 'bob did not receive via relay within 20s');
       assert.equal(received[0].createdBy, alice.identity.name);
-      assert.equal(received[0].fields.focus.text, 'relay smoke CMB from alice');
+      assert.equal(received[0].categories.focus.text, 'relay smoke CMB from alice');
       process.stderr.write(
         `[relay-smoke] ok — relay=${RELAY_URL} group=${group} received=${received.length}\n`,
       );

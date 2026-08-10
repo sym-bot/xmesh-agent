@@ -29,7 +29,7 @@ test('LEVEL_ORDER: standard severity ordering', () => {
 });
 
 test('sanitise: drops raw + cmb keys (noisy dumps)', () => {
-  const cleaned = sanitise({ ok: true, raw: 'huge-response', cmb: { fields: {} }, keep: 'x' });
+  const cleaned = sanitise({ ok: true, raw: 'huge-response', cmb: { categories: {} }, keep: 'x' });
   assert.ok(!('raw' in cleaned));
   assert.ok(!('cmb' in cleaned));
   assert.equal(cleaned.keep, 'x');

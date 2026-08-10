@@ -20,7 +20,7 @@ const DEFAULT_GATE_PATTERNS = Object.freeze({
 function checkGates(cmb, patterns = DEFAULT_GATE_PATTERNS) {
   const hits = [];
   for (const [field, patternList] of Object.entries(patterns)) {
-    const text = cmb?.fields?.[field]?.text;
+    const text = cmb?.categories?.[field]?.text;
     if (!text) continue;
     for (const p of patternList) {
       if (p.test(text)) hits.push({ field, pattern: p.source });

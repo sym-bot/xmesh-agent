@@ -1,6 +1,6 @@
 'use strict';
 
-const CAT7_FIELDS = Object.freeze([
+const CAT7_CATEGORIES = Object.freeze([
   'focus', 'issue', 'intent', 'motivation', 'commitment', 'perspective', 'mood',
 ]);
 
@@ -16,11 +16,11 @@ function estimateTokens(text) {
   return Math.ceil(text.length / 4);
 }
 
-function renderFields(fields) {
-  if (!fields) return '';
+function renderCategories(categories) {
+  if (!categories) return '';
   const out = [];
-  for (const f of CAT7_FIELDS) {
-    const v = fields[f];
+  for (const f of CAT7_CATEGORIES) {
+    const v = categories[f];
     if (!v) continue;
     const text = typeof v === 'string' ? v : v.text;
     if (!text) continue;
@@ -34,7 +34,7 @@ function renderCmb(cmb, { label } = {}) {
   const header = label
     ? `[${label}] ${cmb.id || '?'} from ${cmb.source || '?'}`
     : `${cmb.id || '?'} from ${cmb.source || '?'}`;
-  const body = renderFields(cmb.fields);
+  const body = renderCategories(cmb.categories);
   return body ? `${header}\n${body}` : header;
 }
 
@@ -49,7 +49,7 @@ function rolePreamble(role) {
       .join(', ');
     if (summary) lines.push(`SVAF field priorities: ${summary}.`);
   }
-  lines.push('Respond by emitting a CAT7 CMB. Populate fields that serve your role; leave irrelevant fields empty.');
+  lines.push('Respond by emitting a CAT7 CMB. Populate categories that serve your role; leave irrelevant categories empty.');
   return lines.join('\n');
 }
 
@@ -120,7 +120,7 @@ async function assembleContext({ admittedCmb, role, mesh, limits = {} }) {
   sections.push({
     name: 'instruction',
     droppable: false,
-    text: 'Respond with a CAT7 CMB. Populate fields that serve your role. Leave irrelevant fields empty.',
+    text: 'Respond with a CAT7 CMB. Populate categories that serve your role. Leave irrelevant categories empty.',
   });
 
   const truncated = _truncate(sections, L.maxContextTokens);
@@ -157,10 +157,10 @@ function _truncate(sections, maxTokens) {
 module.exports = {
   assembleContext,
   estimateTokens,
-  renderFields,
+  renderCategories,
   renderCmb,
   rolePreamble,
   walkLineage,
   DEFAULT_LIMITS,
-  CAT7_FIELDS,
+  CAT7_CATEGORIES,
 };

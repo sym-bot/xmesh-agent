@@ -1,6 +1,6 @@
 'use strict';
 
-const { assembleContext, CAT7_FIELDS } = require('./context.js');
+const { assembleContext, CAT7_CATEGORIES } = require('./context.js');
 const { detectCycle } = require('../safety/cycle.js');
 const { checkGates } = require('../safety/gates.js');
 const { CircuitBreaker, isTransientError } = require('../safety/circuit-breaker.js');
@@ -9,25 +9,25 @@ const EMIT_CMB_TOOL = {
   name: 'emit_cmb',
   description:
     'Emit a CAT7 Cognitive Memory Block as your response on the xmesh mesh. ' +
-    'Populate only the fields that serve your role; leave others empty.',
+    'Populate only the categories that serve your role; leave others empty.',
   input_schema: {
     type: 'object',
-    properties: Object.fromEntries(CAT7_FIELDS.map((f) => [f, { type: 'string' }])),
+    properties: Object.fromEntries(CAT7_CATEGORIES.map((f) => [f, { type: 'string' }])),
     additionalProperties: false,
   },
 };
 
 function mapPendingToCmbFields(toolInput) {
-  const fields = {};
-  for (const f of CAT7_FIELDS) {
+  const categories = {};
+  for (const f of CAT7_CATEGORIES) {
     const v = toolInput?.[f];
-    if (typeof v === 'string' && v.trim()) fields[f] = { text: v };
+    if (typeof v === 'string' && v.trim()) categories[f] = { text: v };
   }
-  return fields;
+  return categories;
 }
 
-function cmbHasAnyField(fields) {
-  return CAT7_FIELDS.some((f) => fields[f]);
+function cmbHasAnyField(categories) {
+  return CAT7_CATEGORIES.some((f) => categories[f]);
 }
 
 class AgentLoop {
@@ -166,8 +166,8 @@ class AgentLoop {
         this.logger.info('no-emit', { admittedId: admittedCmb.id, modelText: response.text?.slice(0, 120) });
         return;
       }
-      const fields = mapPendingToCmbFields(toolCall.input);
-      if (!cmbHasAnyField(fields)) {
+      const categories = mapPendingToCmbFields(toolCall.input);
+      if (!cmbHasAnyField(categories)) {
         this.logger.warn('empty-cmb-suppressed', { admittedId: admittedCmb.id });
         this._cmbsSuppressed += 1;
         return;
@@ -175,7 +175,7 @@ class AgentLoop {
 
       const proposed = {
         createdBy: this.role.name,
-        fields,
+        categories,
         ancestors: [admittedCmb.id, ...(admittedCmb.ancestors || [])],
       };
       const lineageCache = await this._buildLineageCache(proposed.ancestors, this.cycleDepth);
@@ -191,7 +191,7 @@ class AgentLoop {
         return;
       }
 
-      const gateResult = checkGates({ fields }, this.gatePatterns);
+      const gateResult = checkGates({ categories }, this.gatePatterns);
       if (!gateResult.passed) {
         this.logger.warn('approval-gate-blocked', { admittedId: admittedCmb.id, hits: gateResult.hits });
         this._cmbsSuppressed += 1;
@@ -200,16 +200,16 @@ class AgentLoop {
 
       const targetPeer = this._chooseTarget(admittedCmb);
       if (targetPeer) {
-        await this.mesh.send({ to: targetPeer, fields, parents: [{ key: admittedCmb.id }] });
+        await this.mesh.send({ to: targetPeer, categories, parents: [{ key: admittedCmb.id }] });
       } else {
-        await this.mesh.observe({ fields, parents: [{ key: admittedCmb.id }] });
+        await this.mesh.observe({ categories, parents: [{ key: admittedCmb.id }] });
       }
       this._cmbsEmitted += 1;
       this.logger.info('emitted', {
         admittedId: admittedCmb.id,
         kind: targetPeer ? 'send' : 'observe',
         to: targetPeer,
-        fields: Object.keys(fields),
+        categories: Object.keys(categories),
       });
     } finally {
       this._handlingCount -= 1;

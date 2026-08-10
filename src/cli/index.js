@@ -142,10 +142,10 @@ function formatResult(cmd, res) {
     for (const link of body.chain) {
       const prefix = '  '.repeat(link.depth);
       if (link.missing) { lines.push(`${prefix}[${link.id}] (not found)`); continue; }
-      const fields = Object.entries(link.fields || {})
+      const categories = Object.entries(link.categories || {})
         .map(([k, v]) => `${k}="${typeof v === 'string' ? v : v?.text || ''}"`)
         .join(' ');
-      lines.push(`${prefix}[${link.id}] by ${link.source} | ${fields}`);
+      lines.push(`${prefix}[${link.id}] by ${link.source} | ${categories}`);
     }
     return lines.join('\n');
   }

@@ -19,11 +19,11 @@ class FakeSymNode extends EventEmitter {
   }
   async start() { this.started = true; }
   async stop() { this.stopped = true; this.started = false; }
-  remember(fields, opts = {}) {
-    const cmb = { fields, createdBy: this.name, lineage: { parents: opts.parents?.map((p) => p.key) || [], ancestors: [] } };
+  remember(categories, opts = {}) {
+    const cmb = { categories, createdBy: this.name, lineage: { parents: opts.parents?.map((p) => p.key) || [], ancestors: [] } };
     if (opts.payload !== undefined && opts.payload !== null) cmb.payload = opts.payload;
     const entry = { key: 'cmb-' + this.remembered.length, cmb, source: this.name };
-    this.remembered.push({ fields, opts, entry });
+    this.remembered.push({ categories, opts, entry });
     this._store.set(entry.key, entry);
     return entry;
   }
@@ -55,8 +55,8 @@ test('resolveServiceType: default group maps to _sym._tcp', () => {
 
 test('MeshAdapter: cannot operate before start()', async () => {
   const { adapter } = makeAdapter();
-  await assert.rejects(adapter.observe({ fields: { focus: { text: 'x' } } }));
-  await assert.rejects(adapter.send({ to: 'other', fields: { focus: { text: 'x' } } }));
+  await assert.rejects(adapter.observe({ categories: { focus: { text: 'x' } } }));
+  await assert.rejects(adapter.send({ to: 'other', categories: { focus: { text: 'x' } } }));
   await assert.rejects(adapter.resolveCmb('anything'));
 });
 
@@ -74,7 +74,7 @@ test('MeshAdapter: start wires a SymNode and reports identity', async () => {
 test('MeshAdapter: observe broadcasts with no `to`', async () => {
   const { adapter, getNode } = makeAdapter();
   await adapter.start();
-  const result = await adapter.observe({ fields: { focus: { text: 'hello' } } });
+  const result = await adapter.observe({ categories: { focus: { text: 'hello' } } });
   assert.equal(getNode().remembered.length, 1);
   assert.equal(getNode().remembered[0].opts.to, undefined);
   assert.ok(result?.key?.startsWith('cmb-'));
@@ -88,7 +88,7 @@ test('MeshAdapter: send resolves peer name to peerId and targets it', async () =
     ],
   });
   await adapter.start();
-  await adapter.send({ to: 'reviewer-01', fields: { intent: { text: 'review' } } });
+  await adapter.send({ to: 'reviewer-01', categories: { intent: { text: 'review' } } });
   assert.equal(getNode().remembered[0].opts.to, 'peer-id-1');
 });
 
@@ -96,7 +96,7 @@ test('MeshAdapter: send throws on unknown peer', async () => {
   const { adapter } = makeAdapter({ peers: [] });
   await adapter.start();
   await assert.rejects(
-    adapter.send({ to: 'ghost', fields: { focus: { text: 'x' } } }),
+    adapter.send({ to: 'ghost', categories: { focus: { text: 'x' } } }),
     /unknown peer: ghost/,
   );
 });
@@ -110,12 +110,12 @@ test('MeshAdapter: onCmbAccepted fires for peer CMBs only, not own', async () =>
   getNode().emit('cmb-accepted', {
     key: 'cmb-peer-1',
     source: 'other-peer',
-    cmb: { createdBy: 'other-peer', fields: { focus: { text: 'peer wrote this' } }, lineage: { ancestors: [] } },
+    cmb: { createdBy: 'other-peer', categories: { focus: { text: 'peer wrote this' } }, lineage: { ancestors: [] } },
   });
   getNode().emit('cmb-accepted', {
     key: 'cmb-own-1',
     source: 'test-peer',
-    cmb: { createdBy: 'test-peer', fields: { focus: { text: 'own echo' } }, lineage: { ancestors: [] } },
+    cmb: { createdBy: 'test-peer', categories: { focus: { text: 'own echo' } }, lineage: { ancestors: [] } },
   });
 
   assert.equal(received.length, 1);
@@ -124,7 +124,7 @@ test('MeshAdapter: onCmbAccepted fires for peer CMBs only, not own', async () =>
 });
 
 test('MeshAdapter: resolveCmb returns normalized shape', async () => {
-  const seed = { key: 'cmb-42', cmb: { fields: { focus: { text: 'seed' } }, createdBy: 'peer', lineage: { parents: [], ancestors: ['cmb-0', 'cmb-1'] } }, source: 'peer' };
+  const seed = { key: 'cmb-42', cmb: { categories: { focus: { text: 'seed' } }, createdBy: 'peer', lineage: { parents: [], ancestors: ['cmb-0', 'cmb-1'] } }, source: 'peer' };
   const { adapter, getNode } = makeAdapter({ storeSeed: [seed] });
   await adapter.start();
   const node = getNode();
@@ -132,7 +132,7 @@ test('MeshAdapter: resolveCmb returns normalized shape', async () => {
   const out = await adapter.resolveCmb('cmb-42');
   assert.equal(out.id, 'cmb-42');
   assert.deepEqual(out.ancestors, ['cmb-0', 'cmb-1']);
-  assert.equal(out.fields.focus.text, 'seed');
+  assert.equal(out.categories.focus.text, 'seed');
 });
 
 test('MeshAdapter: onIdentityCollision fires on collision event', async () => {
@@ -148,7 +148,7 @@ test('MeshAdapter: observe forwards opts.payload to SymNode.remember', async () 
   const { adapter, getNode } = makeAdapter();
   await adapter.start();
   const payload = { request_id: 'r1', user_message: 'hello' };
-  await adapter.observe({ fields: { focus: { text: 'llm-request' } }, payload });
+  await adapter.observe({ categories: { focus: { text: 'llm-request' } }, payload });
   assert.deepEqual(getNode().remembered[0].opts.payload, payload);
 });
 
@@ -158,7 +158,7 @@ test('MeshAdapter: send forwards opts.payload to SymNode.remember', async () => 
   });
   await adapter.start();
   const payload = { request_id: 'r2', system_prompt: 'You are…', user_message: 'echo' };
-  await adapter.send({ to: 'responder', fields: { focus: { text: 'llm-request' } }, payload });
+  await adapter.send({ to: 'responder', categories: { focus: { text: 'llm-request' } }, payload });
   assert.equal(getNode().remembered[0].opts.to, 'peer-id-1');
   assert.deepEqual(getNode().remembered[0].opts.payload, payload);
 });
@@ -166,7 +166,7 @@ test('MeshAdapter: send forwards opts.payload to SymNode.remember', async () => 
 test('MeshAdapter: observe without payload omits opts.payload (back-compat)', async () => {
   const { adapter, getNode } = makeAdapter();
   await adapter.start();
-  await adapter.observe({ fields: { focus: { text: 'plain' } } });
+  await adapter.observe({ categories: { focus: { text: 'plain' } } });
   assert.equal('payload' in getNode().remembered[0].opts, false);
 });
 
@@ -181,7 +181,7 @@ test('MeshAdapter: onCmbAccepted surfaces cmb.payload on incoming peer CMB', asy
     source: 'other-peer',
     cmb: {
       createdBy: 'other-peer',
-      fields: { focus: { text: 'llm-response from peer' } },
+      categories: { focus: { text: 'llm-response from peer' } },
       lineage: { ancestors: [] },
       payload: { request_id: 'r1', text: 'Hello back.', model: 'claude-opus-4-7' },
     },
@@ -206,7 +206,7 @@ test('MeshAdapter: onCmbAccepted surfaces payload=null when peer CMB has no payl
     source: 'other-peer',
     cmb: {
       createdBy: 'other-peer',
-      fields: { focus: { text: 'plain CAT7' } },
+      categories: { focus: { text: 'plain CAT7' } },
       lineage: { ancestors: [] },
     },
   });

@@ -92,7 +92,7 @@ async function dryRun(configPath, { out = process.stdout, err = process.stderr }
   const weightKeys = Object.keys(cfg.roleWeights);
   const required = ['focus', 'issue', 'intent', 'motivation', 'commitment', 'perspective', 'mood'];
   const missing = required.filter((k) => !weightKeys.includes(k));
-  if (missing.length > 0) record('SVAF α_f weights', false, `missing fields: ${missing.join(', ')}`);
+  if (missing.length > 0) record('SVAF α_f weights', false, `missing categories: ${missing.join(', ')}`);
   else record('SVAF α_f weights', true, required.map((k) => `${k}=${cfg.roleWeights[k]}`).join(' '));
 
   const b = cfg.budget;

@@ -5,26 +5,26 @@ const assert = require('node:assert/strict');
 const { checkGates } = require('../src/safety/gates.js');
 
 test('checkGates: passes clean CMB', () => {
-  const r = checkGates({ fields: { focus: { text: 'refactor the cache key' } } });
+  const r = checkGates({ categories: { focus: { text: 'refactor the cache key' } } });
   assert.equal(r.passed, true);
   assert.deepEqual(r.hits, []);
 });
 
 test('checkGates: blocks git push in intent', () => {
-  const r = checkGates({ fields: { intent: { text: 'run git push origin main' } } });
+  const r = checkGates({ categories: { intent: { text: 'run git push origin main' } } });
   assert.equal(r.passed, false);
   assert.ok(r.hits.some((h) => h.field === 'intent'));
 });
 
 test('checkGates: blocks .env in commitment', () => {
-  const r = checkGates({ fields: { commitment: { text: 'update .env with new token' } } });
+  const r = checkGates({ categories: { commitment: { text: 'update .env with new token' } } });
   assert.equal(r.passed, false);
   assert.ok(r.hits.some((h) => h.field === 'commitment'));
 });
 
 test('checkGates: blocks multiple patterns', () => {
   const r = checkGates({
-    fields: {
+    categories: {
       intent: { text: 'deploy and publish to prod' },
       commitment: { text: 'rotate secrets' },
     },
@@ -33,8 +33,8 @@ test('checkGates: blocks multiple patterns', () => {
   assert.ok(r.hits.length >= 2);
 });
 
-test('checkGates: empty fields pass', () => {
-  const r = checkGates({ fields: {} });
+test('checkGates: empty categories pass', () => {
+  const r = checkGates({ categories: {} });
   assert.equal(r.passed, true);
 });
 
