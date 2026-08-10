@@ -16,7 +16,7 @@ const RELAY_URL = process.env.SYM_RELAY_URL;
 const RELAY_TOKEN = process.env.SYM_RELAY_TOKEN;
 const skip = !RELAY_URL || !RELAY_TOKEN;
 
-function uniqueGroup() {
+function uniqueRoom() {
   return 'xmesh-relay-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 6);
 }
 
@@ -24,7 +24,7 @@ test(
   'relay smoke: two peers exchange a CMB via WebSocket relay',
   { skip, timeout: 60_000 },
   async () => {
-    const room = uniqueGroup();
+    const room = uniqueRoom();
     const weights = { focus: 2.0, issue: 1.5, intent: 1.5, motivation: 1.0, commitment: 1.5, perspective: 0.5, mood: 0.8 };
 
     const alice = new MeshAdapter({

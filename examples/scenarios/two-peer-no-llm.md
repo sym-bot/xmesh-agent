@@ -10,7 +10,7 @@ LLM scenarios in this directory layer on top of the same wire.
 
 ## What you'll see
 
-- Two distinct peer identities (`alice`, `bob`) emit CMBs into a shared mesh group
+- Two distinct peer identities (`alice`, `bob`) emit CMBs into a shared mesh room
 - Each CMB carries the CAT7 schema (focus / intent / motivation / commitment /
   perspective / issue / mood) and a stable identity signature
 - A third call (`sym recall`) reads the admitted CMBs back from the mesh,

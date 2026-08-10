@@ -7,7 +7,7 @@ const CAT7_CATEGORIES = Object.freeze([
 const DEFAULT_LIMITS = Object.freeze({
   kLineage: 3,
   nOwn: 5,
-  nGroup: 10,
+  nRoom: 10,
   maxContextTokens: 8000,
 });
 
@@ -87,9 +87,9 @@ async function assembleContext({ admittedCmb, role, mesh, limits = {} }) {
   const ownRecent = recentAll
     .filter((c) => c.source === selfName)
     .slice(0, L.nOwn);
-  const groupRecent = recentAll
+  const roomRecent = recentAll
     .filter((c) => c.source !== selfName && c.id !== admittedCmb.id)
-    .slice(0, L.nGroup);
+    .slice(0, L.nRoom);
 
   const sections = [];
   sections.push({ name: 'preamble', droppable: false, text: preamble });
@@ -109,11 +109,11 @@ async function assembleContext({ admittedCmb, role, mesh, limits = {} }) {
       text: ['[OWN RECENT CMBs]', ...ownRecent.map((c) => renderCmb(c))].join('\n\n'),
     });
   }
-  if (groupRecent.length > 0) {
+  if (roomRecent.length > 0) {
     sections.push({
       name: 'room-recent',
       droppable: true,
-      text: ['[ROOM RECENT CMBs]', ...groupRecent.map((c) => renderCmb(c))].join('\n\n'),
+      text: ['[ROOM RECENT CMBs]', ...roomRecent.map((c) => renderCmb(c))].join('\n\n'),
     });
   }
 

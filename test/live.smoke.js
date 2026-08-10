@@ -11,12 +11,12 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 const { MeshAdapter } = require('../src/mesh/node.js');
 
-function uniqueGroup() {
+function uniqueRoom() {
   return 'xmesh-smoke-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 6);
 }
 
 test('live smoke: two SymNode peers discover via Bonjour and exchange a CMB', { timeout: 30_000 }, async () => {
-  const room = uniqueGroup();
+  const room = uniqueRoom();
   const weights = { focus: 2.0, issue: 1.5, intent: 1.5, motivation: 1.0, commitment: 1.5, perspective: 0.5, mood: 0.8 };
 
   const alice = new MeshAdapter({

@@ -1,5 +1,59 @@
 # Changelog
 
+## 0.3.3 (2026-08-10)
+
+Three releases in one day is not a good look. All three were the same defect found in
+three places, and the trail ran through the documentation each time — the docs were the
+only artifact that wrote the full contract down, so they were the only place the two
+halves of a rename could be seen to disagree.
+
+### Fixed
+
+- **The shipped `examples/agent.toml.example` did not validate.** It still said
+  `group = "xmesh-dev-demo"`, which 0.3.2's schema rejects. `dry-run` reported
+  `room=default` and then failed validation — copy the example, get an error. The 0.3.2
+  sweep covered `examples/scenarios/*.toml` and missed the example config beside them.
+
+- **The GitHub Action passed `--group` to a CLI that renamed the flag to `--room`.**
+  Every `uses: sym-bot/xmesh-agent` workflow scaffolded a peer with a dead flag.
+
+- **The cross-host runbook's verification step pointed at an endpoint that does not
+  exist.** It told you to check `sym-relay.onrender.com/admin/groups`; `sym-relay` serves
+  `/health` and nothing else — the relay forwards frames and does not track membership,
+  so verification is always peer-side. Replaced with `sym peers --room`.
+
+### Changed — breaking
+
+- **`agent.toml`: `n_group` → `n_room`.** It sets how many room-context CMBs enter the
+  prompt, so it was never a generic sample count. Internally `nGroup` → `nRoom`.
+
+- **Action input `group:` → `room:`.** The retired name is still declared, and setting it
+  **fails the run** with the fix in the message. Same reasoning as 0.3.2's schema: an
+  ignored setting is what put every peer in the wrong room to begin with.
+
+`::group::`/`::endgroup::` (GitHub log folding), dependabot's `groups:` key, and
+`n_group`-free vendor names are untouched — they are other people's vocabulary.
+
+## 0.3.2 (2026-08-10)
+
+### Fixed
+
+- **Every agent landed in the `default` room regardless of its `agent.toml`.** `SymNode`
+  0.11.1 accepts `opts.room`; this adapter still passed `group`. An unknown option is not
+  an error, so the room silently defaulted while the config file sat there looking obeyed.
+
+### Changed — breaking
+
+- `agent.toml`: `group = ...` → `room = ...`; the schema **rejects** the old key rather
+  than ignoring it. `SYM_GROUP` → `SYM_ROOM`. `fieldWeights` → `categoryWeights`.
+
+## 0.3.1 (2026-08-10)
+
+### Changed
+
+- **Repin `@sym-bot/sym` 0.11.0 → 0.11.1** and adopt the one-container CAT7 record:
+  `fields` → `categories` alongside `metadata`.
+
 ## 0.3.0 (2026-08-07)
 
 ### Changed

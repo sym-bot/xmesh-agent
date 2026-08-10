@@ -62,7 +62,7 @@ const SCHEMA = Object.freeze({
       properties: {
         k_lineage: { type: 'integer', minimum: 0, default: 3 },
         n_own: { type: 'integer', minimum: 0, default: 5 },
-        n_group: { type: 'integer', minimum: 0, default: 10 },
+        n_room: { type: 'integer', minimum: 0, default: 10 },
         max_context_tokens: { type: 'integer', minimum: 256, default: 8000 },
       },
     },

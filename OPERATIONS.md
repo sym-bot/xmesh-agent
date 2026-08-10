@@ -61,7 +61,7 @@ until the mesh does work.
 
 ```bash
 # From a fourth process — any sym client
-npx --package=@sym-bot/sym -- sym observe --group xmesh-demo \
+npx --package=@sym-bot/sym -- sym observe --room xmesh-demo \
   --focus "implement rate-limit middleware for /api/login" \
   --intent "draft a spec, review it, add tests" \
   --motivation "prod outage traced to credential stuffing"
@@ -230,7 +230,7 @@ Since 0.1.0-alpha.13 all runtime state lives under `~/.xmesh/`:
 ```
 ~/.xmesh/
   keys/                  per-peer ed25519 keypairs (0600 on .key)
-  trusted-keys/<group>/  pinned peer public keys per group
+  trusted-keys/<room>/   pinned peer public keys per room
   state/                 per-peer lifetime stats JSON sidecars
   <peer>.sock            IPC sockets for stop/status/cost/trace
 ```

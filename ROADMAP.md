@@ -48,7 +48,7 @@ Ed25519-signed CMBs verified at admission time. The Phase-1 identity primitive b
 Scope:
 
 - Envelope delta — every CMB carries `identity.publicKey` + `identity.keyId` + `signature` over a canonical content hash
-- Three admission modes per group: `tofu` (trust-on-first-use, default), `strict` (pre-loaded keys only), `open` (legacy interop opt-in)
+- Three admission modes per room: `tofu` (trust-on-first-use, default), `strict` (pre-loaded keys only), `open` (legacy interop opt-in)
 - Mixed-version migration window — older v0.5.x peers continue to interop for ~30–60 days; the v0.6.0 default flips to strict after the window
 - Key rotation with dual-sign grace window
 - 30–60 day mixed-version window — no hard cutover
@@ -83,9 +83,9 @@ These will land as separate `attach.mode` values in `agent.toml` once one of the
 
 No commitment yet. Open issues to vote / discuss.
 
-- **Shared team DAG** — a CRDT-merged CMB graph scoped to a group, so peers see a unified team-memory view rather than only their own remix store
+- **Shared team DAG** — a CRDT-merged CMB graph scoped to a room, so peers see a unified team-memory view rather than only their own remix store
 - **Convergence / deadlock detection** beyond cycle detection — periodic commitment-CMBs + quorum agreement signal
-- **Role conflict arbitration** at the group level — protocol-level rule for "two peers both claim the same role"
+- **Role conflict arbitration** at the room level — protocol-level rule for "two peers both claim the same role"
 - **HTTP control plane** — REST surface alongside the IPC socket so a web dashboard can render `status` / `cost` / `trace`
 - **Streaming model output** — relevant for interactive attach modes; not needed for headless
 - **Post-quantum signatures** — Phase-3+; ed25519 is the current primitive
