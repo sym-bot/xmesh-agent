@@ -16,7 +16,7 @@ test('SCHEMA: top-level shape matches JSON Schema 2020-12', () => {
   assert.deepEqual(SCHEMA.required, ['identity', 'mesh', 'role_weights', 'model']);
 });
 
-test('SCHEMA: role_weights requires all seven CAT7 fields', () => {
+test('SCHEMA: role_weights requires all seven CAT7 categories', () => {
   const w = SCHEMA.properties.role_weights;
   assert.deepEqual(
     [...w.required].sort(),
@@ -57,7 +57,7 @@ test('printSchema: emits pretty-printed JSON to stdout', () => {
   assert.ok(text.includes('\n'));
 });
 
-test('SCHEMA: every example scenario in examples/scenarios parses fields that match schema keys', () => {
+test('SCHEMA: every example scenario in examples/scenarios parses categories that match schema keys', () => {
   const fs = require('node:fs');
   const path = require('node:path');
   const toml = require('@iarna/toml');

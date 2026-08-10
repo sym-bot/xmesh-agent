@@ -3,7 +3,7 @@
 const fs = require('node:fs');
 const { ROLE_EXPECTATIONS } = require('../core/role-sanity.js');
 
-const CAT7_FIELDS = ['focus', 'issue', 'intent', 'motivation', 'commitment', 'perspective', 'mood'];
+const CAT7_CATEGORIES = ['focus', 'issue', 'intent', 'motivation', 'commitment', 'perspective', 'mood'];
 
 const ROLE_PRESETS = Object.freeze({
   writer:        { focus: 2.0, issue: 1.0, intent: 2.5, motivation: 1.5, commitment: 1.0, perspective: 0.5, mood: 0.6 },
@@ -38,7 +38,7 @@ function buildToml({ peerName, role, group, adapter, modelName, costCap }) {
   lines.push('# relay_token = "..."                       # or set SYM_RELAY_TOKEN in env');
   lines.push('');
   lines.push('[role_weights]');
-  for (const f of CAT7_FIELDS) lines.push(`${f} = ${weights[f]}`);
+  for (const f of CAT7_CATEGORIES) lines.push(`${f} = ${weights[f]}`);
   lines.push('');
   lines.push('[model]');
   lines.push(`adapter = "${adapter}"`);

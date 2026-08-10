@@ -83,7 +83,7 @@ test('ROLE_EXPECTATIONS: every known role has at least one high field', () => {
   }
 });
 
-test('ROLE_EXPECTATIONS: high fields are valid CAT7 field names', () => {
+test('ROLE_EXPECTATIONS: high categories are valid CAT7 field names', () => {
   const CAT7 = ['focus', 'issue', 'intent', 'motivation', 'commitment', 'perspective', 'mood'];
   for (const [role, spec] of Object.entries(ROLE_EXPECTATIONS)) {
     for (const f of spec.high) {

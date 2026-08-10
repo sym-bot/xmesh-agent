@@ -29,8 +29,8 @@ function fakeMesh({ peers = [], storeSeed = new Map() } = {}) {
     peers: () => peers,
     resolveCmb: async (id) => store.get(id) || null,
     recall: async () => Array.from(store.values()),
-    observe: async ({ fields, parents }) => { emitted.push({ kind: 'observe', fields, parents }); return { key: 'e-' + emitted.length }; },
-    send: async ({ to, fields, parents }) => { emitted.push({ kind: 'send', to, fields, parents }); return { key: 'e-' + emitted.length }; },
+    observe: async ({ categories, parents }) => { emitted.push({ kind: 'observe', categories, parents }); return { key: 'e-' + emitted.length }; },
+    send: async ({ to, categories, parents }) => { emitted.push({ kind: 'send', to, categories, parents }); return { key: 'e-' + emitted.length }; },
     get started() { return started; },
   };
 }
@@ -53,8 +53,8 @@ function fakeModel({ toolCall, text = '', cost = 0.001, inTok = 100, outTok = 50
   return adapter;
 }
 
-function cmb({ id, source, fields = {}, ancestors = [] }) {
-  return { id, source, fields, ancestors };
+function cmb({ id, source, categories = {}, ancestors = [] }) {
+  return { id, source, categories, ancestors };
 }
 
 function makeLoop(overrides = {}) {
@@ -96,11 +96,11 @@ test('AgentLoop: emits a CMB via observe when peer unreachable', async () => {
     mesh: fakeMesh({ peers: [] }),
   });
   await loop.start();
-  await loop._handleAdmission(cmb({ id: 'a1', source: 'writer-01', fields: { focus: { text: 'spec' } } }));
+  await loop._handleAdmission(cmb({ id: 'a1', source: 'writer-01', categories: { focus: { text: 'spec' } } }));
   assert.equal(model.calls.length, 1);
   assert.equal(mesh.emitted.length, 1);
   assert.equal(mesh.emitted[0].kind, 'observe');
-  assert.equal(mesh.emitted[0].fields.issue.text, 'missing test');
+  assert.equal(mesh.emitted[0].categories.issue.text, 'missing test');
   assert.equal(loop.stats.cmbsEmitted, 1);
 });
 
@@ -201,7 +201,7 @@ test('AgentLoop: suppresses emission when model returns no tool_use', async () =
   assert.equal(loop.stats.cmbsEmitted, 0);
 });
 
-test('AgentLoop: suppresses empty-fields CMB', async () => {
+test('AgentLoop: suppresses empty-categories CMB', async () => {
   const toolCall = { id: 't1', name: 'emit_cmb', input: {} };
   const { loop, mesh } = makeLoop({ model: fakeModel({ toolCall }) });
   await loop.start();
@@ -267,14 +267,14 @@ test('AgentLoop: forwards EMIT_CMB_TOOL to the model', async () => {
   assert.equal(tools[0].name, 'emit_cmb');
 });
 
-test('mapPendingToCmbFields: only maps populated CAT7 fields', () => {
+test('mapPendingToCmbFields: only maps populated CAT7 categories', () => {
   const out = mapPendingToCmbFields({ focus: 'x', mood: '  ', unknown: 'skip' });
   assert.ok(out.focus);
   assert.equal(out.mood, undefined);
   assert.equal(out.unknown, undefined);
 });
 
-test('EMIT_CMB_TOOL: schema has all CAT7 fields', () => {
+test('EMIT_CMB_TOOL: schema has all CAT7 categories', () => {
   const keys = Object.keys(EMIT_CMB_TOOL.input_schema.properties);
   assert.deepEqual(
     keys.sort(),

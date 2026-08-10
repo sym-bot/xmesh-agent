@@ -51,7 +51,7 @@ test('live smoke: two SymNode peers discover via Bonjour and exchange a CMB', { 
     );
 
     await alice.observe({
-      fields: {
+      categories: {
         focus: { text: 'smoke test CMB from alice' },
         intent: { text: 'verify duplex via Bonjour' },
       },
@@ -65,7 +65,7 @@ test('live smoke: two SymNode peers discover via Bonjour and exchange a CMB', { 
     assert.equal(received.length >= 1, true, 'bob did not receive alice\'s CMB within 5s');
     assert.equal(received[0].createdBy, alice.identity.name, 'createdBy should be the originator (alice)');
     assert.ok(received[0].source.includes(alice.identity.name), 'source should reference alice (remix notation expected)');
-    assert.equal(received[0].fields.focus.text, 'smoke test CMB from alice');
+    assert.equal(received[0].categories.focus.text, 'smoke test CMB from alice');
   } finally {
     try { await alice.stop(); } catch {}
     try { await bob.stop(); } catch {}

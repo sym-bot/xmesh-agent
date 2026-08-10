@@ -16,8 +16,8 @@ const collectingLogger = () => {
   };
 };
 
-function cmb({ id, source, fields = {}, ancestors = [] }) {
-  return { id, source, fields, ancestors };
+function cmb({ id, source, categories = {}, ancestors = [] }) {
+  return { id, source, categories, ancestors };
 }
 
 function makeMesh({ peers = [], store = new Map() } = {}) {
@@ -36,8 +36,8 @@ function makeMesh({ peers = [], store = new Map() } = {}) {
     peers: () => peers,
     resolveCmb: async (id) => store.get(id) || null,
     recall: async () => Array.from(store.values()),
-    observe: async ({ fields, parents }) => { emitted.push({ kind: 'observe', fields, parents }); return { key: 'e-' + emitted.length }; },
-    send: async ({ to, fields, parents }) => { emitted.push({ kind: 'send', to, fields, parents }); return { key: 'e-' + emitted.length }; },
+    observe: async ({ categories, parents }) => { emitted.push({ kind: 'observe', categories, parents }); return { key: 'e-' + emitted.length }; },
+    send: async ({ to, categories, parents }) => { emitted.push({ kind: 'send', to, categories, parents }); return { key: 'e-' + emitted.length }; },
     get started() { return started; },
   };
 }
@@ -103,12 +103,12 @@ test('drill 2 — cycle-attack: two-peer naive mirror cannot loop past depth', a
   await loop.stop();
 });
 
-test('drill 3 — malformed CMB: empty fields + missing ancestors are skipped cleanly', async () => {
+test('drill 3 — malformed CMB: empty categories + missing ancestors are skipped cleanly', async () => {
   const logger = collectingLogger();
   const loop = makeLoop({ logger });
   await loop.start();
 
-  await loop._handleAdmission(cmb({ id: 'mal-1', source: 'peer', fields: null, ancestors: null }));
+  await loop._handleAdmission(cmb({ id: 'mal-1', source: 'peer', categories: null, ancestors: null }));
   await loop._handleAdmission(cmb({ id: 'mal-2', source: 'peer' }));
   await loop._handleAdmission({});
 

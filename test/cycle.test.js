@@ -15,7 +15,7 @@ test('detectCycle: clean chain without self-ancestor', () => {
     { id: 'b1', createdBy: 'peer-b', ancestors: ['a1'] },
   ]);
   const r = detectCycle({
-    proposed: { ancestors: ['b1'], fields: {} },
+    proposed: { ancestors: ['b1'], categories: {} },
     resolveAncestors: resolve,
     selfName: 'peer-c',
   });
@@ -29,7 +29,7 @@ test('detectCycle: suspects when own CMB appears in ancestor chain', () => {
     { id: 'other1', createdBy: 'peer', ancestors: ['mine1'] },
   ]);
   const r = detectCycle({
-    proposed: { ancestors: ['other1'], fields: {} },
+    proposed: { ancestors: ['other1'], categories: {} },
     resolveAncestors: resolve,
     selfName: 'me',
   });
@@ -44,7 +44,7 @@ test('detectCycle: commitment exception bypasses check', () => {
     { id: 'mine1', createdBy: 'me', ancestors: [] },
   ]);
   const r = detectCycle({
-    proposed: { ancestors: ['mine1'], fields: { commitment: { text: 'done' } } },
+    proposed: { ancestors: ['mine1'], categories: { commitment: { text: 'done' } } },
     resolveAncestors: resolve,
     selfName: 'me',
   });
@@ -63,14 +63,14 @@ test('detectCycle: respects depth limit', () => {
     { id: 'p6', createdBy: 'x', ancestors: ['p5'] },
   ]);
   const shallow = detectCycle({
-    proposed: { ancestors: ['p6'], fields: {} },
+    proposed: { ancestors: ['p6'], categories: {} },
     resolveAncestors: resolve,
     selfName: 'me',
     depth: 3,
   });
   assert.equal(shallow.suspect, false);
   const deep = detectCycle({
-    proposed: { ancestors: ['p6'], fields: {} },
+    proposed: { ancestors: ['p6'], categories: {} },
     resolveAncestors: resolve,
     selfName: 'me',
     depth: 10,
@@ -81,7 +81,7 @@ test('detectCycle: respects depth limit', () => {
 test('detectCycle: no ancestors means clean', () => {
   const resolve = buildStore([]);
   const r = detectCycle({
-    proposed: { ancestors: [], fields: {} },
+    proposed: { ancestors: [], categories: {} },
     resolveAncestors: resolve,
     selfName: 'me',
   });
@@ -97,7 +97,7 @@ test('detectCycle: handles diamond DAG without infinite loop', () => {
     { id: 'tip', createdBy: 'x', ancestors: ['l', 'r'] },
   ]);
   const result = detectCycle({
-    proposed: { ancestors: ['tip'], fields: {} },
+    proposed: { ancestors: ['tip'], categories: {} },
     resolveAncestors: resolve,
     selfName: 'me',
   });
@@ -108,7 +108,7 @@ test('detectCycle: handles diamond DAG without infinite loop', () => {
 test('detectCycle: missing ancestor lookup is treated as clean edge', () => {
   const resolve = () => null;
   const r = detectCycle({
-    proposed: { ancestors: ['ghost'], fields: {} },
+    proposed: { ancestors: ['ghost'], categories: {} },
     resolveAncestors: resolve,
     selfName: 'me',
   });

@@ -35,13 +35,13 @@ class InMemoryMesh extends EventEmitter {
       }
     };
     node.stop = async () => { self.nodes.delete(name); };
-    node.remember = (fields, opts = {}) => {
+    node.remember = (categories, opts = {}) => {
       self._cmbSeq += 1;
       const id = `cmb-${self._cmbSeq}`;
       const entry = {
         key: id,
         cmb: {
-          fields,
+          categories,
           createdBy: name,
           lineage: {
             parents: opts.parents?.map((p) => p.key) || [],
@@ -53,7 +53,7 @@ class InMemoryMesh extends EventEmitter {
           },
         },
         source: name,
-        content: Object.values(fields).map((f) => f?.text).filter(Boolean).join(' | '),
+        content: Object.values(categories).map((f) => f?.text).filter(Boolean).join(' | '),
       };
       self.cmbStore.set(id, entry);
       if (opts.to) {
@@ -127,7 +127,7 @@ test('integration: writer → reviewer → test-writer triad produces lineage ch
   await testWriter.loop.start();
 
   await writer.mesh.observe({
-    fields: { focus: { text: 'implement rate-limit' }, intent: { text: 'draft → review → test' } },
+    categories: { focus: { text: 'implement rate-limit' }, intent: { text: 'draft → review → test' } },
   });
 
   for (let i = 0; i < 50; i += 1) await new Promise((r) => setImmediate(r));
@@ -166,7 +166,7 @@ test('integration: commitment field terminates the cycle chain', async () => {
 
   await writer.loop.start();
   await reviewer.loop.start();
-  await writer.mesh.observe({ fields: { focus: { text: 'start' } } });
+  await writer.mesh.observe({ categories: { focus: { text: 'start' } } });
 
   for (let i = 0; i < 20; i += 1) await new Promise((r) => setImmediate(r));
 
@@ -189,7 +189,7 @@ test('integration: approval gate blocks emission across the triad', async () => 
 
   await rogue.loop.start();
   await peer.loop.start();
-  await peer.mesh.observe({ fields: { focus: { text: 'trigger' } } });
+  await peer.mesh.observe({ categories: { focus: { text: 'trigger' } } });
 
   for (let i = 0; i < 20; i += 1) await new Promise((r) => setImmediate(r));
 

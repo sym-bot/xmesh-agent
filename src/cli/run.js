@@ -188,7 +188,7 @@ async function runFromConfig(configPath) {
           visited.add(id);
           const cmb = await mesh.resolveCmb(id);
           if (!cmb) { chain.push({ id, depth, missing: true }); continue; }
-          chain.push({ id, depth, source: cmb.source, fields: cmb.fields, ancestors: cmb.ancestors });
+          chain.push({ id, depth, source: cmb.source, categories: cmb.categories, ancestors: cmb.ancestors });
           for (const a of cmb.ancestors || []) queue.push({ id: a, depth: depth + 1 });
         }
         return { root: cmbId, chain };
