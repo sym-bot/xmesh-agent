@@ -43,7 +43,7 @@ The job spins up a reviewer peer for 3 minutes, capped at $0.50, runs autonomous
 | `role` | `reviewer` | Peer role when scaffolding. One of: writer / reviewer / test-writer / auditor / generator / spec / generic. |
 | `adapter` | `anthropic` | Model adapter when scaffolding. One of: anthropic / openai / ollama. |
 | `model` | `''` (per-adapter default) | Vendor-specific model name. |
-| `group` | `xmesh-ci` | Mesh group name. |
+| `room` | `xmesh-ci` | Mesh room name. |
 | `peer-name` | `<role>-<run-id>` | Peer name. Defaults uniquely per CI run. |
 | `cost-cap-usd` | `1.00` | Per-run cost cap in USD. |
 | `duration-seconds` | `300` | Maximum runtime. Peer auto-stops at this deadline. |
@@ -88,7 +88,7 @@ Use them in subsequent steps:
 
 ## Multi-peer mesh in CI
 
-Each `uses: sym-bot/xmesh-agent` step runs ONE peer. To get a 3-peer mesh, run three jobs in parallel sharing a `group`:
+Each `uses: sym-bot/xmesh-agent` step runs ONE peer. To get a 3-peer mesh, run three jobs in parallel sharing a `room`:
 
 ```yaml
 jobs:
@@ -98,7 +98,7 @@ jobs:
       - uses: sym-bot/xmesh-agent@v0.1.6
         with:
           role: writer
-          group: ci-mesh-${{ github.run_id }}
+          room: ci-mesh-${{ github.run_id }}
           openai-api-key: ${{ secrets.OPENAI_API_KEY }}
 
   reviewer:
@@ -107,7 +107,7 @@ jobs:
       - uses: sym-bot/xmesh-agent@v0.1.6
         with:
           role: reviewer
-          group: ci-mesh-${{ github.run_id }}
+          room: ci-mesh-${{ github.run_id }}
           openai-api-key: ${{ secrets.OPENAI_API_KEY }}
 
   test-writer:
@@ -116,7 +116,7 @@ jobs:
       - uses: sym-bot/xmesh-agent@v0.1.6
         with:
           role: test-writer
-          group: ci-mesh-${{ github.run_id }}
+          room: ci-mesh-${{ github.run_id }}
           openai-api-key: ${{ secrets.OPENAI_API_KEY }}
 ```
 

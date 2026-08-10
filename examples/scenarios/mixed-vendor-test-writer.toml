@@ -6,7 +6,7 @@ name = "mvendor-test-writer"
 role = "test-writer"
 
 [mesh]
-group = "xmesh-mixed-vendor-demo"
+room = "xmesh-mixed-vendor-demo"
 
 [role_weights]
 focus = 1.2

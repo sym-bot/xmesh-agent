@@ -114,11 +114,11 @@ test('assembleContext: includes lineage ancestors when present', async () => {
   assert.ok(ctx.includedSections.includes('lineage'));
 });
 
-test('assembleContext: separates own vs group recent CMBs', async () => {
+test('assembleContext: separates own vs room recent CMBs', async () => {
   const recallAll = [
     cmb({ id: 'o1', source: 'me', categories: { focus: { text: 'own-1' } } }),
     cmb({ id: 'o2', source: 'me', categories: { focus: { text: 'own-2' } } }),
-    cmb({ id: 'g1', source: 'peer', categories: { focus: { text: 'group-1' } } }),
+    cmb({ id: 'g1', source: 'peer', categories: { focus: { text: 'room-1' } } }),
   ];
   const mesh = fakeMesh({ recallAll });
   const admittedCmb = cmb({ id: 'trig', source: 'other', categories: { focus: { text: 'trigger' } } });
@@ -128,12 +128,12 @@ test('assembleContext: separates own vs group recent CMBs', async () => {
     mesh,
   });
   assert.ok(ctx.includedSections.includes('own-recent'));
-  assert.ok(ctx.includedSections.includes('group-recent'));
+  assert.ok(ctx.includedSections.includes('room-recent'));
   assert.ok(ctx.messages[0].content.includes('own-1'));
-  assert.ok(ctx.messages[0].content.includes('group-1'));
+  assert.ok(ctx.messages[0].content.includes('room-1'));
 });
 
-test('assembleContext: excludes admitted CMB from group-recent to avoid double-render', async () => {
+test('assembleContext: excludes admitted CMB from room-recent to avoid double-render', async () => {
   const admittedCmb = cmb({ id: 'dup', source: 'peer', categories: { focus: { text: 'only once' } } });
   const recallAll = [admittedCmb, cmb({ id: 'other', source: 'peer2', categories: { focus: { text: 'different' } } })];
   const mesh = fakeMesh({ recallAll });
@@ -166,7 +166,7 @@ test('assembleContext: truncates in drop order when over budget', async () => {
   assert.ok(ctx.includedSections.includes('preamble'));
   assert.ok(ctx.includedSections.includes('instruction'));
   assert.ok(ctx.droppedSections.length > 0);
-  assert.ok(ctx.droppedSections.includes('group-recent') || ctx.droppedSections.includes('own-recent'));
+  assert.ok(ctx.droppedSections.includes('room-recent') || ctx.droppedSections.includes('own-recent'));
 });
 
 test('assembleContext: rejects missing admittedCmb or mesh', async () => {

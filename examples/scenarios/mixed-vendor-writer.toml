@@ -8,7 +8,7 @@ name = "mvendor-writer"
 role = "writer"
 
 [mesh]
-group = "xmesh-mixed-vendor-demo"
+room = "xmesh-mixed-vendor-demo"
 
 [role_weights]
 focus = 2.0

@@ -119,12 +119,12 @@ function verifyEnvelope(envelope, signatureB64, publicKey) {
   }
 }
 
-function trustKey({ group, peer, publicRaw, fingerprint, baseDir = defaultTrustDir() }) {
-  const groupDir = path.join(baseDir, group);
+function trustKey({ room, peer, publicRaw, fingerprint, baseDir = defaultTrustDir() }) {
+  const groupDir = path.join(baseDir, room);
   fs.mkdirSync(groupDir, { recursive: true });
   const out = {
     peer,
-    group,
+    room,
     algorithm: 'ed25519',
     fingerprint: fingerprint || fingerprintOf(publicRaw),
     publicKeyBase64Url: publicRaw.toString('base64url'),
@@ -134,8 +134,8 @@ function trustKey({ group, peer, publicRaw, fingerprint, baseDir = defaultTrustD
   return out;
 }
 
-function listTrustedKeys(group, baseDir = defaultTrustDir()) {
-  const groupDir = path.join(baseDir, group);
+function listTrustedKeys(room, baseDir = defaultTrustDir()) {
+  const groupDir = path.join(baseDir, room);
   if (!fs.existsSync(groupDir)) return [];
   return fs.readdirSync(groupDir)
     .filter((f) => f.endsWith('.json'))

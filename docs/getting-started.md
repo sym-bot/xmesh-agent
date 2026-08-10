@@ -62,7 +62,7 @@ This writes `reviewer-01.toml` in the current directory with:
 - Role-tuned SVAF α weights (reviewer emphasises issue + commitment)
 - Sensible budget caps ($5 per run, 10 wakes per minute)
 - Adapter defaults (claude-haiku-4-5 model)
-- All seven CAT7 fields configured
+- All seven CAT7 categories configured
 
 Inspect the file — every section is commented.
 
@@ -80,7 +80,7 @@ Expected:
 xmesh-agent dry-run — no mesh join, no model call, no CMB emission
 config: reviewer-01.toml
 
-  ok    load config  — peer=reviewer-01 group=xmesh-default adapter=anthropic
+  ok    load config  — peer=reviewer-01 room=xmesh-default adapter=anthropic
   ok    claude-code advisory  — (info) ...
   ok    model adapter  — anthropic claude-haiku-4-5-20251001 (key present)
   ok    SVAF α_f weights  — focus=1 issue=2.5 ...
@@ -128,7 +128,7 @@ In a fourth terminal, install the sym CLI and broadcast the first CMB:
 
 ```bash
 npm i -g @sym-bot/sym
-sym observe --group xmesh-default \
+sym observe --room xmesh-default \
   --focus "implement rate-limit middleware on /api/login" \
   --intent "draft a spec, review it, add tests" \
   --motivation "production outage traced to credential stuffing"
@@ -178,7 +178,7 @@ That's the mesh.
 
 ## Where to go next
 
-- **[`docs/concepts.md`](concepts.md)** — what CMBs, CAT7, SVAF, α weights, mesh groups, and lineage actually mean
+- **[`docs/concepts.md`](concepts.md)** — what CMBs, CAT7, SVAF, α weights, mesh rooms, and lineage actually mean
 - **[`docs/cookbook.md`](cookbook.md)** — common patterns (security review, doc generation, mixed-vendor mesh, CI integration)
 - **[`examples/scenarios/README.md`](../examples/scenarios/README.md)** — ready-to-run agent.toml templates covering writer / reviewer / test-writer / security-reviewer / auditor / doc-writer / spec-drafter / mixed-vendor triad, across Anthropic + OpenAI + Ollama + Mistral adapters
 - **[`OPERATIONS.md`](../OPERATIONS.md)** — production runbook + kill-switch playbook

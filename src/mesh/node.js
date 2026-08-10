@@ -7,18 +7,18 @@ function defaultNodeFactory(cfg) {
   return new SymNode(cfg);
 }
 
-function resolveServiceType(group) {
-  if (!group || group === 'default') return DEFAULT_SERVICE_TYPE;
-  return `_${group}._tcp`;
+function resolveServiceType(room) {
+  if (!room || room === 'default') return DEFAULT_SERVICE_TYPE;
+  return `_${room}._tcp`;
 }
 
 class MeshAdapter {
   constructor(opts) {
     this.nodeName = opts.nodeName;
-    this.group = opts.group || 'default';
+    this.room = opts.room || 'default';
     this.relay = opts.relay || null;
     this.relayToken = opts.relayToken || null;
-    this.fieldWeights = opts.fieldWeights;
+    this.categoryWeights = opts.categoryWeights;
     this.cognitiveProfile = opts.cognitiveProfile || null;
     this.svafFreshnessSeconds = opts.svafFreshnessSeconds || 7200;
     // Adaptive integration timescale (liquid substrate): the SVAF memory-decay timescale
@@ -38,7 +38,7 @@ class MeshAdapter {
   get identity() {
     return {
       name: this.nodeName,
-      group: this.group,
+      room: this.room,
       nodeId: this._node?.nodeId || null,
       started: this._started,
     };
@@ -49,13 +49,13 @@ class MeshAdapter {
     this._node = this._nodeFactory({
       name: this.nodeName,
       cognitiveProfile: this.cognitiveProfile,
-      svafFieldWeights: this.fieldWeights,
+      svafFieldWeights: this.categoryWeights,
       svafFreshnessSeconds: this.svafFreshnessSeconds,
       svafAdaptiveTimescale: this.svafAdaptiveTimescale,
       svafMinFreshnessSeconds: this.svafMinFreshnessSeconds,
       svafReactivity: this.svafReactivity,
-      discoveryServiceType: resolveServiceType(this.group),
-      group: this.group,
+      discoveryServiceType: resolveServiceType(this.room),
+      room: this.room,
       relay: this.relay,
       relayToken: this.relayToken,
       silent: true,

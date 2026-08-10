@@ -25,7 +25,7 @@ test('parseArgs: defaults when only peer-name given', () => {
   const opts = parseArgs(['my-peer']);
   assert.equal(opts.peerName, 'my-peer');
   assert.equal(opts.role, 'generic');
-  assert.equal(opts.group, 'xmesh-default');
+  assert.equal(opts.room, 'xmesh-default');
   assert.equal(opts.adapter, 'anthropic');
   assert.equal(opts.costCap, 5);
   assert.equal(opts.force, false);
@@ -35,7 +35,7 @@ test('parseArgs: respects all flags', () => {
   const opts = parseArgs([
     'rev-01',
     '--role', 'reviewer',
-    '--group', 'team-a',
+    '--room', 'team-a',
     '--adapter', 'openai',
     '--model', 'gpt-4o',
     '--cost-cap', '10',
@@ -43,7 +43,7 @@ test('parseArgs: respects all flags', () => {
     '--force',
   ]);
   assert.equal(opts.role, 'reviewer');
-  assert.equal(opts.group, 'team-a');
+  assert.equal(opts.room, 'team-a');
   assert.equal(opts.adapter, 'openai');
   assert.equal(opts.model, 'gpt-4o');
   assert.equal(opts.costCap, 10);
@@ -55,7 +55,7 @@ test('buildToml: produces valid TOML that loadConfig will accept', () => {
   const out = buildToml({
     peerName: 'reviewer-01',
     role: 'reviewer',
-    group: 'team-a',
+    room: 'team-a',
     adapter: 'openai',
     modelName: 'gpt-4o-mini',
     costCap: 5.0,
@@ -63,7 +63,7 @@ test('buildToml: produces valid TOML that loadConfig will accept', () => {
   const parsed = toml.parse(out);
   assert.equal(parsed.identity.name, 'reviewer-01');
   assert.equal(parsed.identity.role, 'reviewer');
-  assert.equal(parsed.mesh.group, 'team-a');
+  assert.equal(parsed.mesh.room, 'team-a');
   assert.equal(parsed.model.adapter, 'openai');
   assert.equal(parsed.model.model_name, 'gpt-4o-mini');
   assert.equal(parsed.budget.max_cost_usd_per_run, 5.0);
@@ -72,7 +72,7 @@ test('buildToml: produces valid TOML that loadConfig will accept', () => {
 
 test('buildToml: reviewer role gets reviewer α weights', () => {
   const out = buildToml({
-    peerName: 'r', role: 'reviewer', group: 'g', adapter: 'anthropic', modelName: 'x', costCap: 5,
+    peerName: 'r', role: 'reviewer', room: 'g', adapter: 'anthropic', modelName: 'x', costCap: 5,
   });
   const parsed = toml.parse(out);
   assert.equal(parsed.role_weights.issue, 2.5);
@@ -81,7 +81,7 @@ test('buildToml: reviewer role gets reviewer α weights', () => {
 
 test('buildToml: unknown role falls back to generic uniform weights', () => {
   const out = buildToml({
-    peerName: 'p', role: 'unknown', group: 'g', adapter: 'anthropic', modelName: 'x', costCap: 5,
+    peerName: 'p', role: 'unknown', room: 'g', adapter: 'anthropic', modelName: 'x', costCap: 5,
   });
   const parsed = toml.parse(out);
   assert.equal(parsed.role_weights.focus, 1.0);

@@ -15,7 +15,7 @@ xmesh-agent run --config examples/scenarios/reviewer.toml
 xmesh-agent run --config examples/scenarios/test-writer.toml
 
 # Fourth terminal — seed
-sym observe --group xmesh-demo \
+sym observe --room xmesh-demo \
   --focus "implement OAuth2 PKCE flow on /auth/callback" \
   --intent "draft → review → tests"
 ```
@@ -35,7 +35,7 @@ xmesh-agent run --config examples/scenarios/reviewer-openai.toml
 xmesh-agent run --config examples/scenarios/test-writer-openai.toml
 ```
 
-Same group `xmesh-demo`. gpt-4o-mini default. ~$0.001–$0.01 per cycle.
+Same room `xmesh-demo`. gpt-4o-mini default. ~$0.001–$0.01 per cycle.
 
 ---
 
@@ -100,7 +100,7 @@ Architecture-level spec drafter feeds a docs writer:
 xmesh-agent run --config examples/scenarios/spec-drafter.toml   # Claude Opus
 xmesh-agent run --config examples/scenarios/doc-writer.toml     # gpt-4o
 
-sym observe --group xmesh-demo \
+sym observe --room xmesh-demo \
   --focus "design the mesh-channel restart-resume protocol" \
   --motivation "ops team needs a runbook"
 ```
@@ -123,7 +123,7 @@ xmesh-agent run --config examples/scenarios/mixed-vendor-writer.toml       # Ant
 xmesh-agent run --config examples/scenarios/mixed-vendor-reviewer.toml     # OpenAI gpt-4o-mini
 xmesh-agent run --config examples/scenarios/mixed-vendor-test-writer.toml  # Local Ollama
 
-sym observe --group xmesh-mixed-vendor-demo \
+sym observe --room xmesh-mixed-vendor-demo \
   --focus "build a vendor-agnostic agent triad" \
   --intent "show that any-model claim is mechanical"
 ```
@@ -142,13 +142,13 @@ npm i -g @sym-bot/mesh-channel
 # Restart Claude Code; you'll see sym_send / sym_observe / sym_recall tools
 ```
 
-Now Claude Code in any folder can join a group:
+Now Claude Code in any folder can join a room:
 
 ```
-> sym_join_group --group xmesh-demo
+> sym_join_group --room xmesh-demo
 ```
 
-And from then on, every CMB other peers emit in that group surfaces in Claude Code's transcript via the `<channel>` event. You can `sym_send` and `sym_observe` from inside Claude Code, and Claude responds to admitted CMBs as part of its conversation.
+And from then on, every CMB other peers emit in that room surfaces in Claude Code's transcript via the `<channel>` event. You can `sym_send` and `sym_observe` from inside Claude Code, and Claude responds to admitted CMBs as part of its conversation.
 
 This is the **interactive attach mode** — opposite of `xmesh-agent run` (headless). Pair them: 2 headless peers + 1 Claude Code peer is a great "human in the loop" mesh.
 
@@ -232,7 +232,7 @@ When peers aren't on the same LAN, use the relay:
 
 ```toml
 [mesh]
-group = "my-team"
+room = "my-team"
 relay = "wss://sym-relay.onrender.com"
 relay_token = "..."   # or set SYM_RELAY_TOKEN in env
 ```

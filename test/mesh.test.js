@@ -34,8 +34,8 @@ function makeAdapter({ peers = [], storeSeed = [] } = {}) {
   let nodeRef;
   const adapter = new MeshAdapter({
     nodeName: 'test-peer',
-    group: 'test-group',
-    fieldWeights: { focus: 1, issue: 1, intent: 1, motivation: 1, commitment: 1, perspective: 1, mood: 1 },
+    room: 'test-room',
+    categoryWeights: { focus: 1, issue: 1, intent: 1, motivation: 1, commitment: 1, perspective: 1, mood: 1 },
     _nodeFactory: (cfg) => {
       const n = new FakeSymNode(cfg);
       for (const p of peers) n._peers.set(p.id, p);
@@ -47,7 +47,7 @@ function makeAdapter({ peers = [], storeSeed = [] } = {}) {
   return { adapter, getNode: () => nodeRef };
 }
 
-test('resolveServiceType: default group maps to _sym._tcp', () => {
+test('resolveServiceType: default room maps to _sym._tcp', () => {
   assert.equal(resolveServiceType('default'), '_sym._tcp');
   assert.equal(resolveServiceType(null), '_sym._tcp');
   assert.equal(resolveServiceType('xmesh-dev-demo'), '_xmesh-dev-demo._tcp');
@@ -64,7 +64,7 @@ test('MeshAdapter: start wires a SymNode and reports identity', async () => {
   const { adapter, getNode } = makeAdapter();
   const id = await adapter.start();
   assert.equal(id.name, 'test-peer');
-  assert.equal(id.group, 'test-group');
+  assert.equal(id.room, 'test-room');
   assert.equal(id.started, true);
   assert.ok(getNode().started);
   await adapter.stop();

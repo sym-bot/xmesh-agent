@@ -5,7 +5,7 @@ name = "mvendor-reviewer"
 role = "reviewer"
 
 [mesh]
-group = "xmesh-mixed-vendor-demo"
+room = "xmesh-mixed-vendor-demo"
 
 [role_weights]
 focus = 1.0

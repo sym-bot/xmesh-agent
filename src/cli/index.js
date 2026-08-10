@@ -21,8 +21,8 @@ function printHelp() {
       '  migrate [--apply]         Migrate ~/.xmesh-agent → ~/.xmesh (dry-run by default)',
       '  keygen <peer> [--force]   Generate ed25519 identity keypair (identity signing v0.1)',
       '  fingerprint <peer>        Print fingerprint of peer\'s public key',
-      '  trust add --group <g> --peer <p> --public-key <b64url>',
-      '  trust list --group <g>',
+      '  trust add --room <g> --peer <p> --public-key <b64url>',
+      '  trust list --room <g>',
       '  stop <peer-name>          Graceful shutdown of a running peer',
       '  status <peer-name>        Report peer state, uptime, budget usage',
       '  watch [--interval <ms>]   Live multi-peer status table (refresh in place)',
@@ -112,7 +112,7 @@ function formatResult(cmd, res) {
   if (cmd === 'status') {
     return [
       `peer:       ${body.peer}`,
-      `group:      ${body.group}`,
+      `room:      ${body.room}`,
       `model:      ${body.model}`,
       `uptime_ms:  ${body.uptimeMs}`,
       `running:    ${body.stats.running}`,
@@ -216,13 +216,13 @@ async function main(argv) {
       const sub = args[1];
       if (sub === 'add') {
         return trustAdd({
-          group: parseFlag(args, '--group'),
+          room: parseFlag(args, '--room'),
           peer: parseFlag(args, '--peer'),
           publicKey: parseFlag(args, '--public-key'),
         });
       }
       if (sub === 'list') {
-        return trustList({ group: parseFlag(args, '--group') });
+        return trustList({ room: parseFlag(args, '--room') });
       }
       process.stderr.write(`xmesh-agent trust: unknown subcommand "${sub}"; expected add | list\n`);
       return 2;

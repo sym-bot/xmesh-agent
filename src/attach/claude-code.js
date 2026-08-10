@@ -55,12 +55,12 @@ class ClaudeCodeAttach {
         error: `Claude config has no "${MCP_ENTRY_KEY}" MCP server entry; install @sym-bot/mesh-channel first`,
       };
     }
-    const entryGroup = entry.env?.SYM_GROUP;
+    const entryGroup = entry.env?.SYM_ROOM;
     const entryName = entry.env?.SYM_NODE_NAME;
     return {
       ok: true,
       configPath: resolved,
-      group: entryGroup || 'default',
+      room: entryGroup || 'default',
       nodeName: entryName || null,
       cmd: entry.command,
       args: entry.args || [],
@@ -71,13 +71,13 @@ class ClaudeCodeAttach {
     return async () => {
       const pre = await this.preflight();
       if (!pre.ok) return { ok: false, advisory: pre.error };
-      if (pre.group !== meshGroup) {
+      if (pre.room !== meshGroup) {
         return {
           ok: false,
           advisory:
-            `Claude Code mesh-channel is configured for group "${pre.group}" ` +
-            `but this xmesh-agent peer is on group "${meshGroup}". ` +
-            `Update SYM_GROUP in ${pre.configPath} [mcp-servers.${MCP_ENTRY_KEY}.env] to match.`,
+            `Claude Code mesh-channel is configured for room "${pre.room}" ` +
+            `but this xmesh-agent peer is on room "${meshGroup}". ` +
+            `Update SYM_ROOM in ${pre.configPath} [mcp-servers.${MCP_ENTRY_KEY}.env] to match.`,
         };
       }
       if (pre.nodeName && pre.nodeName === this.role?.name) {
@@ -89,7 +89,7 @@ class ClaudeCodeAttach {
             `Identity collision would cause exit(2) on start — rename one of them.`,
         };
       }
-      return { ok: true, group: pre.group, nodeName: pre.nodeName || '(hostname-derived)' };
+      return { ok: true, room: pre.room, nodeName: pre.nodeName || '(hostname-derived)' };
     };
   }
 }

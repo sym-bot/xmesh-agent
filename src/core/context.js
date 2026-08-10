@@ -111,9 +111,9 @@ async function assembleContext({ admittedCmb, role, mesh, limits = {} }) {
   }
   if (groupRecent.length > 0) {
     sections.push({
-      name: 'group-recent',
+      name: 'room-recent',
       droppable: true,
-      text: ['[GROUP RECENT CMBs]', ...groupRecent.map((c) => renderCmb(c))].join('\n\n'),
+      text: ['[ROOM RECENT CMBs]', ...groupRecent.map((c) => renderCmb(c))].join('\n\n'),
     });
   }
 
@@ -139,7 +139,7 @@ async function assembleContext({ admittedCmb, role, mesh, limits = {} }) {
   };
 }
 
-const DROP_ORDER = ['group-recent', 'own-recent', 'lineage'];
+const DROP_ORDER = ['room-recent', 'own-recent', 'lineage'];
 
 function _truncate(sections, maxTokens) {
   const kept = [...sections];

@@ -16,19 +16,19 @@ function uniqueGroup() {
 }
 
 test('live smoke: two SymNode peers discover via Bonjour and exchange a CMB', { timeout: 30_000 }, async () => {
-  const group = uniqueGroup();
+  const room = uniqueGroup();
   const weights = { focus: 2.0, issue: 1.5, intent: 1.5, motivation: 1.0, commitment: 1.5, perspective: 0.5, mood: 0.8 };
 
   const alice = new MeshAdapter({
     nodeName: 'xmesh-smoke-alice-' + process.pid,
-    group,
-    fieldWeights: weights,
+    room,
+    categoryWeights: weights,
     cognitiveProfile: 'xmesh-agent smoke test peer — alice',
   });
   const bob = new MeshAdapter({
     nodeName: 'xmesh-smoke-bob-' + process.pid,
-    group,
-    fieldWeights: weights,
+    room,
+    categoryWeights: weights,
     cognitiveProfile: 'xmesh-agent smoke test peer — bob',
   });
 

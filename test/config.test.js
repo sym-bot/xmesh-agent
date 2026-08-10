@@ -20,7 +20,7 @@ test('loadConfig: parses a minimal valid config', () => {
 name = "reviewer-01"
 
 [mesh]
-group = "xmesh-dev"
+room = "xmesh-dev"
 
 [role_weights]
 focus = 1.0
@@ -36,7 +36,7 @@ adapter = "anthropic"
 `);
   const cfg = loadConfig(p);
   assert.equal(cfg.identity.name, 'reviewer-01');
-  assert.equal(cfg.mesh.group, 'xmesh-dev');
+  assert.equal(cfg.mesh.room, 'xmesh-dev');
   assert.equal(cfg.roleWeights.issue, 2.0);
   assert.equal(cfg.model.adapter, 'anthropic');
   assert.equal(cfg.model.modelName, 'claude-opus-4-7');
@@ -48,7 +48,7 @@ test('loadConfig: rejects missing required sections', () => {
 [identity]
 name = "x"
 [mesh]
-group = "g"
+room = "g"
 [role_weights]
 focus = 1
 `);
@@ -60,7 +60,7 @@ test('loadConfig: rejects missing identity.name', () => {
 [identity]
 role = "x"
 [mesh]
-group = "g"
+room = "g"
 [role_weights]
 focus = 1
 issue = 1
@@ -80,7 +80,7 @@ test('loadConfig: rejects unsupported model adapter', () => {
 [identity]
 name = "x"
 [mesh]
-group = "g"
+room = "g"
 [role_weights]
 focus = 1
 issue = 1
@@ -100,7 +100,7 @@ test('loadConfig: accepts openai adapter', () => {
 [identity]
 name = "x"
 [mesh]
-group = "g"
+room = "g"
 [role_weights]
 focus = 1
 issue = 1
@@ -138,7 +138,7 @@ test('loadConfig: missing CAT7 weight names the field', () => {
 [identity]
 name = "p"
 [mesh]
-group = "g"
+room = "g"
 [role_weights]
 focus = 1
 issue = 1
@@ -158,7 +158,7 @@ test('loadConfig: applies defaults for optional sections', () => {
 [identity]
 name = "x"
 [mesh]
-group = "g"
+room = "g"
 [role_weights]
 focus = 1
 issue = 1

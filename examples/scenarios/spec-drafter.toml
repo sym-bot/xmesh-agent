@@ -8,7 +8,7 @@ name = "spec-drafter-01"
 role = "spec"
 
 [mesh]
-group = "xmesh-demo"
+room = "xmesh-demo"
 
 [role_weights]
 focus = 2.5

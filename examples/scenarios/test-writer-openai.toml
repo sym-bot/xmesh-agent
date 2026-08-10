@@ -6,7 +6,7 @@ name = "test-writer-02-openai"
 role = "test-writer"
 
 [mesh]
-group = "xmesh-demo"
+room = "xmesh-demo"
 
 [role_weights]
 focus = 1.2

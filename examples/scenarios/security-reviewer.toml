@@ -9,7 +9,7 @@ name = "security-reviewer-01"
 role = "auditor"
 
 [mesh]
-group = "xmesh-demo"
+room = "xmesh-demo"
 
 [role_weights]
 focus = 1.0

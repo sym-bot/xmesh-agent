@@ -65,7 +65,7 @@ npm install -g @sym-bot/xmesh-agent
 
 ### 2. Define a peer
 
-A peer is one `agent.toml` — its identity, its group, its role α-weights (what it pays attention to), and its model:
+A peer is one `agent.toml` — its identity, its room, its role α-weights (what it pays attention to), and its model:
 
 ```toml
 [identity]
@@ -73,7 +73,7 @@ name = "reviewer-01"
 role = "reviewer"
 
 [mesh]
-group = "my-team"
+room = "my-team"
 
 [role_weights]      # what this peer attends to (SVAF α)
 focus = 1.0
@@ -100,13 +100,13 @@ xmesh-agent dry-run --config path/to/reviewer-01.toml
 export OPENAI_API_KEY=sk-proj-...           # or ANTHROPIC_API_KEY, or run Ollama
 xmesh-agent run --config path/to/reviewer-01.toml   # logs "[run] xmesh-agent started", waits
 
-# from another terminal — broadcast a task into the group:
-sym observe --group my-team \
+# from another terminal — broadcast a task into the room:
+sym observe --room my-team \
   --focus "implement rate-limit middleware on /api/login" \
   --intent "draft a spec, review it, add tests"
 ```
 
-Within seconds the peer logs `model-call` then `emitted`. Add more peers (writer, test-writer) to the same group and they coordinate end-to-end — each waking on the others' responses, each running its own SVAF admission. Watch and control:
+Within seconds the peer logs `model-call` then `emitted`. Add more peers (writer, test-writer) to the same room and they coordinate end-to-end — each waking on the others' responses, each running its own SVAF admission. Watch and control:
 
 ```bash
 xmesh-agent status <peer>      # state, uptime, budget usage
@@ -149,7 +149,7 @@ A peer is the tuple **(model adapter, attach mode, role α weights)** sharing on
             │                                            │
             │  wake on admitted CMB                      │
             │   → assemble context (lineage + own +      │
-            │     group recents, token-bounded)          │
+            │     room recents, token-bounded)          │
             │   → model call                             │
             │   → safety checks (cycle / gates)          │
             │   → emit response CMB                      │

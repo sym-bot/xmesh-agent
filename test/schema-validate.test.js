@@ -41,10 +41,10 @@ test('validate: minLength violation', () => {
 
 test('validate: nested path is reported in error', () => {
   const errs = validate(
-    { mesh: { group: 42 } },
-    { type: 'object', properties: { mesh: { type: 'object', properties: { group: { type: 'string' } } } } },
+    { mesh: { room: 42 } },
+    { type: 'object', properties: { mesh: { type: 'object', properties: { room: { type: 'string' } } } } },
   );
-  assert.ok(errs.some((e) => e.startsWith('mesh.group:')), `got: ${errs.join(', ')}`);
+  assert.ok(errs.some((e) => e.startsWith('mesh.room:')), `got: ${errs.join(', ')}`);
 });
 
 test('validate: integer rejects non-integer number', () => {
@@ -81,7 +81,7 @@ test('validate: SCHEMA rejects a config with an unknown section', () => {
   const { SCHEMA } = require('../src/cli/schema.js');
   const bad = {
     identity: { name: 'p', role: 'reviewer' },
-    mesh: { group: 'g' },
+    mesh: { room: 'g' },
     role_weights: { focus: 1, issue: 1, intent: 1, motivation: 1, commitment: 1, perspective: 1, mood: 1 },
     model: { adapter: 'anthropic' },
     typo_section: { foo: 'bar' },
@@ -94,7 +94,7 @@ test('validate: SCHEMA rejects an unknown adapter enum', () => {
   const { SCHEMA } = require('../src/cli/schema.js');
   const bad = {
     identity: { name: 'p', role: 'reviewer' },
-    mesh: { group: 'g' },
+    mesh: { room: 'g' },
     role_weights: { focus: 1, issue: 1, intent: 1, motivation: 1, commitment: 1, perspective: 1, mood: 1 },
     model: { adapter: 'cohere' },
   };
