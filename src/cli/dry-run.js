@@ -25,7 +25,7 @@ async function dryRun(configPath, { out = process.stdout, err = process.stderr }
   let cfg;
   try {
     cfg = loadConfig(configPath);
-    record('load config', true, `peer=${cfg.identity.name} group=${cfg.mesh.group} adapter=${cfg.model.adapter}`);
+    record('load config', true, `peer=${cfg.identity.name} room=${cfg.mesh.room} adapter=${cfg.model.adapter}`);
   } catch (e) {
     record('load config', false, e.message);
     return { ok: false, checks };
@@ -49,8 +49,8 @@ async function dryRun(configPath, { out = process.stdout, err = process.stderr }
 
   try {
     const ccAttach = new ClaudeCodeAttach({ role: { name: cfg.identity.name } });
-    const advisory = await ccAttach.advisoryFor(cfg.mesh.group)();
-    if (advisory.ok) record('claude-code advisory', true, `group=${advisory.group} name=${advisory.nodeName}`);
+    const advisory = await ccAttach.advisoryFor(cfg.mesh.room)();
+    if (advisory.ok) record('claude-code advisory', true, `room=${advisory.room} name=${advisory.nodeName}`);
     else if (advisory.advisory) record('claude-code advisory', true, `(info) ${advisory.advisory}`);
   } catch (e) {
     record('claude-code advisory', false, e.message);

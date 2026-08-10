@@ -24,7 +24,7 @@ const SCHEMA = Object.freeze({
       type: 'object',
       additionalProperties: false,
       properties: {
-        group: { type: 'string', default: 'default', description: 'Mesh group (Bonjour service-type segment). Peers only discover within the same group.' },
+        room: { type: 'string', default: 'default', description: 'Mesh room (Bonjour service-type segment). Peers only discover within the same room.' },
         relay: { type: ['string', 'null'], description: 'Optional WebSocket relay URL for WAN mode.' },
         relay_token: { type: ['string', 'null'], description: 'Relay authentication token (or omit; read SYM_RELAY_TOKEN env).' },
       },

@@ -82,7 +82,7 @@ test('doctor: lists state totals when peer state exists', async () => {
   try {
     const { StateStore } = require('../src/core/state-store.js');
     const s = new StateStore({ peerName: 'reviewer-01', baseDir: path.join(dir, 'state') });
-    s.onRunStart({ configPath: '/x.toml', model: 'openai/gpt-4o', group: 'g' });
+    s.onRunStart({ configPath: '/x.toml', model: 'openai/gpt-4o', room: 'g' });
     s.recordStats({ cmbsEmitted: 5, cmbsSuppressed: 1, costUsdTotal: 0.05 });
     s.onRunStop({ reason: 'test' });
     const out = new SinkStream();

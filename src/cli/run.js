@@ -71,10 +71,10 @@ async function runFromConfig(configPath) {
 
   const mesh = new MeshAdapter({
     nodeName: cfg.identity.name,
-    group: cfg.mesh.group,
+    room: cfg.mesh.room,
     relay: cfg.mesh.relay,
     relayToken: cfg.mesh.relayToken,
-    fieldWeights: cfg.roleWeights,
+    categoryWeights: cfg.roleWeights,
     cognitiveProfile: `xmesh-agent peer — role ${cfg.identity.role}`,
   });
 
@@ -110,11 +110,11 @@ async function runFromConfig(configPath) {
   });
 
   const ccAttach = new ClaudeCodeAttach({ role: { name: cfg.identity.name } });
-  const advisoryCheck = ccAttach.advisoryFor(cfg.mesh.group);
+  const advisoryCheck = ccAttach.advisoryFor(cfg.mesh.room);
   const advisoryResult = await advisoryCheck();
   if (advisoryResult.ok) {
     process.stderr.write(
-      `[run] claude-code advisory: group="${advisoryResult.group}" nodeName="${advisoryResult.nodeName}" — mesh-channel compatible\n`,
+      `[run] claude-code advisory: room="${advisoryResult.room}" nodeName="${advisoryResult.nodeName}" — mesh-channel compatible\n`,
     );
   } else if (advisoryResult.advisory) {
     process.stderr.write(`[run] claude-code advisory: ${advisoryResult.advisory}\n`);
@@ -124,12 +124,12 @@ async function runFromConfig(configPath) {
   stateStore.onRunStart({
     configPath,
     model: cfg.model.adapter + '/' + cfg.model.modelName,
-    group: cfg.mesh.group,
+    room: cfg.mesh.room,
   });
 
   await loop.start();
   process.stderr.write(
-    `[run] xmesh-agent started — peer=${cfg.identity.name} group=${cfg.mesh.group} model=${cfg.model.modelName}\n`,
+    `[run] xmesh-agent started — peer=${cfg.identity.name} room=${cfg.mesh.room} model=${cfg.model.modelName}\n`,
   );
   if (stateStore.state.totals.runs > 1) {
     const t = stateStore.state.totals;
@@ -149,7 +149,7 @@ async function runFromConfig(configPath) {
     handlers: {
       status: () => ({
         peer: cfg.identity.name,
-        group: cfg.mesh.group,
+        room: cfg.mesh.room,
         model: cfg.model.modelName,
         uptimeMs: Date.now() - startedAt,
         stats: loop.stats,

@@ -30,7 +30,7 @@ async function pingSocket(sockPath) {
         conn.end();
         try {
           const r = JSON.parse(buf.split('\n')[0]);
-          resolve({ alive: r.ok, peer: r.peer, group: r.group, model: r.model, stats: r.stats });
+          resolve({ alive: r.ok, peer: r.peer, room: r.room, model: r.model, stats: r.stats });
         } catch (e) { resolve({ alive: false, reason: 'invalid response: ' + e.message }); }
       }
     });
@@ -64,14 +64,14 @@ async function doctor({ out = process.stdout, err = process.stderr } = {}) {
     out.write('\n');
   }
 
-  out.write(`trusted-keys (~/.xmesh/trusted-keys/<group>/)\n`);
-  const groups = listIfDir(trustedKeysDir());
-  if (groups.length === 0) {
-    out.write('  no trusted-key groups configured\n\n');
+  out.write(`trusted-keys (~/.xmesh/trusted-keys/<room>/)\n`);
+  const rooms = listIfDir(trustedKeysDir());
+  if (rooms.length === 0) {
+    out.write('  no trusted-key rooms configured\n\n');
   } else {
-    for (const g of groups) {
+    for (const g of rooms) {
       const trusted = listIfDir(path.join(trustedKeysDir(), g)).filter((f) => f.endsWith('.json'));
-      out.write(`  group "${g}": ${trusted.length} trusted peer(s)\n`);
+      out.write(`  room "${g}": ${trusted.length} trusted peer(s)\n`);
     }
     out.write('\n');
   }
@@ -101,7 +101,7 @@ async function doctor({ out = process.stdout, err = process.stderr } = {}) {
       const result = await pingSocket(sockPath);
       if (result.alive) {
         const s = result.stats || {};
-        out.write(`  ${peer}  ALIVE  group=${result.group} model=${result.model} emitted=${s.cmbsEmitted ?? '?'} cost=$${(s.costUsdTotal ?? 0).toFixed(6)}\n`);
+        out.write(`  ${peer}  ALIVE  room=${result.room} model=${result.model} emitted=${s.cmbsEmitted ?? '?'} cost=$${(s.costUsdTotal ?? 0).toFixed(6)}\n`);
       } else {
         out.write(`  ${peer}  STALE  ${result.reason}  ⚠ stop+remove the socket: \`rm ${sockPath}\`\n`);
       }

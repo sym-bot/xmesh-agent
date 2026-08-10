@@ -94,10 +94,10 @@ test('trustAdd: shows full fingerprint and verification advisory per CMO Q4', ()
     const kp = generateKeyPair();
     const pubB64 = kp.publicRaw.toString('base64url');
     const out = new SinkStream();
-    const code = trustAdd({ group: 'demo', peer: 'alice', publicKey: pubB64 }, { out });
+    const code = trustAdd({ room: 'demo', peer: 'alice', publicKey: pubB64 }, { out });
     assert.equal(code, 0);
     const text = out.text();
-    assert.match(text, /trusted alice in group "demo"/);
+    assert.match(text, /trusted alice in room "demo"/);
     assert.match(text, /keyprint:\s+[0-9a-f]{16}/);
     assert.match(text, new RegExp(`fingerprint:\\s+${fullFingerprintOf(kp.publicRaw)}`));
     assert.match(text, /verify this matches the peer's reported full fingerprint/);
@@ -108,22 +108,22 @@ test('trustAdd: rejects missing args with exit 2', () => {
   const out = new SinkStream();
   const code = trustAdd({}, { out });
   assert.equal(code, 2);
-  assert.match(out.text(), /require --group/);
+  assert.match(out.text(), /require --room/);
 });
 
 test('trustAdd: rejects non-32-byte public key with exit 2', () => {
   const shortKey = Buffer.from('not-a-real-key').toString('base64url');
   const out = new SinkStream();
-  const code = trustAdd({ group: 'g', peer: 'p', publicKey: shortKey }, { out });
+  const code = trustAdd({ room: 'g', peer: 'p', publicKey: shortKey }, { out });
   assert.equal(code, 2);
   assert.match(out.text(), /expected 32-byte ed25519 public key/);
 });
 
-test('trustList: prints empty group cleanly', () => {
+test('trustList: prints empty room cleanly', () => {
   const dir = tmpRuntime();
   try {
     const out = new SinkStream();
-    const code = trustList({ group: 'never-seen' }, { out });
+    const code = trustList({ room: 'never-seen' }, { out });
     assert.equal(code, 0);
     assert.match(out.text(), /no trusted keys/);
   } finally { cleanup(dir); }
@@ -134,17 +134,17 @@ test('trustList: lists trusted entries with keyprint + peer + trustedAt', () => 
   try {
     const kp = generateKeyPair();
     trustAdd(
-      { group: 'demo', peer: 'alice', publicKey: kp.publicRaw.toString('base64url') },
+      { room: 'demo', peer: 'alice', publicKey: kp.publicRaw.toString('base64url') },
       { out: new SinkStream() },
     );
     const out = new SinkStream();
-    trustList({ group: 'demo' }, { out });
+    trustList({ room: 'demo' }, { out });
     assert.match(out.text(), /[0-9a-f]{16}\s+alice/);
     assert.match(out.text(), /trusted 20\d\d-/);
   } finally { cleanup(dir); }
 });
 
-test('trustList: rejects missing --group with exit 2', () => {
+test('trustList: rejects missing --room with exit 2', () => {
   const out = new SinkStream();
   const code = trustList({}, { out });
   assert.equal(code, 2);

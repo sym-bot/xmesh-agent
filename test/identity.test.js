@@ -136,7 +136,7 @@ test('trustKey + listTrustedKeys: round-trip with fingerprint', () => {
   const dir = tmpRuntimeDir();
   try {
     const kp = generateKeyPair();
-    trustKey({ group: 'demo', peer: 'alice', publicRaw: kp.publicRaw });
+    trustKey({ room: 'demo', peer: 'alice', publicRaw: kp.publicRaw });
     const list = listTrustedKeys('demo');
     assert.equal(list.length, 1);
     assert.equal(list[0].peer, 'alice');
@@ -145,10 +145,10 @@ test('trustKey + listTrustedKeys: round-trip with fingerprint', () => {
   } finally { cleanup(dir); }
 });
 
-test('listTrustedKeys: unknown group returns empty array', () => {
+test('listTrustedKeys: unknown room returns empty array', () => {
   const dir = tmpRuntimeDir();
   try {
-    assert.deepEqual(listTrustedKeys('ghost-group'), []);
+    assert.deepEqual(listTrustedKeys('ghost-room'), []);
   } finally { cleanup(dir); }
 });
 
@@ -157,7 +157,7 @@ test('end-to-end: alice signs, bob verifies via trusted-keys pinning', () => {
   try {
     const aliceKp = generateKeyPair();
     saveKeyPair('alice', aliceKp);
-    trustKey({ group: 'demo', peer: 'alice', publicRaw: aliceKp.publicRaw });
+    trustKey({ room: 'demo', peer: 'alice', publicRaw: aliceKp.publicRaw });
 
     const envelope = {
       version: '0.3.0',

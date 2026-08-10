@@ -57,11 +57,11 @@ test('loadState: malformed JSON returns empty state (no throw)', () => {
 test('StateStore: onRunStart increments runs, sets firstSeenIso on first run only', () => {
   const base = tmpBase();
   const s = new StateStore({ peerName: 'peer-e', baseDir: base });
-  s.onRunStart({ configPath: '/a.toml', model: 'anthropic/claude-opus-4-7', group: 'g' });
+  s.onRunStart({ configPath: '/a.toml', model: 'anthropic/claude-opus-4-7', room: 'g' });
   assert.equal(s.state.totals.runs, 1);
   const firstSeen = s.state.firstSeenIso;
   assert.ok(firstSeen);
-  s.onRunStart({ configPath: '/a.toml', model: 'x', group: 'g' });
+  s.onRunStart({ configPath: '/a.toml', model: 'x', room: 'g' });
   assert.equal(s.state.totals.runs, 2);
   assert.equal(s.state.firstSeenIso, firstSeen);
 });
@@ -69,7 +69,7 @@ test('StateStore: onRunStart increments runs, sets firstSeenIso on first run onl
 test('StateStore: recordStats accumulates deltas into lifetime totals', () => {
   const base = tmpBase();
   const s = new StateStore({ peerName: 'peer-f', baseDir: base });
-  s.onRunStart({ configPath: '', model: 'x', group: 'g' });
+  s.onRunStart({ configPath: '', model: 'x', room: 'g' });
   s.recordStats({ cmbsEmitted: 3, cmbsSuppressed: 1, costUsdTotal: 0.05 });
   s.recordStats({ cmbsEmitted: 7, cmbsSuppressed: 1, costUsdTotal: 0.10 });
   assert.equal(s.state.totals.cmbsEmitted, 7);
@@ -80,7 +80,7 @@ test('StateStore: recordStats accumulates deltas into lifetime totals', () => {
 test('StateStore: multi-run totals persist across StateStore instances', () => {
   const base = tmpBase();
   const s1 = new StateStore({ peerName: 'peer-g', baseDir: base });
-  s1.onRunStart({ configPath: '', model: 'x', group: 'g' });
+  s1.onRunStart({ configPath: '', model: 'x', room: 'g' });
   s1.recordStats({ cmbsEmitted: 10, cmbsSuppressed: 2, costUsdTotal: 0.50 });
   s1.onRunStop({ reason: 'test' });
 
@@ -89,7 +89,7 @@ test('StateStore: multi-run totals persist across StateStore instances', () => {
   assert.equal(s2.state.totals.cmbsEmitted, 10);
   assert.equal(s2.state.totals.costUsdTotal, 0.50);
 
-  s2.onRunStart({ configPath: '', model: 'x', group: 'g' });
+  s2.onRunStart({ configPath: '', model: 'x', room: 'g' });
   s2.recordStats({ cmbsEmitted: 5, cmbsSuppressed: 0, costUsdTotal: 0.25 });
   assert.equal(s2.state.totals.runs, 2);
   assert.equal(s2.state.totals.cmbsEmitted, 15, '10 prior + 5 this run');
@@ -99,10 +99,10 @@ test('StateStore: multi-run totals persist across StateStore instances', () => {
 test('StateStore: decreasing stats (new run starts fresh) do not decrement totals', () => {
   const base = tmpBase();
   const s = new StateStore({ peerName: 'peer-h', baseDir: base });
-  s.onRunStart({ configPath: '', model: 'x', group: 'g' });
+  s.onRunStart({ configPath: '', model: 'x', room: 'g' });
   s.recordStats({ cmbsEmitted: 20, cmbsSuppressed: 5, costUsdTotal: 1.0 });
   s.onRunStop({ reason: 'stop' });
-  s.onRunStart({ configPath: '', model: 'x', group: 'g' });
+  s.onRunStart({ configPath: '', model: 'x', room: 'g' });
   s.recordStats({ cmbsEmitted: 0, cmbsSuppressed: 0, costUsdTotal: 0 });
   assert.equal(s.state.totals.cmbsEmitted, 20, 'lifetime total unchanged');
 });
@@ -110,7 +110,7 @@ test('StateStore: decreasing stats (new run starts fresh) do not decrement total
 test('StateStore: onRunStop records stoppedIso + reason', () => {
   const base = tmpBase();
   const s = new StateStore({ peerName: 'peer-i', baseDir: base });
-  s.onRunStart({ configPath: '', model: 'x', group: 'g' });
+  s.onRunStart({ configPath: '', model: 'x', room: 'g' });
   s.onRunStop({ reason: 'SIGTERM' });
   assert.equal(s.state.lastRun.stopReason, 'SIGTERM');
   assert.ok(s.state.lastRun.stoppedIso);

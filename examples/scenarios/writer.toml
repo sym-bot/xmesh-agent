@@ -6,7 +6,7 @@ name = "writer-01"
 role = "writer"
 
 [mesh]
-group = "xmesh-demo"
+room = "xmesh-demo"
 
 [role_weights]
 focus = 2.0

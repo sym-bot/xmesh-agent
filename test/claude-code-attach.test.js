@@ -71,7 +71,7 @@ test('ClaudeCodeAttach.preflight: reports missing mesh-channel entry', async () 
   assert.match(out.error, /no "sym-mesh-channel" MCP server/);
 });
 
-test('ClaudeCodeAttach.preflight: extracts group + nodeName from env', async () => {
+test('ClaudeCodeAttach.preflight: extracts room + nodeName from env', async () => {
   const attach = new ClaudeCodeAttach({
     role: { name: 'r' },
     configPath: '/fake/claude.json',
@@ -82,7 +82,7 @@ test('ClaudeCodeAttach.preflight: extracts group + nodeName from env', async () 
           [MCP_ENTRY_KEY]: {
             command: 'sym-mesh-channel',
             args: [],
-            env: { SYM_GROUP: 'xmesh-demo', SYM_NODE_NAME: 'claude-code-mac' },
+            env: { SYM_ROOM: 'xmesh-demo', SYM_NODE_NAME: 'claude-code-mac' },
           },
         },
       },
@@ -90,11 +90,11 @@ test('ClaudeCodeAttach.preflight: extracts group + nodeName from env', async () 
   });
   const out = await attach.preflight();
   assert.equal(out.ok, true);
-  assert.equal(out.group, 'xmesh-demo');
+  assert.equal(out.room, 'xmesh-demo');
   assert.equal(out.nodeName, 'claude-code-mac');
 });
 
-test('ClaudeCodeAttach.advisoryFor: flags group mismatch', async () => {
+test('ClaudeCodeAttach.advisoryFor: flags room mismatch', async () => {
   const attach = new ClaudeCodeAttach({
     role: { name: 'reviewer-01' },
     configPath: '/fake/claude.json',
@@ -102,7 +102,7 @@ test('ClaudeCodeAttach.advisoryFor: flags group mismatch', async () => {
     _readConfig: mockRead({
       '/fake/claude.json': {
         mcpServers: {
-          [MCP_ENTRY_KEY]: { command: 'x', env: { SYM_GROUP: 'other-group' } },
+          [MCP_ENTRY_KEY]: { command: 'x', env: { SYM_ROOM: 'other-room' } },
         },
       },
     }),
@@ -110,7 +110,7 @@ test('ClaudeCodeAttach.advisoryFor: flags group mismatch', async () => {
   const check = attach.advisoryFor('xmesh-demo');
   const out = await check();
   assert.equal(out.ok, false);
-  assert.match(out.advisory, /configured for group "other-group"/);
+  assert.match(out.advisory, /configured for room "other-room"/);
 });
 
 test('ClaudeCodeAttach.advisoryFor: flags identity collision on name', async () => {
@@ -121,7 +121,7 @@ test('ClaudeCodeAttach.advisoryFor: flags identity collision on name', async () 
     _readConfig: mockRead({
       '/fake/claude.json': {
         mcpServers: {
-          [MCP_ENTRY_KEY]: { command: 'x', env: { SYM_GROUP: 'xmesh-demo', SYM_NODE_NAME: 'claude-code-mac' } },
+          [MCP_ENTRY_KEY]: { command: 'x', env: { SYM_ROOM: 'xmesh-demo', SYM_NODE_NAME: 'claude-code-mac' } },
         },
       },
     }),
@@ -132,7 +132,7 @@ test('ClaudeCodeAttach.advisoryFor: flags identity collision on name', async () 
   assert.match(out.advisory, /identity collision/i);
 });
 
-test('ClaudeCodeAttach.advisoryFor: passes when group matches + no collision', async () => {
+test('ClaudeCodeAttach.advisoryFor: passes when room matches + no collision', async () => {
   const attach = new ClaudeCodeAttach({
     role: { name: 'reviewer-01' },
     configPath: '/fake/claude.json',
@@ -140,7 +140,7 @@ test('ClaudeCodeAttach.advisoryFor: passes when group matches + no collision', a
     _readConfig: mockRead({
       '/fake/claude.json': {
         mcpServers: {
-          [MCP_ENTRY_KEY]: { command: 'x', env: { SYM_GROUP: 'xmesh-demo', SYM_NODE_NAME: 'claude-code-mac' } },
+          [MCP_ENTRY_KEY]: { command: 'x', env: { SYM_ROOM: 'xmesh-demo', SYM_NODE_NAME: 'claude-code-mac' } },
         },
       },
     }),
@@ -148,6 +148,6 @@ test('ClaudeCodeAttach.advisoryFor: passes when group matches + no collision', a
   const check = attach.advisoryFor('xmesh-demo');
   const out = await check();
   assert.equal(out.ok, true);
-  assert.equal(out.group, 'xmesh-demo');
+  assert.equal(out.room, 'xmesh-demo');
   assert.equal(out.nodeName, 'claude-code-mac');
 });

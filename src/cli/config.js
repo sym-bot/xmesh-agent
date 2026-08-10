@@ -41,7 +41,7 @@ function loadConfig(path) {
   if (!parsed.identity.name) {
     throw new Error(
       'agent.toml [identity] requires `name` (your peer\'s unique name on the mesh)\n' +
-      '  hint: pick a stable identifier like "reviewer-01" — it must be unique within the mesh group',
+      '  hint: pick a stable identifier like "reviewer-01" — it must be unique within the mesh room',
     );
   }
   if (!parsed.model.adapter) {
@@ -73,7 +73,7 @@ function normalise(p) {
       role: p.identity.role || p.identity.name,
     },
     mesh: {
-      group: p.mesh.group || 'default',
+      room: p.mesh.room || 'default',
       relay: p.mesh.relay || null,
       relayToken: p.mesh.relay_token || null,
     },

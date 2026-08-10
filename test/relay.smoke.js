@@ -1,6 +1,6 @@
 'use strict';
 
-// WAN-relay smoke — two peers join the same group via a WebSocket relay
+// WAN-relay smoke — two peers join the same room via a WebSocket relay
 // (LAN-Bonjour disabled by using relay-only mode). Skip-gated on
 // SYM_RELAY_URL + SYM_RELAY_TOKEN env vars. Run via `npm run smoke`.
 //
@@ -24,21 +24,21 @@ test(
   'relay smoke: two peers exchange a CMB via WebSocket relay',
   { skip, timeout: 60_000 },
   async () => {
-    const group = uniqueGroup();
+    const room = uniqueGroup();
     const weights = { focus: 2.0, issue: 1.5, intent: 1.5, motivation: 1.0, commitment: 1.5, perspective: 0.5, mood: 0.8 };
 
     const alice = new MeshAdapter({
       nodeName: 'xmesh-relay-alice-' + process.pid,
-      group,
-      fieldWeights: weights,
+      room,
+      categoryWeights: weights,
       relay: RELAY_URL,
       relayToken: RELAY_TOKEN,
       cognitiveProfile: 'xmesh-agent relay smoke — alice',
     });
     const bob = new MeshAdapter({
       nodeName: 'xmesh-relay-bob-' + process.pid,
-      group,
-      fieldWeights: weights,
+      room,
+      categoryWeights: weights,
       relay: RELAY_URL,
       relayToken: RELAY_TOKEN,
       cognitiveProfile: 'xmesh-agent relay smoke — bob',
@@ -78,7 +78,7 @@ test(
       assert.equal(received[0].createdBy, alice.identity.name);
       assert.equal(received[0].categories.focus.text, 'relay smoke CMB from alice');
       process.stderr.write(
-        `[relay-smoke] ok — relay=${RELAY_URL} group=${group} received=${received.length}\n`,
+        `[relay-smoke] ok — relay=${RELAY_URL} room=${room} received=${received.length}\n`,
       );
     } finally {
       try { await alice.stop(); } catch { /* ignore */ }

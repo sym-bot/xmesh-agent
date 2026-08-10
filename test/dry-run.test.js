@@ -26,7 +26,7 @@ function baseToml(adapter, extra = '') {
 name = "dry-peer"
 
 [mesh]
-group = "dry-group"
+room = "dry-room"
 
 [role_weights]
 focus = 1
@@ -93,7 +93,7 @@ test('dryRun: flags missing SVAF field weight at load config (CAT7 completeness 
 [identity]
 name = "p"
 [mesh]
-group = "g"
+room = "g"
 [role_weights]
 focus = 1
 issue = 1
@@ -114,11 +114,11 @@ adapter = "ollama"
   assert.match(w.detail, /mood/);
 });
 
-test('dryRun: records peer/group/adapter on load-config line', async () => {
+test('dryRun: records peer/room/adapter on load-config line', async () => {
   const p = writeToml(baseToml('ollama'));
   const out = new SinkStream();
   await dryRun(p, { out, err: new SinkStream() });
   assert.match(out.text(), /peer=dry-peer/);
-  assert.match(out.text(), /group=dry-group/);
+  assert.match(out.text(), /room=dry-room/);
   assert.match(out.text(), /adapter=ollama/);
 });

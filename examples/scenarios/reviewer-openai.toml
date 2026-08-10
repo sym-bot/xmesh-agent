@@ -7,7 +7,7 @@ name = "reviewer-02-openai"
 role = "reviewer"
 
 [mesh]
-group = "xmesh-demo"
+room = "xmesh-demo"
 
 [role_weights]
 focus = 1.0

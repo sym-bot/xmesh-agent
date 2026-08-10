@@ -2,7 +2,7 @@
 
 If you're evaluating multi-agent frameworks for a real project, you'll likely look at LangGraph, CrewAI, AutoGen, and Anthropic's MCP / Claude Agent SDK alongside xmesh-agent. They solve overlapping but distinct problems. This page is honest about what xmesh-agent is, isn't, and where each alternative is the better choice.
 
-**TL;DR** — xmesh-agent is the right pick when you want **decentralised peer-to-peer coordination over an open wire protocol**, with **per-peer admission policy** and **any model + any IDE**. It is the wrong pick if you want a single supervisor agent orchestrating a fixed pipeline (use LangGraph), a quick CrewAI-style team-of-experts demo (use CrewAI), or a Microsoft-Azure-native group chat between agents (use AutoGen).
+**TL;DR** — xmesh-agent is the right pick when you want **decentralised peer-to-peer coordination over an open wire protocol**, with **per-peer admission policy** and **any model + any IDE**. It is the wrong pick if you want a single supervisor agent orchestrating a fixed pipeline (use LangGraph), a quick CrewAI-style team-of-experts demo (use CrewAI), or a Microsoft-Azure-native room chat between agents (use AutoGen).
 
 ---
 
@@ -10,15 +10,15 @@ If you're evaluating multi-agent frameworks for a real project, you'll likely lo
 
 | Property | xmesh-agent | LangGraph | CrewAI | AutoGen | MCP / Claude Agent SDK |
 |---|---|---|---|---|---|
-| **Topology** | Peer-to-peer mesh | Centralised graph (you author the DAG) | Team-of-experts (sequential or hierarchical) | Group-chat manager | Single agent + tool calls |
+| **Topology** | Peer-to-peer mesh | Centralised graph (you author the DAG) | Team-of-experts (sequential or hierarchical) | Room-chat manager | Single agent + tool calls |
 | **Wire protocol** | Open (MMP, CC-BY-4.0) | In-process (LangChain) | In-process | In-process | MCP (Anthropic-stewarded) |
 | **Model lock-in** | Any (Anthropic / OpenAI / Ollama / Mistral, more on roadmap) | Any LangChain-supported | Any LangChain-supported | Any AutoGen-supported | Any Anthropic-supported |
 | **Coordination unit** | CMB (CAT7-fielded message) over the wire | Function calls in a graph | Method calls between agents | Chat messages | Tool calls + responses |
-| **Routing** | Per-peer SVAF α weights (admission, not routing) | Edges in the graph | Pre-declared workflow | Group-chat manager decides | N/A — single agent |
+| **Routing** | Per-peer SVAF α weights (admission, not routing) | Edges in the graph | Pre-declared workflow | Room-chat manager decides | N/A — single agent |
 | **Memory model** | Per-peer remix store + lineage DAG | LangChain memory abstractions | Pydantic structures | Conversation history | Per-tool context |
 | **Cross-process** | Yes — Bonjour LAN or WebSocket relay | No (single Python process) | No (single Python process) | No (single Python process) | Process-local (MCP host ↔ MCP server) |
 | **Cross-language** | Yes — wire protocol speaks Node + Swift today, JVM/Rust roadmap | Python only | Python only | Python only | Multiple SDKs (TS, Python, …) |
-| **Best fit** | Long-running peer agents on different machines | Complex single-process workflows with deterministic routing | Rapid prototyping a sequential team | Microsoft-stack group chat | Single-agent productivity in a host |
+| **Best fit** | Long-running peer agents on different machines | Complex single-process workflows with deterministic routing | Rapid prototyping a sequential team | Microsoft-stack room chat | Single-agent productivity in a host |
 
 ---
 
@@ -60,16 +60,16 @@ Pick xmesh-agent over CrewAI when:
 
 ## When AutoGen is the better choice
 
-**AutoGen** ([github.com/microsoft/autogen](https://github.com/microsoft/autogen)) provides a "group chat" manager that orchestrates conversations between role-played agents.
+**AutoGen** ([github.com/microsoft/autogen](https://github.com/microsoft/autogen)) provides a "room chat" manager that orchestrates conversations between role-played agents.
 
 Pick AutoGen when:
 - You're on the Microsoft / Azure stack and want native integration
-- A **conversational group-chat** model fits your domain (e.g. agents debating until consensus)
+- A **conversational room-chat** model fits your domain (e.g. agents debating until consensus)
 - You want extensive observability tooling that AutoGen Studio provides
 - Your agents are happy living in one Python process
 
 Pick xmesh-agent over AutoGen when:
-- You don't want a centralised group-chat manager — peers should decide what they admit
+- You don't want a centralised room-chat manager — peers should decide what they admit
 - You need **distributed peers**, not a Python process
 - You want to keep the protocol open and not Microsoft-stewarded
 - You're not running .NET / Azure infrastructure
@@ -138,7 +138,7 @@ You can run xmesh-agent **alongside** any other framework — they don't compete
 
 - **LangGraph + xmesh-agent** — your LangGraph workflow emits a CAT7 CMB at key state transitions; xmesh-agent peers admit those CMBs and react autonomously. LangGraph keeps the deterministic core; xmesh adds the cross-process layer.
 - **CrewAI + xmesh-agent** — your CrewAI crew finalises a deliverable, then publishes a commitment-CMB on the mesh; downstream xmesh peers (e.g. a deployment peer) admit and act on it.
-- **AutoGen + xmesh-agent** — same pattern as CrewAI; AutoGen handles in-process group chat, xmesh handles cross-process broadcast.
+- **AutoGen + xmesh-agent** — same pattern as CrewAI; AutoGen handles in-process room chat, xmesh handles cross-process broadcast.
 - **MCP + xmesh-agent** — install `@sym-bot/mesh-channel` MCP server; your Claude Code session becomes a mesh peer alongside `xmesh-agent` headless peers.
 
 There's no "rip and replace" — start by adding one xmesh-agent peer to whatever you have today and see if the per-peer admission model fits your problem.

@@ -58,7 +58,7 @@ class StateStore {
     this.state = loadState(peerName, baseDir);
   }
 
-  onRunStart({ configPath, model, group, startedIso }) {
+  onRunStart({ configPath, model, room, startedIso }) {
     const now = startedIso || new Date().toISOString();
     if (!this.state.firstSeenIso) this.state.firstSeenIso = now;
     this.state.totals.runs += 1;
@@ -67,7 +67,7 @@ class StateStore {
       stoppedIso: null,
       configPath,
       model,
-      group,
+      room,
       cmbsEmitted: 0,
       cmbsSuppressed: 0,
       costUsdRun: 0,

@@ -4,14 +4,14 @@ The vocabulary you need to understand what xmesh-agent does and why.
 
 ---
 
-## Mesh, peer, group
+## Mesh, peer, room
 
 A **mesh** is a set of agent processes that talk to each other directly via the **Mesh Memory Protocol** (MMP). Each process is a **peer** — it has its own identity, its own memory store, its own SVAF admission weights. There is no central coordinator.
 
-Peers are organised into **groups**. A group is a logical scope — peers in `xmesh-demo` only see CMBs from other peers in `xmesh-demo`. Bonjour service-type isolation enforces this on the LAN; relay token isolation enforces it on WAN.
+Peers are organised into **rooms**. A room is a logical scope — peers in `xmesh-demo` only see CMBs from other peers in `xmesh-demo`. Bonjour service-type isolation enforces this on the LAN; relay token isolation enforces it on WAN.
 
 ```
-        group: my-team
+        room: my-team
    ┌─────────────────────┐
    │   peer A   peer B   │
    │       \   /         │
@@ -25,7 +25,7 @@ Peers are organised into **groups**. A group is a logical scope — peers in `xm
 
 A **CMB** is a structured message — the unit of exchange between peers. Every CMB carries:
 
-- **CAT7 fields** (see below) — the semantic payload
+- **CAT7 categories** (see below) — the semantic payload
 - A **content hash** — content-addressable identity
 - **Lineage** — pointers to ancestor CMBs that this one was derived from
 - A **createdBy** — the originating peer
@@ -106,9 +106,9 @@ What every xmesh-agent peer does, on repeat:
 1. **Wake** when SVAF admits a peer's CMB into local memory
 2. **Check** wake-budget — am I within rate limits?
 3. **Check** circuit breaker — has the model been failing?
-4. **Assemble context** — admitted CMB + lineage ancestors + own recent CMBs + group recent CMBs, truncated to fit the model's context window
+4. **Assemble context** — admitted CMB + lineage ancestors + own recent CMBs + room recent CMBs, truncated to fit the model's context window
 5. **Call model** — send the context, ask for a response
-6. **Parse** the model's tool-use response into CAT7 fields
+6. **Parse** the model's tool-use response into CAT7 categories
 7. **Check** cycle detection — would this response create an infinite loop?
 8. **Check** approval gates — does any field contain a dangerous pattern (`git push`, `.env`, etc.)?
 9. **Emit** the response CMB on the mesh — broadcast (default) or targeted to originator
@@ -126,7 +126,7 @@ Two distinct properties of an xmesh mesh:
 
 **Collective intelligence** — each peer's α weights filter what it admits, so admitting a CMB is a *decision* not a *delivery*. Aligned peers (similar α) converge on the same memory state; divergent peers stay sovereign. This is the cognition-level property.
 
-Both are required for the canonical claim "agent-to-agent mesh for collective intelligence." Wire duplex without per-peer admission = a chat group. Per-peer admission without wire duplex = isolated agents polling for updates.
+Both are required for the canonical claim "agent-to-agent mesh for collective intelligence." Wire duplex without per-peer admission = a chat room. Per-peer admission without wire duplex = isolated agents polling for updates.
 
 ---
 
@@ -134,7 +134,7 @@ Both are required for the canonical claim "agent-to-agent mesh for collective in
 
 **Today (Phase 1):** every peer has a name (`SYM_NODE_NAME`) but identity is self-declared. ed25519 keypairs can be generated (`xmesh-agent keygen`) and stored locally, but the wire path doesn't yet sign or verify CMBs.
 
-**Phase 2 (next major):** wire-signed CMBs. Every CMB carries an ed25519 signature over its content hash. Receivers verify against pinned public keys before admission. Three admission modes per group: `tofu` (trust-on-first-use), `strict` (pre-loaded keys only), `open` (legacy interop). See [`ROADMAP.md`](../ROADMAP.md).
+**Phase 2 (next major):** wire-signed CMBs. Every CMB carries an ed25519 signature over its content hash. Receivers verify against pinned public keys before admission. Three admission modes per room: `tofu` (trust-on-first-use), `strict` (pre-loaded keys only), `open` (legacy interop). See [`ROADMAP.md`](../ROADMAP.md).
 
 ---
 
@@ -143,14 +143,14 @@ Both are required for the canonical claim "agent-to-agent mesh for collective in
 | Word | What it means here |
 |---|---|
 | Peer | One xmesh-agent process with its own identity + memory + SVAF |
-| Group | Logical scope — peers in different groups don't see each other |
+| Room | Logical scope — peers in different rooms don't see each other |
 | CMB | Cognitive Memory Block — the unit of exchange |
 | CAT7 | The 7-field schema of every CMB |
 | SVAF | Per-field admission policy on the receiver |
 | α (alpha) weights | The per-field priorities that drive SVAF |
 | Lineage | The DAG of ancestor CMBs for a given response |
 | MMP | Mesh Memory Protocol — the wire format |
-| Mesh | The set of all peers in a group |
+| Mesh | The set of all peers in a room |
 | Wake | When a peer's SVAF admits a CMB and the loop fires |
 | Admission | Per-field decision to accept a CMB into local memory |
 | Remix | Storing an admitted CMB with lineage back to its parents |

@@ -17,7 +17,7 @@ class InMemoryMesh extends EventEmitter {
     this._cmbSeq = 0;
   }
 
-  makeNode(name, { weights, group = 'demo' } = {}) {
+  makeNode(name, { weights, room = 'demo' } = {}) {
     const self = this;
     const node = new EventEmitter();
     node.name = name;
@@ -69,7 +69,7 @@ class InMemoryMesh extends EventEmitter {
     };
     node.recall = () => Array.from(self.cmbStore.values());
     node.weights = weights || {};
-    node.group = group;
+    node.room = room;
     return node;
   }
 }
@@ -77,8 +77,8 @@ class InMemoryMesh extends EventEmitter {
 function makePeer(bus, name, weights, scriptedResponses) {
   const mesh = new MeshAdapter({
     nodeName: name,
-    group: 'demo',
-    fieldWeights: weights,
+    room: 'demo',
+    categoryWeights: weights,
     _nodeFactory: () => bus.makeNode(name, { weights }),
   });
   const model = {

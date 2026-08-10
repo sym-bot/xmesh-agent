@@ -43,9 +43,9 @@ function fingerprint(peerName, { out = process.stdout } = {}) {
   return 0;
 }
 
-function trustAdd({ group, peer, publicKey }, { out = process.stderr } = {}) {
-  if (!group || !peer || !publicKey) {
-    out.write('trust add: require --group <group> --peer <peer-name> --public-key <base64url>\n');
+function trustAdd({ room, peer, publicKey }, { out = process.stderr } = {}) {
+  if (!room || !peer || !publicKey) {
+    out.write('trust add: require --room <room> --peer <peer-name> --public-key <base64url>\n');
     return 2;
   }
   let raw;
@@ -57,22 +57,22 @@ function trustAdd({ group, peer, publicKey }, { out = process.stderr } = {}) {
   }
   const keyprint = fingerprintOf(raw);
   const full = fullFingerprintOf(raw);
-  trustKey({ group, peer, publicRaw: raw, fingerprint: keyprint });
-  out.write(`trusted ${peer} in group "${group}"\n`);
+  trustKey({ room, peer, publicRaw: raw, fingerprint: keyprint });
+  out.write(`trusted ${peer} in room "${room}"\n`);
   out.write(`  keyprint:    ${keyprint}\n`);
   out.write(`  fingerprint: ${full}\n`);
   out.write(`  ^ verify this matches the peer's reported full fingerprint before sharing CMBs.\n`);
   return 0;
 }
 
-function trustList({ group }, { out = process.stdout } = {}) {
-  if (!group) {
-    out.write('trust list: require --group <group>\n');
+function trustList({ room }, { out = process.stdout } = {}) {
+  if (!room) {
+    out.write('trust list: require --room <room>\n');
     return 2;
   }
-  const entries = listTrustedKeys(group);
+  const entries = listTrustedKeys(room);
   if (entries.length === 0) {
-    out.write(`no trusted keys for group "${group}"\n`);
+    out.write(`no trusted keys for room "${room}"\n`);
     return 0;
   }
   for (const e of entries) {

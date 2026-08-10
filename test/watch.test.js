@@ -37,7 +37,7 @@ test('formatRow: alive peer renders all columns', () => {
   const row = formatRow({
     name: 'reviewer-01',
     status: 'alive',
-    group: 'demo',
+    room: 'demo',
     model: 'gpt-4o-mini',
     uptimeMs: 90_000,
     emitted: 5,
@@ -76,7 +76,7 @@ test('formatRow: error peer renders ERROR marker', () => {
 
 test('formatRow: open breaker rendered (yellow but coloring off here)', () => {
   const row = formatRow({
-    name: 'p', status: 'alive', group: 'g', model: 'm', uptimeMs: 1000,
+    name: 'p', status: 'alive', room: 'g', model: 'm', uptimeMs: 1000,
     emitted: 0, suppressed: 0, cost: 0, budget: {}, breaker: 'open',
   }, { color: false });
   assert.match(row, /open/);
@@ -84,7 +84,7 @@ test('formatRow: open breaker rendered (yellow but coloring off here)', () => {
 
 test('formatHeader: column titles present', () => {
   const h = formatHeader({ color: false });
-  for (const col of ['PEER', 'MODEL', 'GROUP', 'UPTIME', 'CMBs', 'COST', 'BUDGET', 'BREAKER']) {
+  for (const col of ['PEER', 'MODEL', 'ROOM', 'UPTIME', 'CMBs', 'COST', 'BUDGET', 'BREAKER']) {
     assert.ok(h.includes(col), `missing column: ${col}`);
   }
 });

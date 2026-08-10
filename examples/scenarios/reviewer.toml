@@ -6,7 +6,7 @@ name = "reviewer-01"
 role = "reviewer"
 
 [mesh]
-group = "xmesh-demo"
+room = "xmesh-demo"
 
 [role_weights]
 focus = 1.0

@@ -38,7 +38,7 @@ async function pollPeer(name) {
     return {
       name,
       status: 'alive',
-      group: res.group,
+      room: res.room,
       model: res.model,
       uptimeMs: res.uptimeMs,
       emitted: res.stats?.cmbsEmitted ?? 0,
@@ -67,7 +67,7 @@ function formatRow(r, opts = {}) {
   return [
     `${c(ANSI.bold)}${pad(r.name, 28)}${c(ANSI.reset)}`,
     `${c(ANSI.cyan)}${pad(r.model || '?', 32)}${c(ANSI.reset)}`,
-    pad(r.group || '?', 18),
+    pad(r.room || '?', 18),
     pad(uptime, 8),
     pad(`E${r.emitted}/S${r.suppressed}`, 10),
     pad(`$${r.cost.toFixed(6)}`, 12),
@@ -91,7 +91,7 @@ function formatHeader(opts = {}) {
   return [
     `${c(ANSI.dim)}${pad('PEER', 28)}`,
     pad('MODEL', 32),
-    pad('GROUP', 18),
+    pad('ROOM', 18),
     pad('UPTIME', 8),
     pad('CMBs', 10),
     pad('COST', 12),
