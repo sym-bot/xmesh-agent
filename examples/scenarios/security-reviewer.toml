@@ -28,7 +28,7 @@ max_tokens_per_call = 1024
 [context]
 k_lineage = 5     # deeper lineage walk — security trail matters
 n_own = 5
-n_group = 15      # see more group context for cross-cutting concerns
+n_room = 15      # see more room context for cross-cutting concerns
 max_context_tokens = 12000
 
 [budget]

@@ -26,7 +26,7 @@ max_tokens_per_call = 1024
 [context]
 k_lineage = 3
 n_own = 5
-n_group = 10
+n_room = 10
 max_context_tokens = 8000
 
 [budget]

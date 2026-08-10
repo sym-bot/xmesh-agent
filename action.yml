@@ -22,10 +22,14 @@ inputs:
     description: 'Vendor-specific model name when scaffolding. Ignored if config is provided.'
     required: false
     default: ''
-  group:
-    description: 'Mesh group name when scaffolding. Ignored if config is provided.'
+  room:
+    description: 'Mesh room name when scaffolding. Ignored if config is provided.'
     required: false
     default: 'xmesh-ci'
+  group:
+    description: 'RETIRED — renamed to `room` in 0.3.3. Setting it fails the run rather than being ignored.'
+    required: false
+    default: ''
   peer-name:
     description: 'Peer name when scaffolding. Defaults to <role>-<run-id>. Ignored if config is provided.'
     required: false
@@ -84,6 +88,10 @@ runs:
         OPENAI_API_KEY: ${{ inputs.openai-api-key }}
       run: |
         set -euo pipefail
+        if [ -n "${{ inputs.group }}" ]; then
+          echo "::error::input 'group' was renamed to 'room' in xmesh-agent 0.3.3. Change 'group:' to 'room:' in your workflow. Failing rather than ignoring it, because an ignored setting is how peers silently landed in the wrong room."
+          exit 1
+        fi
         if [ -n "${{ inputs.config }}" ]; then
           CONFIG_PATH="${{ inputs.config }}"
           if [ ! -f "$CONFIG_PATH" ]; then
@@ -103,7 +111,7 @@ runs:
           xmesh-agent init "$PEER_NAME" \
             --role "${{ inputs.role }}" \
             --adapter "${{ inputs.adapter }}" \
-            --group "${{ inputs.group }}" \
+            --room "${{ inputs.room }}" \
             --cost-cap "${{ inputs.cost-cap-usd }}" \
             $MODEL_FLAG \
             --out "${PEER_NAME}.toml"

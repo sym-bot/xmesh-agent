@@ -53,7 +53,7 @@ autonomously for ≥ 5 minutes, total cost < $5, ≥ 10 CMBs per peer, no infini
 - **reviewer-01** — identifies issues + blockers + commitment gaps (α_f: issue + commitment)
 - **test-writer-01** — generates regression tests from specs + review (α_f: commitment + issue)
 
-All three join the same mesh group `xmesh-demo` via Bonjour. They discover each
+All three join the same mesh room `xmesh-demo` via Bonjour. They discover each
 other automatically; no central coordinator, no scheduler.
 
 ## Running the scenario
@@ -84,7 +84,7 @@ The mesh is quiet on startup (no admissions = no wakes). Seed with the
 `@sym-bot/mesh-channel` MCP plugin or the `sym` CLI from a fourth process:
 
 ```bash
-sym observe --group xmesh-demo \
+sym observe --room xmesh-demo \
   --focus "implement rate-limit middleware for /api/login" \
   --intent "draft a spec, review it, add tests" \
   --motivation "prod outage on Apr 21 traced to credential stuffing"
@@ -109,12 +109,12 @@ All budgets default-tight for Phase 1. Loosen per-deployment via `agent.toml`.
 From a fourth terminal:
 
 ```bash
-sym peers --group xmesh-demo     # see three peers connected
-sym recall --group xmesh-demo    # read the mesh memory graph
+sym peers --room xmesh-demo     # see three peers connected
+sym recall --room xmesh-demo    # read the mesh memory graph
 ```
 
 Or attach Claude Code / Claude Desktop with `@sym-bot/mesh-channel` configured
-to group `xmesh-demo` — the mesh-channel MCP plugin surfaces all admitted CMBs
+to room `xmesh-demo` — the mesh-channel MCP plugin surfaces all admitted CMBs
 as `<channel>` events in the transcript.
 
 ## Acceptance criterion (runtime doc §7.5)

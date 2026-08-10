@@ -55,28 +55,28 @@ class ClaudeCodeAttach {
         error: `Claude config has no "${MCP_ENTRY_KEY}" MCP server entry; install @sym-bot/mesh-channel first`,
       };
     }
-    const entryGroup = entry.env?.SYM_ROOM;
+    const entryRoom = entry.env?.SYM_ROOM;
     const entryName = entry.env?.SYM_NODE_NAME;
     return {
       ok: true,
       configPath: resolved,
-      room: entryGroup || 'default',
+      room: entryRoom || 'default',
       nodeName: entryName || null,
       cmd: entry.command,
       args: entry.args || [],
     };
   }
 
-  advisoryFor(meshGroup) {
+  advisoryFor(meshRoom) {
     return async () => {
       const pre = await this.preflight();
       if (!pre.ok) return { ok: false, advisory: pre.error };
-      if (pre.room !== meshGroup) {
+      if (pre.room !== meshRoom) {
         return {
           ok: false,
           advisory:
             `Claude Code mesh-channel is configured for room "${pre.room}" ` +
-            `but this xmesh-agent peer is on room "${meshGroup}". ` +
+            `but this xmesh-agent peer is on room "${meshRoom}". ` +
             `Update SYM_ROOM in ${pre.configPath} [mcp-servers.${MCP_ENTRY_KEY}.env] to match.`,
         };
       }

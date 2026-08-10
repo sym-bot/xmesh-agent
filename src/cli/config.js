@@ -88,7 +88,7 @@ function normalise(p) {
     context: {
       kLineage: p.context?.k_lineage ?? 3,
       nOwn: p.context?.n_own ?? 5,
-      nGroup: p.context?.n_group ?? 10,
+      nRoom: p.context?.n_room ?? 10,
       maxContextTokens: p.context?.max_context_tokens ?? 8000,
     },
     budget: {

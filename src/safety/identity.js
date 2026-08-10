@@ -120,8 +120,8 @@ function verifyEnvelope(envelope, signatureB64, publicKey) {
 }
 
 function trustKey({ room, peer, publicRaw, fingerprint, baseDir = defaultTrustDir() }) {
-  const groupDir = path.join(baseDir, room);
-  fs.mkdirSync(groupDir, { recursive: true });
+  const roomDir = path.join(baseDir, room);
+  fs.mkdirSync(roomDir, { recursive: true });
   const out = {
     peer,
     room,
@@ -130,16 +130,16 @@ function trustKey({ room, peer, publicRaw, fingerprint, baseDir = defaultTrustDi
     publicKeyBase64Url: publicRaw.toString('base64url'),
     trustedAt: new Date().toISOString(),
   };
-  fs.writeFileSync(path.join(groupDir, `${peer}.json`), JSON.stringify(out, null, 2));
+  fs.writeFileSync(path.join(roomDir, `${peer}.json`), JSON.stringify(out, null, 2));
   return out;
 }
 
 function listTrustedKeys(room, baseDir = defaultTrustDir()) {
-  const groupDir = path.join(baseDir, room);
-  if (!fs.existsSync(groupDir)) return [];
-  return fs.readdirSync(groupDir)
+  const roomDir = path.join(baseDir, room);
+  if (!fs.existsSync(roomDir)) return [];
+  return fs.readdirSync(roomDir)
     .filter((f) => f.endsWith('.json'))
-    .map((f) => JSON.parse(fs.readFileSync(path.join(groupDir, f), 'utf8')));
+    .map((f) => JSON.parse(fs.readFileSync(path.join(roomDir, f), 'utf8')));
 }
 
 module.exports = {

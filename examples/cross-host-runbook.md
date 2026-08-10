@@ -1,6 +1,6 @@
 # Cross-host verification runbook
 
-Runtime doc §7.2 acceptance — Mac peer + Win peer on the same group exchange
+Runtime doc §7.2 acceptance — Mac peer + Win peer on the same room exchange
 CMBs both ways. This is a manual runbook; run it before tagging a release
 that will ship to external users.
 
@@ -19,16 +19,16 @@ cd xmesh-agent
 npm install
 ```
 
-## Step 1 — unique group name for this run
+## Step 1 — unique room name for this run
 
-Pick a timestamped group name so it does not collide with any running peer.
+Pick a timestamped room name so it does not collide with any running peer.
 
 ```bash
-export XMESH_SMOKE_GROUP=xmesh-xhost-$(date +%Y%m%d%H%M%S)
-echo "using group: $XMESH_SMOKE_GROUP"
+export XMESH_SMOKE_ROOM=xmesh-xhost-$(date +%Y%m%d%H%M%S)
+echo "using room: $XMESH_SMOKE_ROOM"
 ```
 
-Communicate the group name to the second machine operator.
+Communicate the room name to the second machine operator.
 
 ## Step 2 — start Alice on Mac
 
@@ -40,7 +40,7 @@ name = "xhost-alice"
 role = "verifier"
 
 [mesh]
-group = "${XMESH_SMOKE_GROUP}"
+room = "${XMESH_SMOKE_ROOM}"
 
 [role_weights]
 focus = 1.5
@@ -69,14 +69,14 @@ node src/cli/index.js run --config /tmp/alice.toml
 ```
 
 Keep this terminal open. Expect log lines:
-- `[run] xmesh-agent started — peer=xhost-alice group=xmesh-xhost-<ts>`
+- `[run] xmesh-agent started — peer=xhost-alice room=xmesh-xhost-<ts>`
 - `[run] ipc socket: <home>/.xmesh-agent/xhost-alice.sock`
 
 ## Step 3 — start Bob on Windows (or second Mac)
 
 ```bash
 # Windows (Git Bash or WSL) / second Mac
-export XMESH_SMOKE_GROUP=xmesh-xhost-<same-as-step-1>
+export XMESH_SMOKE_ROOM=xmesh-xhost-<same-as-step-1>
 export ANTHROPIC_API_KEY=sk-ant-...
 
 # Same alice.toml but with:
@@ -100,7 +100,7 @@ should report both peers in its peer list. Check via running a third terminal
 with `@sym-bot/sym`'s peer CLI:
 
 ```bash
-npx --package=@sym-bot/sym -- sym peers --group "$XMESH_SMOKE_GROUP"
+npx --package=@sym-bot/sym -- sym peers --room "$XMESH_SMOKE_ROOM"
 ```
 
 Expected output: both `xhost-alice` and `xhost-bob` listed.
@@ -112,7 +112,7 @@ From a third process on either machine:
 ```bash
 npx --package=@sym-bot/mesh-channel -- sym-mesh-channel init --project /tmp
 # OR, if you have sym CLI:
-npx --package=@sym-bot/sym -- sym observe --group "$XMESH_SMOKE_GROUP" \
+npx --package=@sym-bot/sym -- sym observe --room "$XMESH_SMOKE_ROOM" \
   --focus "cross-host verification ping" \
   --intent "verify duplex" \
   --motivation "pre-release runbook"
@@ -153,13 +153,17 @@ If LAN Bonjour is not available (different networks), add to each TOML:
 
 ```toml
 [mesh]
-group = "xmesh-xhost-<ts>"
+room = "xmesh-xhost-<ts>"
 relay = "wss://sym-relay.onrender.com"
 relay_token = "..."   # or env SYM_RELAY_TOKEN
 ```
 
-The rest of the runbook is identical. Verify by checking
-`https://sym-relay.onrender.com/admin/groups` shows both peers connected.
+The rest of the runbook is identical. Verify with `sym peers --room` from Step 3
+— it lists peers reached through the relay exactly as it does on the LAN.
+
+There is no relay-side peer listing to check. `sym-relay` exposes `/health` and
+nothing else that reports membership: the relay forwards frames and does not
+track who is in which room. Verification is therefore always peer-side.
 
 ### Automated WAN smoke (single-machine)
 
@@ -172,9 +176,9 @@ export SYM_RELAY_TOKEN=...
 npm run smoke   # includes test/relay.smoke.js — skips when env vars absent
 ```
 
-Asserts: two peers in the same group discover through the relay within 30s,
+Asserts: two peers in the same room discover through the relay within 30s,
 exchange a CAT7 CMB within 20s, shut down cleanly. Fails loudly if the
-relay is unreachable, tokens are wrong, or group isolation is broken.
+relay is unreachable, tokens are wrong, or room isolation is broken.
 
 ## Acceptance criterion
 

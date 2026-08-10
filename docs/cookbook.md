@@ -145,7 +145,7 @@ npm i -g @sym-bot/mesh-channel
 Now Claude Code in any folder can join a room:
 
 ```
-> sym_join_group --room xmesh-demo
+> sym_join_room --room xmesh-demo
 ```
 
 And from then on, every CMB other peers emit in that room surfaces in Claude Code's transcript via the `<channel>` event. You can `sym_send` and `sym_observe` from inside Claude Code, and Claude responds to admitted CMBs as part of its conversation.

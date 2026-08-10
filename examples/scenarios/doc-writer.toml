@@ -28,7 +28,7 @@ max_tokens_per_call = 2048   # higher — docs are longer than spec / review CMB
 [context]
 k_lineage = 4
 n_own = 5
-n_group = 10
+n_room = 10
 max_context_tokens = 12000
 
 [budget]

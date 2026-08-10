@@ -55,7 +55,7 @@ function buildToml({ peerName, role, room, adapter, modelName, costCap }) {
   lines.push('[context]');
   lines.push('k_lineage = 3');
   lines.push('n_own = 5');
-  lines.push('n_group = 10');
+  lines.push('n_room = 10');
   lines.push('max_context_tokens = 8000');
   lines.push('');
   lines.push('[budget]');
